@@ -3,97 +3,97 @@ window.addEventListener("load", () => {
         .then(r => { return r.json() })
         .then(roomPlan => {
             let room: IRoom = <IRoom>roomPlan;
+            init(room);
         });
-
-    new testing();
-    
-    /*let rect1 = SVGHelper.NewRect(30, 20);
-    let rect2 = SVGHelper.NewRect(30, 20);
-    let intSvg = new InteractiveSVG();
-    intSvg.addElement(rect1, {x: 10, y: 40});
-    intSvg.addElement(rect2, {x: 136, y: 60});
-
-    document.body.appendChild(intSvg.wrapper);*/
 });
 
-class testing {
-    svg: SVGElement;
-    rect: SVGElement;
-    moving = false;
+function init(roomPlan: IRoom) {
+    console.log(roomPlan);
+    const intSvg = new InteractiveSVG(roomPlan.width, roomPlan.height)
+    const testElm1 = new InteractiveSVGElement(SVGHelper.NewRect(50, 50), {x: 620, y: 134}, true)
+    const testElm2 = new InteractiveSVGElement(SVGHelper.NewRect(50, 50), {x: 150, y: 400}, true)
+    const testElm3 = new InteractiveSVGElement(SVGHelper.NewRect(50, 50), {x: 250, y: 200}, true)
+    intSvg.AddElement(testElm1);
+    intSvg.AddElement(testElm2);
+    intSvg.AddElement(testElm3);
+    document.body.appendChild(intSvg.Wrapper);
+}
 
-    x: number = 0;
-    y: number = 0;
-    
-    constructor() {
-        let svg = SVGHelper.NewSVG(500, 500);
-        let rect = SVGHelper.NewRect(50, 10);
-        svg.appendChild(rect);
-        let wrapper = document.getElementById("wrapper")
-        if (wrapper != null) {
-            wrapper.appendChild(svg);
-        }
+class InteractiveSVGElement {
+    public SvgElement: SVGElement;
+    private pos: IPoint = { x: 0, y: 0 };
+    public Moveable: boolean = false;
+    public MousePos: IPoint | undefined; // for testing
 
-        this.svg = svg;
-        this.rect = rect;
+    set Position(pos: IPoint) {
+        SVGHelper.SetPosition(this.SvgElement, pos.x, pos.y);
+        this.pos = pos;
+    }
+    get Position(): IPoint { return this.pos };
 
-        rect.addEventListener("mousedown", (e) => {
-            this.moving = true;
-        });
+    constructor(element: SVGElement, position?: IPoint, moveable?: boolean) {
+        this.SvgElement = element;
+        if (moveable) this.Moveable = moveable;
+        if (position) this.Position = position;
+        else this.Position = { x: 0, y: 0 };
 
-        svg.addEventListener("mouseup", (e) => {
-            this.moving = false;
-        });
-
-        svg.addEventListener("mousemove", (e) => {
-            this.x = e.layerX;
-            this.y = e.layerY;
-            if (this.moving) {
-                rect.setAttribute("x", this.x + "px")
-                rect.setAttribute("y", this.y + "px")
-            }
+        this.SvgElement.addEventListener("mousemove", (e) => {
+            this.MousePos = { x: (e.layerX - this.pos.x), y: (e.layerY - this.pos.y) };
         });
     }
 }
-
 
 class InteractiveSVG {
-    public wrapper: HTMLElement;
+    public Wrapper: HTMLElement;
     private svg: SVGElement;
+    private width: number = 500;
+    private height: number = 500;
+    private elements: InteractiveSVGElement[] = [];
+    private mousePos: IPoint | undefined;
+    
+    private moving: InteractiveSVGElement | undefined;
+    private mouseOffset: IPoint | undefined;
 
-    constructor(width: number = 500, height: number = 500) {
-        this.wrapper = document.createElement("div");
-        this.wrapper.id = "InteractiveSVGWrapper";
-        this.wrapper.style.position = "absolute"; // subject to change
+    constructor(width: number, height: number) {
+        this.width, this.height = width, height;
+        this.Wrapper = document.createElement("div");
+        this.Wrapper.id = "InteractiveSVGWrapper";
         this.svg = SVGHelper.NewSVG(width, height)
-        this.wrapper.appendChild(this.svg);
+        this.Wrapper.appendChild(this.svg);
+
+        this.svg.addEventListener("mousemove", (e: MouseEvent) => {
+            this.mousePos = { x: e.layerX, y: e.layerY };
+            if (this.moving) {
+                if (this.mouseOffset) {
+                    const newX = this.mousePos.x - this.mouseOffset.x;
+                    const newY = this.mousePos.y - this.mouseOffset.y;
+                    this.moving.Position = { x: newX, y: newY };
+                }
+            }
+        });
+        this.svg.addEventListener("mouseup", (e: MouseEvent) => {
+            this.moving = undefined;
+            this.mouseOffset = undefined;
+        });
     }
 
-    addElement(element: SVGElement, position: IPoint, moveable: boolean = true): void {
-        this.svg.appendChild(element);
-        SVGHelper.SetLocation(element, position.x, position.y);
-        if (moveable) {
-            this.registerMoveableElement(element);
-        }
+    public AddElement(element: InteractiveSVGElement): void {
+        this.svg.appendChild(element.SvgElement)
+        if (element.Moveable) this.registerMoveableElement(element);
+        this.elements.push(element);
     }
 
-    private registerMoveableElement(element: SVGElement) {
-        element.addEventListener("mousedown", (e) => this.movementHandler(e));
-    }
-
-    private movementHandler(e: MouseEvent) {
-        console.log(e);
+    private registerMoveableElement(element: InteractiveSVGElement) {
+        element.SvgElement.addEventListener("mousedown", (e: MouseEvent) => {
+            this.moving = element;
+            const elmPos = element.Position;
+            this.mouseOffset = { x: (e.layerX - elmPos.x), y: (e.layerY - elmPos.y) }
+        });
     }
 }
 
-class MoveableSVGElement {
-    element: SVGElement;
-    posistion: IPoint;
-
-    constructor(element: SVGElement, posistion: IPoint) {
-        this.element = element;
-        this.posistion = posistion;
-        element.addEventListener("mousedown", (e) => );
-    }
+class RoomVisualizer {
+    // takes IRoom as input and uses InteractiveSVG to visulize room
 }
 
 interface IPoint {
@@ -104,25 +104,31 @@ interface IPoint {
 interface ITable {
     width: number,
     height: number,
-    location: IPoint;
+    position: IPoint;
+}
+
+interface IWall {
+    to: IPoint,
+    from: IPoint
 }
 
 interface IRoom {
     width: number,
     height: number,
-    tables: ITable[]
+    tables: ITable[],
+    walls: IWall[]
 }
 
 class SVGHelper {
     private static readonly svgNS = "http://www.w3.org/2000/svg";
 
     public static NewSVG(width: number, height: number): SVGElement {
-        let svg = document.createElementNS(this.svgNS, "svg") as SVGElement;
+        const svg = document.createElementNS(this.svgNS, "svg") as SVGElement;
         this.SetSize(svg, width, height);
         return svg;
     }
     public static NewRect(width: number, height: number): SVGRectElement {
-        let rect = document.createElementNS(this.svgNS, "rect") as SVGRectElement;
+        const rect = document.createElementNS(this.svgNS, "rect") as SVGRectElement;
         this.SetSize(rect, width, height);
         return rect;
     }
@@ -130,7 +136,7 @@ class SVGHelper {
         element.setAttribute("width", w + "px");
         element.setAttribute("height", h + "px");
     }
-    public static SetLocation(element: SVGElement, x: number, y: number) {
+    public static SetPosition(element: SVGElement, x: number, y: number) {
         element.setAttribute("x", x + "px");
         element.setAttribute("y", y + "px");
     }

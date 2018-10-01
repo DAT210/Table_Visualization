@@ -1,7 +1,13 @@
 svg {
-    background-color: cadetblue;
+    background-color: whitesmoke;
+    border: 1px solid gray;
 }
 
-#wrapper {
+body {
+    display: flex;
+    justify-content: center;
+}
+
+#InteractiveSVGWrapper {
     position: absolute;
 }

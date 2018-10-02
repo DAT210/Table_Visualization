@@ -15,10 +15,7 @@ EXPOSE 80
 
 # Define environment variable
 ENV NAME World
-ENV POSTGRES_URL="127.0.0.1:5432"
-ENV POSTGRES_USER="postgres"
-ENV POSTGRES_PW="dbpw"
-ENV POSTGRES_DB="test"
+
 
 # Run app.py when the container launches
 CMD ["python", "app.py", "database.py"]

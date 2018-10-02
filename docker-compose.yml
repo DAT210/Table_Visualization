@@ -10,15 +10,20 @@ services:
         environment:                                                            
             - POSTGRES_USER=postgres
             - POSTGRES_PASSWORD=dbpw
-            - POSTGRES_DB=test
+            - POSTGRES_DB=mydatabase2
         networks:
             - postgresnet
         ports: #make db accessible locally
-            - '5432:5432'
+            - 5432
 
     app:
         build: .
         hostname: app
+        environment:
+          - POSTGRES_URL="127.0.0.1:5432"
+          - POSTGRES_USER="postgres"
+          - POSTGRES_PW="dbpw"
+          - POSTGRES_DB="mydatabase"
         container_name: app
         ports:
           - '4000:80'

@@ -5,7 +5,7 @@ FROM python:3.7-slim
 WORKDIR /app
 
 # Copy the current directory contents into the container at /app
-COPY . /app
+ADD . /app
 
 # Install any needed packages specified in requirements.txt
 RUN pip install --trusted-host pypi.python.org -r src/requirements.txt
@@ -13,9 +13,10 @@ RUN pip install --trusted-host pypi.python.org -r src/requirements.txt
 # Make port 80 available to the world outside this container
 EXPOSE 80
 
+
 # Define environment variable
 ENV NAME World
 
 
 # Run app.py when the container launches
-CMD ["python", "src/app.py", "src/database.py"]
+CMD ["python", "src/app.py"]

@@ -6,14 +6,47 @@ Table Visualization is made by Group 3
 
 ## Installing / Getting started
 
-A quick introduction of the minimal setup you need to get a hello world up &
-running.
-
+Make sure you have docker installed before testing this project:
 ```shell
-commands here
+docker -v
+```
+If not, download on: https://www.docker.com/
+
+### Set up git repository
+```shell
+git clone https://github.com/DAT210/Table_Visualization.git
+cd into the repository location
 ```
 
-Here you should say what actually happens when you execute the code above.
+### Build the images and run containers
+```shell
+docker-compose up --build
+```
+This will build and start running two containers.  The app should be visible at:  <br />
+http://127.0.0.1:4000/    (Docker) <br />
+http://192.168.99.100:4000/    (Docker toolbox)
+
+PostgreSQL port:5432
+
+### Connect to the database container
+You can bash into the postgres server currently running by entering:
+```shell
+docker exec -it postgresql psql -U postgres
+```
+Useful commands inside the postgres server:
+```shell
+\l    (list of databases)
+\c    (connect to a database)
+\d    (List of tables inside the database)
+\q    (To exit the postgres server)
+```
+### Automatically populate database from python file
+Run this to automatically create a database named "mydb" inside the postgres server. The database.py file will set up
+a database and create tables with inserts statements found in create_tables.py file.
+```shell
+docker-compose exec app python src/database.py 
+```
+You can now bash into the postgres server and \c mydb. The \d will then list the tables on mydb, and <br /> select * from [table name] will show all of the entries.
 
 ## Developing
 

@@ -20,7 +20,7 @@ cd into the repository location
 
 ### Build the images and run containers
 ```shell
-docker-compose up --build
+docker-compose up -d --build
 ```
 This will build and start running two containers.  The app should be visible at:  <br />
 http://127.0.0.1:4000/    (Docker) <br />

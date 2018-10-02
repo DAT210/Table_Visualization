@@ -4,7 +4,7 @@ from __init__ import app
 
 @app.route('/')
 def hello():
-    return "Hello World 2!"
+    return "Hello world"
 
 
 if __name__ == '__main__':

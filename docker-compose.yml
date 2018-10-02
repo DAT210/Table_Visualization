@@ -1,0 +1,30 @@
+version: "3"
+networks:
+    postgresnet:
+
+services:
+    postgresql:  
+        image: postgres:9.6 
+        hostname: postgresql          
+        container_name: postgresql
+        environment:                                                            
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=dbpw
+            - POSTGRES_DB=test
+        networks:
+            - postgresnet
+        ports: #make db accessible locally
+            - '5432:5432'
+
+    app:
+        build: .
+        hostname: app
+        container_name: app
+        ports:
+          - '4000:80'
+        volumes:
+            - .:/app
+        depends_on:
+            - postgresql
+        networks:                                                               
+            - postgresnet 

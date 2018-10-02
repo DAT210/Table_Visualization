@@ -1,6 +1,6 @@
 "use strict";
 window.addEventListener("load", function () {
-    fetch("roomPlan.json")
+    fetch("/visualize")
         .then(function (r) { return r.json(); })
         .then(function (roomPlan) {
         var room = roomPlan;

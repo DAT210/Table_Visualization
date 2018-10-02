@@ -1,5 +1,5 @@
 window.addEventListener("load", () => {
-    fetch("roomPlan.json")
+    fetch("/visualize")
         .then(r => { return r.json() })
         .then(roomPlan => {
             let room: IRoom = <IRoom>roomPlan;

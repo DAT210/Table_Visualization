@@ -9,20 +9,76 @@ window.addEventListener("load", function () {
 });
 function init(roomPlan) {
     console.log(roomPlan);
-    var intSvg = new InteractiveSVG(roomPlan.width, roomPlan.height);
-    var testElm1 = new InteractiveSVGElement(SVGHelper.NewRect(50, 50), { x: 620, y: 134 }, true);
-    var testElm2 = new InteractiveSVGElement(SVGHelper.NewRect(50, 50), { x: 150, y: 400 }, true);
-    var testElm3 = new InteractiveSVGElement(SVGHelper.NewRect(50, 50), { x: 250, y: 200 }, true);
-    intSvg.AddElement(testElm1);
-    intSvg.AddElement(testElm2);
-    intSvg.AddElement(testElm3);
-    document.body.appendChild(intSvg.Wrapper);
+    var rv = new RoomVisualizer(roomPlan);
+    console.log(rv);
 }
+var InteractiveSVG = /** @class */ (function () {
+    function InteractiveSVG(width, height) {
+        if (width === void 0) { width = 500; }
+        if (height === void 0) { height = 500; }
+        this.elements = [];
+        this.width = width;
+        this.height = height;
+        this.Wrapper = document.createElement("div");
+        this.Wrapper.id = "InteractiveSVGWrapper";
+        this.svg = SVGHelper.NewSVG(this.width, this.height);
+        this.Wrapper.appendChild(this.svg);
+        this.registerEventListeners();
+    }
+    InteractiveSVG.prototype.registerEventListeners = function () {
+        var _this = this;
+        this.svg.addEventListener("mousemove", function (e) {
+            _this.mousePos = { x: e.layerX, y: e.layerY };
+            if (_this.currentlyMoving) {
+                if (_this.mouseOffset) {
+                    var newX = _this.mousePos.x - _this.mouseOffset.x;
+                    var newY = _this.mousePos.y - _this.mouseOffset.y;
+                    _this.currentlyMoving.Position = { x: newX, y: newY };
+                }
+            }
+        });
+        this.svg.addEventListener("mouseup", function (e) {
+            _this.currentlyMoving = undefined;
+            _this.mouseOffset = undefined;
+        });
+        this.Wrapper.addEventListener("mouseleave", function (e) {
+            _this.currentlyMoving = undefined;
+            _this.mouseOffset = undefined;
+        });
+    };
+    InteractiveSVG.prototype.AddRect = function (w, h, pos, moveable, clickHandler) {
+        if (moveable === void 0) { moveable = false; }
+        var elm = new InteractiveSVGElement(SVGHelper.NewRect(w, h), pos, moveable);
+        if (clickHandler)
+            elm.ClickHandler = clickHandler;
+        this.addElement(elm);
+    };
+    InteractiveSVG.prototype.AddLine = function (pos1, pos2) {
+        var elm = new InteractiveSVGElement(SVGHelper.NewLine(pos1, pos2));
+        this.addElement(elm);
+    };
+    InteractiveSVG.prototype.addElement = function (element) {
+        this.svg.appendChild(element.SvgElement);
+        if (element.Moveable)
+            this.registerMoveableElement(element);
+        this.elements.push(element);
+    };
+    InteractiveSVG.prototype.registerMoveableElement = function (element) {
+        var _this = this;
+        element.SvgElement.addEventListener("mousedown", function (e) {
+            _this.currentlyMoving = element;
+            var elmPos = element.Position;
+            _this.mouseOffset = { x: (e.layerX - elmPos.x), y: (e.layerY - elmPos.y) };
+        });
+    };
+    return InteractiveSVG;
+}());
 var InteractiveSVGElement = /** @class */ (function () {
     function InteractiveSVGElement(element, position, moveable) {
         var _this = this;
         this.pos = { x: 0, y: 0 };
         this.Moveable = false;
+        this.ClickHandler = function () { };
         this.SvgElement = element;
         if (moveable)
             this.Moveable = moveable;
@@ -30,8 +86,13 @@ var InteractiveSVGElement = /** @class */ (function () {
             this.Position = position;
         else
             this.Position = { x: 0, y: 0 };
-        this.SvgElement.addEventListener("mousemove", function (e) {
-            _this.MousePos = { x: (e.layerX - _this.pos.x), y: (e.layerY - _this.pos.y) };
+        this.SvgElement.addEventListener("mousedown", function () {
+            _this.prevPos = _this.pos;
+        });
+        this.SvgElement.addEventListener("mouseup", function () {
+            if (_this.prevPos == _this.pos) {
+                _this.ClickHandler();
+            }
         });
     }
     Object.defineProperty(InteractiveSVGElement.prototype, "Position", {
@@ -46,51 +107,30 @@ var InteractiveSVGElement = /** @class */ (function () {
     ;
     return InteractiveSVGElement;
 }());
-var InteractiveSVG = /** @class */ (function () {
-    function InteractiveSVG(width, height) {
-        var _this = this;
-        this.width = 500;
-        this.height = 500;
-        this.elements = [];
-        this.width, this.height = width, height;
-        this.Wrapper = document.createElement("div");
-        this.Wrapper.id = "InteractiveSVGWrapper";
-        this.svg = SVGHelper.NewSVG(width, height);
-        this.Wrapper.appendChild(this.svg);
-        this.svg.addEventListener("mousemove", function (e) {
-            _this.mousePos = { x: e.layerX, y: e.layerY };
-            if (_this.moving) {
-                if (_this.mouseOffset) {
-                    var newX = _this.mousePos.x - _this.mouseOffset.x;
-                    var newY = _this.mousePos.y - _this.mouseOffset.y;
-                    _this.moving.Position = { x: newX, y: newY };
-                }
-            }
-        });
-        this.svg.addEventListener("mouseup", function (e) {
-            _this.moving = undefined;
-            _this.mouseOffset = undefined;
-        });
-    }
-    InteractiveSVG.prototype.AddElement = function (element) {
-        this.svg.appendChild(element.SvgElement);
-        if (element.Moveable)
-            this.registerMoveableElement(element);
-        this.elements.push(element);
-    };
-    InteractiveSVG.prototype.registerMoveableElement = function (element) {
-        var _this = this;
-        element.SvgElement.addEventListener("mousedown", function (e) {
-            _this.moving = element;
-            var elmPos = element.Position;
-            _this.mouseOffset = { x: (e.layerX - elmPos.x), y: (e.layerY - elmPos.y) };
-        });
-    };
-    return InteractiveSVG;
-}());
 var RoomVisualizer = /** @class */ (function () {
-    function RoomVisualizer() {
+    function RoomVisualizer(roomPlan) {
+        this.roomPlan = roomPlan;
+        this.visualizer = new InteractiveSVG(roomPlan.width, roomPlan.height);
+        document.body.appendChild(this.visualizer.Wrapper);
+        this.drawWalls();
+        this.drawTables();
     }
+    RoomVisualizer.prototype.drawWalls = function () {
+        for (var _i = 0, _a = this.roomPlan.walls; _i < _a.length; _i++) {
+            var wall = _a[_i];
+            this.visualizer.AddLine(wall.from, wall.to);
+        }
+    };
+    RoomVisualizer.prototype.drawTables = function () {
+        var _loop_1 = function (table) {
+            this_1.visualizer.AddRect(table.width, table.height, table.position, true, function () { alert("Table " + table.id + " clicked!"); });
+        };
+        var this_1 = this;
+        for (var _i = 0, _a = this.roomPlan.tables; _i < _a.length; _i++) {
+            var table = _a[_i];
+            _loop_1(table);
+        }
+    };
     return RoomVisualizer;
 }());
 var SVGHelper = /** @class */ (function () {
@@ -106,6 +146,11 @@ var SVGHelper = /** @class */ (function () {
         this.SetSize(rect, width, height);
         return rect;
     };
+    SVGHelper.NewLine = function (pos1, pos2) {
+        var line = document.createElementNS(this.svgNS, "line");
+        this.SetLinePos(line, pos1, pos2);
+        return line;
+    };
     SVGHelper.SetSize = function (element, w, h) {
         element.setAttribute("width", w + "px");
         element.setAttribute("height", h + "px");
@@ -113,6 +158,12 @@ var SVGHelper = /** @class */ (function () {
     SVGHelper.SetPosition = function (element, x, y) {
         element.setAttribute("x", x + "px");
         element.setAttribute("y", y + "px");
+    };
+    SVGHelper.SetLinePos = function (element, pos1, pos2) {
+        element.setAttribute("x1", pos1.x + "px");
+        element.setAttribute("y1", pos1.y + "px");
+        element.setAttribute("x2", pos2.x + "px");
+        element.setAttribute("y2", pos2.y + "px");
     };
     SVGHelper.svgNS = "http://www.w3.org/2000/svg";
     return SVGHelper;

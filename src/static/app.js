@@ -1,4 +1,3 @@
-"use strict";
 window.addEventListener("load", function () {
     fetch("/visualize")
         .then(function (r) { return r.json(); })

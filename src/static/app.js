@@ -8,9 +8,9 @@ window.addEventListener("load", function () {
     });
 });
 function init(roomPlan) {
-    console.log(roomPlan);
-    var rv = new RoomVisualizer(roomPlan);
-    console.log(rv);
+    console.log("RoomPlan:\n" + roomPlan);
+    var visualizer = new InteractiveSVG();
+    var rv = new RoomVisualizer(roomPlan, visualizer);
 }
 var InteractiveSVG = /** @class */ (function () {
     function InteractiveSVG(width, height) {
@@ -25,6 +25,35 @@ var InteractiveSVG = /** @class */ (function () {
         this.Wrapper.appendChild(this.svg);
         this.registerEventListeners();
     }
+    Object.defineProperty(InteractiveSVG.prototype, "Width", {
+        get: function () { return this.width; },
+        set: function (w) {
+            this.width = w;
+            SVGHelper.SetSize(this.svg, this.width, this.height);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(InteractiveSVG.prototype, "Height", {
+        get: function () { return this.height; },
+        set: function (h) {
+            this.height = h;
+            SVGHelper.SetSize(this.svg, this.width, this.height);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    InteractiveSVG.prototype.AddRect = function (w, h, pos, moveable, clickHandler) {
+        if (moveable === void 0) { moveable = false; }
+        var elm = new InteractiveSVGElement(SVGHelper.NewRect(w, h), pos, moveable);
+        if (clickHandler)
+            elm.ClickHandler = clickHandler;
+        this.addElement(elm);
+    };
+    InteractiveSVG.prototype.AddLine = function (pos1, pos2) {
+        var elm = new InteractiveSVGElement(SVGHelper.NewLine(pos1, pos2));
+        this.addElement(elm);
+    };
     InteractiveSVG.prototype.registerEventListeners = function () {
         var _this = this;
         this.svg.addEventListener("mousemove", function (e) {
@@ -46,24 +75,13 @@ var InteractiveSVG = /** @class */ (function () {
             _this.mouseOffset = undefined;
         });
     };
-    InteractiveSVG.prototype.AddRect = function (w, h, pos, moveable, clickHandler) {
-        if (moveable === void 0) { moveable = false; }
-        var elm = new InteractiveSVGElement(SVGHelper.NewRect(w, h), pos, moveable);
-        if (clickHandler)
-            elm.ClickHandler = clickHandler;
-        this.addElement(elm);
-    };
-    InteractiveSVG.prototype.AddLine = function (pos1, pos2) {
-        var elm = new InteractiveSVGElement(SVGHelper.NewLine(pos1, pos2));
-        this.addElement(elm);
-    };
     InteractiveSVG.prototype.addElement = function (element) {
         this.svg.appendChild(element.SvgElement);
-        if (element.Moveable)
-            this.registerMoveableElement(element);
+        if (element.Movable)
+            this.registerMovableElement(element);
         this.elements.push(element);
     };
-    InteractiveSVG.prototype.registerMoveableElement = function (element) {
+    InteractiveSVG.prototype.registerMovableElement = function (element) {
         var _this = this;
         element.SvgElement.addEventListener("mousedown", function (e) {
             _this.currentlyMoving = element;
@@ -73,15 +91,18 @@ var InteractiveSVG = /** @class */ (function () {
     };
     return InteractiveSVG;
 }());
+// TODO: split class into line and rect classes
 var InteractiveSVGElement = /** @class */ (function () {
     function InteractiveSVGElement(element, position, moveable) {
         var _this = this;
-        this.pos = { x: 0, y: 0 };
-        this.Moveable = false;
+        this.Movable = false;
         this.ClickHandler = function () { };
+        this.pos = { x: 0, y: 0 };
+        this.width = 0; // to be fixed
+        this.height = 0;
         this.SvgElement = element;
         if (moveable)
-            this.Moveable = moveable;
+            this.Movable = moveable;
         if (position)
             this.Position = position;
         else
@@ -98,19 +119,39 @@ var InteractiveSVGElement = /** @class */ (function () {
     Object.defineProperty(InteractiveSVGElement.prototype, "Position", {
         get: function () { return this.pos; },
         set: function (pos) {
-            SVGHelper.SetPosition(this.SvgElement, pos.x, pos.y);
+            SVGHelper.SetPosition(this.SvgElement, pos);
             this.pos = pos;
         },
         enumerable: true,
         configurable: true
     });
     ;
+    Object.defineProperty(InteractiveSVGElement.prototype, "Width", {
+        get: function () { return this.width; },
+        set: function (w) {
+            this.width = w;
+            SVGHelper.SetSize(this.SvgElement, this.width, this.height);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(InteractiveSVGElement.prototype, "Height", {
+        get: function () { return this.height; },
+        set: function (h) {
+            this.height = h;
+            SVGHelper.SetSize(this.SvgElement, this.width, this.height);
+        },
+        enumerable: true,
+        configurable: true
+    });
     return InteractiveSVGElement;
 }());
 var RoomVisualizer = /** @class */ (function () {
-    function RoomVisualizer(roomPlan) {
+    function RoomVisualizer(roomPlan, visualizer) {
         this.roomPlan = roomPlan;
-        this.visualizer = new InteractiveSVG(roomPlan.width, roomPlan.height);
+        this.visualizer = visualizer;
+        this.visualizer.Width = roomPlan.width;
+        this.visualizer.Height = roomPlan.height;
         document.body.appendChild(this.visualizer.Wrapper);
         this.drawWalls();
         this.drawTables();
@@ -155,9 +196,15 @@ var SVGHelper = /** @class */ (function () {
         element.setAttribute("width", w + "px");
         element.setAttribute("height", h + "px");
     };
-    SVGHelper.SetPosition = function (element, x, y) {
-        element.setAttribute("x", x + "px");
-        element.setAttribute("y", y + "px");
+    SVGHelper.GetWidth = function (element) {
+        return element.width.baseVal.value;
+    };
+    SVGHelper.GetHeight = function (element) {
+        return element.height.baseVal.value;
+    };
+    SVGHelper.SetPosition = function (element, pos) {
+        element.setAttribute("x", pos.x + "px");
+        element.setAttribute("y", pos.y + "px");
     };
     SVGHelper.SetLinePos = function (element, pos1, pos2) {
         element.setAttribute("x1", pos1.x + "px");

@@ -4,13 +4,13 @@ window.addEventListener("load", () => {
         .then(roomPlan => {
             let room: IRoom = <IRoom>roomPlan;
             init(room);
+        })
         });
-});
 
 function init(roomPlan: IRoom) {
-    console.log(roomPlan);
-    const rv = new RoomVisualizer(roomPlan);
-    console.log(rv);
+    console.log("RoomPlan:\n" + roomPlan);
+    const visualizer = new InteractiveSVG();
+    const rv = new RoomVisualizer(roomPlan, visualizer);
 }
 
 interface IPoint {
@@ -39,8 +39,18 @@ interface IRoom {
 
 interface IInteractiveVisualizer {
     Wrapper: HTMLElement,
+    Width: number,
+    Height: number,
     AddRect(w: number, h: number, pos: IPoint, moveble?: boolean, clickHandler?: () => void): void,
     AddLine(pos1: IPoint, pos2: IPoint): void
+}
+
+interface IInteractiveVisualizerElement {
+    Position: IPoint,
+    Width: number,
+    Height: number,
+    ClickHandler: () => void,
+    Movable: boolean
 }
 
 class InteractiveSVG implements IInteractiveVisualizer {
@@ -64,6 +74,28 @@ class InteractiveSVG implements IInteractiveVisualizer {
         this.registerEventListeners();
     }
 
+    set Width(w: number) { 
+        this.width = w;
+        SVGHelper.SetSize(this.svg, this.width, this.height);
+    }
+    get Width(): number { return this.width }
+
+    set Height(h: number) {
+        this.height = h;
+        SVGHelper.SetSize(this.svg, this.width, this.height);
+    }
+    get Height(): number { return this.height }
+
+    public AddRect(w: number, h: number, pos: IPoint, moveable: boolean = false, clickHandler?: () => void): void {
+        const elm = new InteractiveSVGElement(SVGHelper.NewRect(w, h), pos, moveable);
+        if (clickHandler) elm.ClickHandler = clickHandler;
+        this.addElement(elm);
+    }
+    public AddLine(pos1: IPoint, pos2: IPoint): void {
+        const elm = new InteractiveSVGElement(SVGHelper.NewLine(pos1, pos2));
+        this.addElement(elm);
+    }
+
     private registerEventListeners(): void {
         this.svg.addEventListener("mousemove", (e: MouseEvent) => {
             this.mousePos = { x: e.layerX, y: e.layerY };
@@ -84,25 +116,12 @@ class InteractiveSVG implements IInteractiveVisualizer {
             this.mouseOffset = undefined;
         });
     }
-
-    public AddRect(w: number, h: number, pos: IPoint, moveable: boolean = false, clickHandler?: () => void): void {
-        const elm = new InteractiveSVGElement(SVGHelper.NewRect(w, h), pos, moveable);
-        if (clickHandler) elm.ClickHandler = clickHandler;
-        this.addElement(elm);
-    }
-
-    public AddLine(pos1: IPoint, pos2: IPoint): void {
-        const elm = new InteractiveSVGElement(SVGHelper.NewLine(pos1, pos2));
-        this.addElement(elm);
-    }
-
     private addElement(element: InteractiveSVGElement): void {
         this.svg.appendChild(element.SvgElement)
-        if (element.Moveable) this.registerMoveableElement(element);
+        if (element.Movable) this.registerMovableElement(element);
         this.elements.push(element);
     }
-
-    private registerMoveableElement(element: InteractiveSVGElement) {
+    private registerMovableElement(element: InteractiveSVGElement) {
         element.SvgElement.addEventListener("mousedown", (e: MouseEvent) => {
             this.currentlyMoving = element;
             const elmPos = element.Position;
@@ -111,22 +130,20 @@ class InteractiveSVG implements IInteractiveVisualizer {
     }
 }
 
+// TODO: split class into line and rect classes
 class InteractiveSVGElement {
     public SvgElement: SVGElement;
-    private pos: IPoint = { x: 0, y: 0 };
-    private prevPos: IPoint | undefined;
-    public Moveable: boolean = false;
+    public Movable: boolean = false;
     public ClickHandler: () => void = () => {};
 
-    set Position(pos: IPoint) {
-        SVGHelper.SetPosition(this.SvgElement, pos.x, pos.y);
-        this.pos = pos;
-    }
-    get Position(): IPoint { return this.pos };
+    private pos: IPoint = { x: 0, y: 0 };
+    private prevPos: IPoint | undefined;
+    private width: number = 0; // to be fixed
+    private height: number = 0;
 
     constructor(element: SVGElement, position?: IPoint, moveable?: boolean) {
         this.SvgElement = element;
-        if (moveable) this.Moveable = moveable;
+        if (moveable) this.Movable = moveable;
         if (position) this.Position = position;
         else this.Position = { x: 0, y: 0 };
         
@@ -139,16 +156,35 @@ class InteractiveSVGElement {
             }
         });
     }
+
+    set Position(pos: IPoint) {
+        SVGHelper.SetPosition(this.SvgElement, pos);
+        this.pos = pos;
+    }
+    get Position(): IPoint { return this.pos };
+
+    set Width(w: number) {
+        this.width = w;
+        SVGHelper.SetSize(this.SvgElement, this.width, this.height);
+    }
+    get Width() { return this.width; }
+    set Height(h: number) {
+        this.height = h;
+        SVGHelper.SetSize(this.SvgElement, this.width, this.height);
+    }
+    get Height() { return this.height; }
 }
 
 class RoomVisualizer {
     private visualizer: IInteractiveVisualizer;
     private roomPlan: IRoom;
 
-    constructor(roomPlan: IRoom) {
+    constructor(roomPlan: IRoom, visualizer: IInteractiveVisualizer) {
         this.roomPlan = roomPlan;
-        this.visualizer = new InteractiveSVG(roomPlan.width, roomPlan.height);
+        this.visualizer = visualizer;
 
+        this.visualizer.Width = roomPlan.width;
+        this.visualizer.Height = roomPlan.height;
         document.body.appendChild(this.visualizer.Wrapper);
 
         this.drawWalls();
@@ -196,9 +232,15 @@ class SVGHelper {
         element.setAttribute("width", w + "px");
         element.setAttribute("height", h + "px");
     }
-    public static SetPosition(element: SVGElement, x: number, y: number) {
-        element.setAttribute("x", x + "px");
-        element.setAttribute("y", y + "px");
+    public static GetWidth(element: SVGRectElement): number {
+        return element.width.baseVal.value;
+    }
+    public static GetHeight(element: SVGRectElement): number {
+        return element.height.baseVal.value;
+    }
+    public static SetPosition(element: SVGElement, pos: IPoint) {
+        element.setAttribute("x", pos.x + "px");
+        element.setAttribute("y", pos.y + "px");
     }
     public static SetLinePos(element: SVGLineElement, pos1: IPoint, pos2: IPoint) {
         element.setAttribute("x1", pos1.x + "px");

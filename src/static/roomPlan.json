@@ -2,9 +2,7 @@
     "width": 700,
     "height": 500,
     "tables": [
-        { "id": 0, "width": 60, "height": 40, "position": {"x": 185, "y": 85} },
-        { "id": 1, "width": 60, "height": 40, "position": {"x": 105, "y": 275} },
-        { "id": 2, "width": 60, "height": 40, "position": {"x": 450, "y": 150} }
+
     ],
     "walls": [
         { 

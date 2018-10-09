@@ -1,6 +1,9 @@
 svg {
     background-color: whitesmoke;
     border: 1px solid gray;
+}
+
+line {
     stroke: darkgrey;
 }
 

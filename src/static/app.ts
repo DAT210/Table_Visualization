@@ -8,9 +8,11 @@ window.addEventListener("load", () => {
         });
 
 function init(roomPlan: IRoom) {
-    console.log("RoomPlan:\n" + roomPlan);
+    console.log("RoomPlan:");
+    console.log(roomPlan);
     const visualizer = new InteractiveSVG();
-    const rv = new RoomVisualizer(roomPlan, visualizer);
+    const rv = new RoomVisualizer(visualizer);
+    rv.RoomPlan = roomPlan;
 }
 
 interface IPoint {
@@ -22,7 +24,7 @@ interface ITable {
     id: number,
     width: number,
     height: number,
-    position: IPoint;
+    position: IPoint
 }
 
 interface IWall {
@@ -41,16 +43,10 @@ interface IInteractiveVisualizer {
     Wrapper: HTMLElement,
     Width: number,
     Height: number,
-    AddRect(w: number, h: number, pos: IPoint, moveble?: boolean, clickHandler?: () => void): void,
-    AddLine(pos1: IPoint, pos2: IPoint): void
-}
-
-interface IInteractiveVisualizerElement {
-    Position: IPoint,
-    Width: number,
-    Height: number,
-    ClickHandler: () => void,
-    Movable: boolean
+    AddRect(w: number, h: number, pos: IPoint, moveble?: boolean, tag?: string): InteractiveSVGRect,
+    AddLine(pos1: IPoint, pos2: IPoint): InteractiveSVGLine,
+    GetElements(tag: string): InteractiveSVGElement[],
+    Reset(): void
 }
 
 class InteractiveSVG implements IInteractiveVisualizer {
@@ -74,26 +70,40 @@ class InteractiveSVG implements IInteractiveVisualizer {
         this.registerEventListeners();
     }
 
+    get Width(): number { return this.width }
     set Width(w: number) { 
         this.width = w;
         SVGHelper.SetSize(this.svg, this.width, this.height);
-    }
-    get Width(): number { return this.width }
-
+    }    
+    get Height(): number { return this.height }
     set Height(h: number) {
         this.height = h;
         SVGHelper.SetSize(this.svg, this.width, this.height);
     }
-    get Height(): number { return this.height }
 
-    public AddRect(w: number, h: number, pos: IPoint, moveable: boolean = false, clickHandler?: () => void): void {
-        const elm = new InteractiveSVGElement(SVGHelper.NewRect(w, h), pos, moveable);
-        if (clickHandler) elm.ClickHandler = clickHandler;
+    public AddRect(w: number, h: number, pos: IPoint, moveable: boolean = false, tag?: string): InteractiveSVGRect {
+        const elm = new InteractiveSVGRect(w, h, pos, moveable, tag);
         this.addElement(elm);
+        return elm;
     }
-    public AddLine(pos1: IPoint, pos2: IPoint): void {
-        const elm = new InteractiveSVGElement(SVGHelper.NewLine(pos1, pos2));
+    public AddLine(pos1: IPoint, pos2: IPoint): InteractiveSVGLine {
+        const elm = new InteractiveSVGLine(pos1, pos2);
         this.addElement(elm);
+        return elm;
+    }
+    public GetElements(tag: string): InteractiveSVGElement[] {
+        const elms: InteractiveSVGElement[] = [];
+        for (let elm of this.elements) {
+            if (elm.Tag == tag) elms.push(elm);
+        }
+        return elms;
+    }
+    public Reset(): void {
+        this.elements = [];
+        this.svg = SVGHelper.NewSVG(this.width, this.height);
+        this.Wrapper.innerHTML = "";
+        this.Wrapper.appendChild(this.svg);
+        this.registerEventListeners();
     }
 
     private registerEventListeners(): void {
@@ -130,29 +140,46 @@ class InteractiveSVG implements IInteractiveVisualizer {
     }
 }
 
-// TODO: split class into line and rect classes
-class InteractiveSVGElement {
-    public SvgElement: SVGElement;
+abstract class InteractiveSVGElement {
+    public abstract SvgElement: SVGElement;
+    public abstract Position: IPoint;
+    public abstract Width: number;
+    public abstract Height: number;
+    
+    public PrevPosition: IPoint | undefined;
     public Movable: boolean = false;
-    public ClickHandler: () => void = () => {};
+    public OnClick: () => void = () => {};
+    public OnMove: () => void = () => {};
 
+    private tag: string = "";
+
+    constructor(movable?: boolean, tag?: string) {
+        if (movable) this.Movable = movable;
+        if (tag) this.tag = tag;
+    }
+
+    get Tag(): string { return this.tag }
+}
+
+class InteractiveSVGRect extends InteractiveSVGElement {
+    public SvgElement: SVGRectElement;
+    
     private pos: IPoint = { x: 0, y: 0 };
-    private prevPos: IPoint | undefined;
-    private width: number = 0; // to be fixed
+    private width: number = 0;
     private height: number = 0;
 
-    constructor(element: SVGElement, position?: IPoint, moveable?: boolean) {
-        this.SvgElement = element;
-        if (moveable) this.Movable = moveable;
+    constructor(w: number, h: number, position?: IPoint, moveable?: boolean, tag?: string) {
+        super(moveable, tag);
+        this.SvgElement = SVGHelper.NewRect(w, h);
         if (position) this.Position = position;
         else this.Position = { x: 0, y: 0 };
         
         this.SvgElement.addEventListener("mousedown", () => {
-            this.prevPos = this.pos;
+            this.PrevPosition = this.pos;
         });
         this.SvgElement.addEventListener("mouseup", () => {
-            if (this.prevPos == this.pos) {
-                this.ClickHandler();
+            if (this.PrevPosition == this.pos) {
+                this.OnClick();
             }
         });
     }
@@ -160,6 +187,7 @@ class InteractiveSVGElement {
     set Position(pos: IPoint) {
         SVGHelper.SetPosition(this.SvgElement, pos);
         this.pos = pos;
+        this.OnMove();
     }
     get Position(): IPoint { return this.pos };
 
@@ -175,37 +203,72 @@ class InteractiveSVGElement {
     get Height() { return this.height; }
 }
 
+class InteractiveSVGLine extends InteractiveSVGElement {
+    public SvgElement: SVGLineElement;
+    
+    constructor(pos1: IPoint, pos2: IPoint, movable?: boolean, tag?: string) {
+        super(movable, tag);
+        this.SvgElement = SVGHelper.NewLine(pos1, pos2);
+    }
+
+    get Position(): IPoint { 
+        const bBox = this.SvgElement.getBBox();
+        return { x: bBox.x, y: bBox.y }
+    }
+    set Position(pos: IPoint) { throw new Error("Not implemented") }
+
+    get Width(): number { return this.SvgElement.getBBox().width }
+    set Width(w: number) { throw new Error("Not implemented") }
+    get Height(): number { return this.SvgElement.getBBox().height }
+    set Height(w: number) { throw new Error("Not implemented") }
+}
+
 class RoomVisualizer {
     private visualizer: IInteractiveVisualizer;
-    private roomPlan: IRoom;
+    private roomPlan: IRoom | undefined;
 
-    constructor(roomPlan: IRoom, visualizer: IInteractiveVisualizer) {
-        this.roomPlan = roomPlan;
+    constructor(visualizer: IInteractiveVisualizer) {
         this.visualizer = visualizer;
-
-        this.visualizer.Width = roomPlan.width;
-        this.visualizer.Height = roomPlan.height;
         document.body.appendChild(this.visualizer.Wrapper);
+    }
 
+    set RoomPlan(roomPlan: IRoom) {
+        this.roomPlan = roomPlan;
+        this.visualizer.Width = this.roomPlan.width;
+        this.visualizer.Height = this.roomPlan.height;
+        this.drawRoom();
+    }
+
+    private drawRoom(): void {
+        this.visualizer.Reset();
         this.drawWalls();
         this.drawTables();
     }
-
     private drawWalls(): void {
+        if (!this.roomPlan) return;
         for(let wall of this.roomPlan.walls) {
             this.visualizer.AddLine(wall.from, wall.to);
         }
     }
-
     private drawTables(): void {
+        if (!this.roomPlan) return;
         for(let table of this.roomPlan.tables) {
-            this.visualizer.AddRect(
-                table.width, 
-                table.height, 
-                table.position, 
-                true, 
-                () => { alert("Table " + table.id + " clicked!") }
+            const rect = this.visualizer.AddRect(
+                table.width,
+                table.height,
+                table.position,
+                true,
+                "table"
             );
+            rect.OnClick = () => { console.log("Table " + table.id + " clicked!") };
+            rect.OnMove = () => { this.updateTablePos(table.id, rect.Position) };
+        }
+    }
+    private updateTablePos(tableID: number, pos: IPoint): void {
+        if (this.roomPlan) {
+            for (let t of this.roomPlan.tables) {
+                if (t.id == tableID) t.position = pos;
+            }
         }
     }
 }

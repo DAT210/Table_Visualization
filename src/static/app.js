@@ -1,4 +1,17 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 window.addEventListener("load", function () {
     fetch("/visualize")
         .then(function (r) { return r.json(); })
@@ -8,9 +21,11 @@ window.addEventListener("load", function () {
     });
 });
 function init(roomPlan) {
-    console.log("RoomPlan:\n" + roomPlan);
+    console.log("RoomPlan:");
+    console.log(roomPlan);
     var visualizer = new InteractiveSVG();
-    var rv = new RoomVisualizer(roomPlan, visualizer);
+    var rv = new RoomVisualizer(visualizer);
+    rv.RoomPlan = roomPlan;
 }
 var InteractiveSVG = /** @class */ (function () {
     function InteractiveSVG(width, height) {
@@ -43,16 +58,32 @@ var InteractiveSVG = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
-    InteractiveSVG.prototype.AddRect = function (w, h, pos, moveable, clickHandler) {
+    InteractiveSVG.prototype.AddRect = function (w, h, pos, moveable, tag) {
         if (moveable === void 0) { moveable = false; }
-        var elm = new InteractiveSVGElement(SVGHelper.NewRect(w, h), pos, moveable);
-        if (clickHandler)
-            elm.ClickHandler = clickHandler;
+        var elm = new InteractiveSVGRect(w, h, pos, moveable, tag);
         this.addElement(elm);
+        return elm;
     };
     InteractiveSVG.prototype.AddLine = function (pos1, pos2) {
-        var elm = new InteractiveSVGElement(SVGHelper.NewLine(pos1, pos2));
+        var elm = new InteractiveSVGLine(pos1, pos2);
         this.addElement(elm);
+        return elm;
+    };
+    InteractiveSVG.prototype.GetElements = function (tag) {
+        var elms = [];
+        for (var _i = 0, _a = this.elements; _i < _a.length; _i++) {
+            var elm = _a[_i];
+            if (elm.Tag == tag)
+                elms.push(elm);
+        }
+        return elms;
+    };
+    InteractiveSVG.prototype.Reset = function () {
+        this.elements = [];
+        this.svg = SVGHelper.NewSVG(this.width, this.height);
+        this.Wrapper.innerHTML = "";
+        this.Wrapper.appendChild(this.svg);
+        this.registerEventListeners();
     };
     InteractiveSVG.prototype.registerEventListeners = function () {
         var _this = this;
@@ -91,42 +122,58 @@ var InteractiveSVG = /** @class */ (function () {
     };
     return InteractiveSVG;
 }());
-// TODO: split class into line and rect classes
 var InteractiveSVGElement = /** @class */ (function () {
-    function InteractiveSVGElement(element, position, moveable) {
-        var _this = this;
+    function InteractiveSVGElement(movable, tag) {
         this.Movable = false;
-        this.ClickHandler = function () { };
-        this.pos = { x: 0, y: 0 };
-        this.width = 0; // to be fixed
-        this.height = 0;
-        this.SvgElement = element;
-        if (moveable)
-            this.Movable = moveable;
+        this.OnClick = function () { };
+        this.OnMove = function () { };
+        this.tag = "";
+        if (movable)
+            this.Movable = movable;
+        if (tag)
+            this.tag = tag;
+    }
+    Object.defineProperty(InteractiveSVGElement.prototype, "Tag", {
+        get: function () { return this.tag; },
+        enumerable: true,
+        configurable: true
+    });
+    return InteractiveSVGElement;
+}());
+var InteractiveSVGRect = /** @class */ (function (_super) {
+    __extends(InteractiveSVGRect, _super);
+    function InteractiveSVGRect(w, h, position, moveable, tag) {
+        var _this = _super.call(this, moveable, tag) || this;
+        _this.pos = { x: 0, y: 0 };
+        _this.width = 0;
+        _this.height = 0;
+        _this.SvgElement = SVGHelper.NewRect(w, h);
         if (position)
-            this.Position = position;
+            _this.Position = position;
         else
-            this.Position = { x: 0, y: 0 };
-        this.SvgElement.addEventListener("mousedown", function () {
-            _this.prevPos = _this.pos;
+            _this.Position = { x: 0, y: 0 };
+        _this.SvgElement.addEventListener("mousedown", function () {
+            _this.PrevPosition = _this.pos;
         });
-        this.SvgElement.addEventListener("mouseup", function () {
-            if (_this.prevPos == _this.pos) {
-                _this.ClickHandler();
+        _this.SvgElement.addEventListener("mouseup", function () {
+            if (_this.PrevPosition == _this.pos) {
+                _this.OnClick();
             }
         });
+        return _this;
     }
-    Object.defineProperty(InteractiveSVGElement.prototype, "Position", {
+    Object.defineProperty(InteractiveSVGRect.prototype, "Position", {
         get: function () { return this.pos; },
         set: function (pos) {
             SVGHelper.SetPosition(this.SvgElement, pos);
             this.pos = pos;
+            this.OnMove();
         },
         enumerable: true,
         configurable: true
     });
     ;
-    Object.defineProperty(InteractiveSVGElement.prototype, "Width", {
+    Object.defineProperty(InteractiveSVGRect.prototype, "Width", {
         get: function () { return this.width; },
         set: function (w) {
             this.width = w;
@@ -135,7 +182,7 @@ var InteractiveSVGElement = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(InteractiveSVGElement.prototype, "Height", {
+    Object.defineProperty(InteractiveSVGRect.prototype, "Height", {
         get: function () { return this.height; },
         set: function (h) {
             this.height = h;
@@ -144,32 +191,88 @@ var InteractiveSVGElement = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
-    return InteractiveSVGElement;
-}());
+    return InteractiveSVGRect;
+}(InteractiveSVGElement));
+var InteractiveSVGLine = /** @class */ (function (_super) {
+    __extends(InteractiveSVGLine, _super);
+    function InteractiveSVGLine(pos1, pos2, movable, tag) {
+        var _this = _super.call(this, movable, tag) || this;
+        _this.SvgElement = SVGHelper.NewLine(pos1, pos2);
+        return _this;
+    }
+    Object.defineProperty(InteractiveSVGLine.prototype, "Position", {
+        get: function () {
+            var bBox = this.SvgElement.getBBox();
+            return { x: bBox.x, y: bBox.y };
+        },
+        set: function (pos) { throw new Error("Not implemented"); },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(InteractiveSVGLine.prototype, "Width", {
+        get: function () { return this.SvgElement.getBBox().width; },
+        set: function (w) { throw new Error("Not implemented"); },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(InteractiveSVGLine.prototype, "Height", {
+        get: function () { return this.SvgElement.getBBox().height; },
+        set: function (w) { throw new Error("Not implemented"); },
+        enumerable: true,
+        configurable: true
+    });
+    return InteractiveSVGLine;
+}(InteractiveSVGElement));
 var RoomVisualizer = /** @class */ (function () {
-    function RoomVisualizer(roomPlan, visualizer) {
-        this.roomPlan = roomPlan;
+    function RoomVisualizer(visualizer) {
         this.visualizer = visualizer;
-        this.visualizer.Width = roomPlan.width;
-        this.visualizer.Height = roomPlan.height;
         document.body.appendChild(this.visualizer.Wrapper);
+    }
+    Object.defineProperty(RoomVisualizer.prototype, "RoomPlan", {
+        set: function (roomPlan) {
+            this.roomPlan = roomPlan;
+            this.visualizer.Width = this.roomPlan.width;
+            this.visualizer.Height = this.roomPlan.height;
+            this.drawRoom();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    RoomVisualizer.prototype.drawRoom = function () {
+        this.visualizer.Reset();
         this.drawWalls();
         this.drawTables();
-    }
+    };
     RoomVisualizer.prototype.drawWalls = function () {
+        if (!this.roomPlan)
+            return;
         for (var _i = 0, _a = this.roomPlan.walls; _i < _a.length; _i++) {
             var wall = _a[_i];
             this.visualizer.AddLine(wall.from, wall.to);
         }
     };
     RoomVisualizer.prototype.drawTables = function () {
+        var _this = this;
+        if (!this.roomPlan)
+            return;
         var _loop_1 = function (table) {
-            this_1.visualizer.AddRect(table.width, table.height, table.position, true, function () { alert("Table " + table.id + " clicked!"); });
+            var rect = this_1.visualizer.AddRect(table.width, table.height, table.position, true, "table");
+            rect.OnClick = function () { console.log("Table " + table.id + " clicked!"); };
+            rect.OnMove = function () { _this.updateTablePos(table.id, rect.Position); };
         };
         var this_1 = this;
         for (var _i = 0, _a = this.roomPlan.tables; _i < _a.length; _i++) {
             var table = _a[_i];
             _loop_1(table);
+        }
+    };
+    RoomVisualizer.prototype.updateTablePos = function (tableID, pos) {
+        if (this.roomPlan) {
+            for (var _i = 0, _a = this.roomPlan.tables; _i < _a.length; _i++) {
+                var t = _a[_i];
+                if (t.id == tableID)
+                    t.position = pos;
+            }
         }
     };
     return RoomVisualizer;

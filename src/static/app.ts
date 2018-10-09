@@ -43,7 +43,7 @@ interface IInteractiveVisualizer {
     Wrapper: HTMLElement,
     Width: number,
     Height: number,
-    AddRect(w: number, h: number, pos: IPoint, moveble?: boolean, tag?: string): InteractiveSVGRect,
+    AddRect(w: number, h: number, pos: IPoint, movable?: boolean, tag?: string): InteractiveSVGRect,
     AddLine(pos1: IPoint, pos2: IPoint): InteractiveSVGLine,
     GetElements(tag: string): InteractiveSVGElement[],
     Reset(): void
@@ -81,8 +81,8 @@ class InteractiveSVG implements IInteractiveVisualizer {
         SVGHelper.SetSize(this.svg, this.width, this.height);
     }
 
-    public AddRect(w: number, h: number, pos: IPoint, moveable: boolean = false, tag?: string): InteractiveSVGRect {
-        const elm = new InteractiveSVGRect(w, h, pos, moveable, tag);
+    public AddRect(w: number, h: number, pos: IPoint, movable: boolean = false, tag?: string): InteractiveSVGRect {
+        const elm = new InteractiveSVGRect(w, h, pos, movable, tag);
         this.addElement(elm);
         return elm;
     }
@@ -168,8 +168,8 @@ class InteractiveSVGRect extends InteractiveSVGElement {
     private width: number = 0;
     private height: number = 0;
 
-    constructor(w: number, h: number, position?: IPoint, moveable?: boolean, tag?: string) {
-        super(moveable, tag);
+    constructor(w: number, h: number, position?: IPoint, movable?: boolean, tag?: string) {
+        super(movable, tag);
         this.SvgElement = SVGHelper.NewRect(w, h);
         if (position) this.Position = position;
         else this.Position = { x: 0, y: 0 };

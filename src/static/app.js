@@ -58,9 +58,9 @@ var InteractiveSVG = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
-    InteractiveSVG.prototype.AddRect = function (w, h, pos, moveable, tag) {
-        if (moveable === void 0) { moveable = false; }
-        var elm = new InteractiveSVGRect(w, h, pos, moveable, tag);
+    InteractiveSVG.prototype.AddRect = function (w, h, pos, movable, tag) {
+        if (movable === void 0) { movable = false; }
+        var elm = new InteractiveSVGRect(w, h, pos, movable, tag);
         this.addElement(elm);
         return elm;
     };
@@ -142,8 +142,8 @@ var InteractiveSVGElement = /** @class */ (function () {
 }());
 var InteractiveSVGRect = /** @class */ (function (_super) {
     __extends(InteractiveSVGRect, _super);
-    function InteractiveSVGRect(w, h, position, moveable, tag) {
-        var _this = _super.call(this, moveable, tag) || this;
+    function InteractiveSVGRect(w, h, position, movable, tag) {
+        var _this = _super.call(this, movable, tag) || this;
         _this.pos = { x: 0, y: 0 };
         _this.width = 0;
         _this.height = 0;

@@ -4,11 +4,12 @@ class Roomplan(db.Model):
     __tablename__ = 'roomplan'
 
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, primary_key=True)
     xpos = db.Column(db.Integer)
     ypos = db.Column(db.Integer)
     width = db.Column(db.Integer)
     height = db.Column(db.Integer)
-    name = db.Column(db.String)
+
 
 
     def __init__(self, id, xpos,ypos,width, height,name):

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TableVisTest</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="/static/app.js?v0.1"></script>
+    <style>
+        h1{
+            position: absolute;
+            top: 500px;
+        }
+        #forms{
+            position: absolute;
+            top: 580px;
+        }
+    </style>
+</head>
+<body>
+    <div id="wrapper"></div>
+<h1>Admin page</h1>
+    <div id="forms">
+
+ <label>Name: <input type="text" id="table-name" name="name"/> </label> <br>
+ <label><input onclick="printTables()" name="submit_button" id="submitbutton" type="submit" value="Add table" /></label>
+            <h4> Delete a table </h4>
+                <form action="{{ url_for('admin') }}" method="post">
+  <label>Name: <input type="text" name="deletedname"/> </label> <br>
+ <label><input name="submit_button" id ="submitbutton" type="submit" value="Delete table" /></label>
+
+        </form>
+<br><br>
+
+        <br><br><br><br><br><br><br><br>
+        </div>
+
+</body>
+</html>

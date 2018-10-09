@@ -1,17 +1,30 @@
 window.addEventListener("load", () => {
-    fetch("/visualize")
+    path = window.location.pathname;
+    substring = "/table/";
+    if(path.includes(substring)){
+        var res = path.split("/")[2];
+    fetch("/othertables/" + res)
         .then(r => { return r.json() })
         .then(roomPlan => {
             let room: IRoom = <IRoom>roomPlan;
             init(room);
         })
+    } else{
+            fetch("/visualize")
+        .then(r => { return r.json() })
+        .then(roomPlan => {
+            let room: IRoom = <IRoom>roomPlan;
+            init(room);
+        })
+    }
         });
 
+const rv;
 function init(roomPlan: IRoom) {
     console.log("RoomPlan:");
     console.log(roomPlan);
     const visualizer = new InteractiveSVG();
-    const rv = new RoomVisualizer(visualizer);
+    rv = new RoomVisualizer(visualizer);
     rv.RoomPlan = roomPlan;
 }
 
@@ -264,6 +277,7 @@ class RoomVisualizer {
                 "table"
             );
             rect.OnClick = () => { console.log("Table " + table.id + " clicked!") };
+            rect.OnClick = () => { console.log("Table Position for table " + table.id +" " +  table.position.x) };
             rect.OnMove = () => { this.updateTablePos(table.id, rect.Position) };
         }
     }
@@ -314,4 +328,33 @@ class SVGHelper {
         element.setAttribute("x2", pos2.x + "px");
         element.setAttribute("y2", pos2.y + "px");
     }
+}
+
+
+
+function printTables(){
+    if (!rv.roomPlan) return;
+    var dict = [];
+    var TableName = (<HTMLInputElement>document.getElementById('table-name')).value;
+    for(let table of rv.roomPlan.tables) {
+        dict.push({
+            "id": table.id,
+            "width": table.width,
+            "height": table.height,
+            "xpos": table.position.x,
+            "ypos": table.position.y,
+            "name": TableName
+        })
+    }
+    var xhr = new XMLHttpRequest();
+    var url = "/newroom";
+    xhr.open("POST", url, true);
+    xhr.setRequestHeader("Content-type", "application/json");
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+            var json = JSON.parse(xhr.responseText);
+        }
+    }
+    var data = JSON.stringify(dict);
+    xhr.send(data);
 }

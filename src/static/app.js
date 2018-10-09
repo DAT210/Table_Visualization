@@ -12,18 +12,32 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 window.addEventListener("load", function () {
-    fetch("/visualize")
-        .then(function (r) { return r.json(); })
-        .then(function (roomPlan) {
-        var room = roomPlan;
-        init(room);
-    });
+    path = window.location.pathname;
+    substring = "/table/";
+    if (path.includes(substring)) {
+        var res = path.split("/")[2];
+        fetch("/othertables/" + res)
+            .then(function (r) { return r.json(); })
+            .then(function (roomPlan) {
+            var room = roomPlan;
+            init(room);
+        });
+    }
+    else {
+        fetch("/visualize")
+            .then(function (r) { return r.json(); })
+            .then(function (roomPlan) {
+            var room = roomPlan;
+            init(room);
+        });
+    }
 });
+var rv;
 function init(roomPlan) {
     console.log("RoomPlan:");
     console.log(roomPlan);
     var visualizer = new InteractiveSVG();
-    var rv = new RoomVisualizer(visualizer);
+    rv = new RoomVisualizer(visualizer);
     rv.RoomPlan = roomPlan;
 }
 var InteractiveSVG = /** @class */ (function () {
@@ -259,6 +273,7 @@ var RoomVisualizer = /** @class */ (function () {
         var _loop_1 = function (table) {
             var rect = this_1.visualizer.AddRect(table.width, table.height, table.position, true, "table");
             rect.OnClick = function () { console.log("Table " + table.id + " clicked!"); };
+            rect.OnClick = function () { console.log("Table Position for table " + table.id + " " + table.position.x); };
             rect.OnMove = function () { _this.updateTablePos(table.id, rect.Position); };
         };
         var this_1 = this;
@@ -319,3 +334,31 @@ var SVGHelper = /** @class */ (function () {
     SVGHelper.svgNS = "http://www.w3.org/2000/svg";
     return SVGHelper;
 }());
+function printTables() {
+    if (!rv.roomPlan)
+        return;
+    var dict = [];
+    var TableName = document.getElementById('table-name').value;
+    for (var _i = 0, _a = rv.roomPlan.tables; _i < _a.length; _i++) {
+        var table = _a[_i];
+        dict.push({
+            "id": table.id,
+            "width": table.width,
+            "height": table.height,
+            "xpos": table.position.x,
+            "ypos": table.position.y,
+            "name": TableName
+        });
+    }
+    var xhr = new XMLHttpRequest();
+    var url = "/newroom";
+    xhr.open("POST", url, true);
+    xhr.setRequestHeader("Content-type", "application/json");
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+            var json = JSON.parse(xhr.responseText);
+        }
+    };
+    var data = JSON.stringify(dict);
+    xhr.send(data);
+}

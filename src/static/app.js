@@ -152,6 +152,8 @@ var InteractiveSVGRect = /** @class */ (function (_super) {
             _this.Position = position;
         else
             _this.Position = { x: 0, y: 0 };
+        _this.width = w;
+        _this.height = h;
         _this.SvgElement.addEventListener("mousedown", function () {
             _this.PrevPosition = _this.pos;
         });

@@ -173,6 +173,8 @@ class InteractiveSVGRect extends InteractiveSVGElement {
         this.SvgElement = SVGHelper.NewRect(w, h);
         if (position) this.Position = position;
         else this.Position = { x: 0, y: 0 };
+        this.width = w;
+        this.height = h;
         
         this.SvgElement.addEventListener("mousedown", () => {
             this.PrevPosition = this.pos;

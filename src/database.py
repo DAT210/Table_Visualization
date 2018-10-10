@@ -15,4 +15,4 @@ db.create_all()
 # Loads a bunch of tables into the database
 start_tables()
 
-print('Done!')
+print('Done with init!')

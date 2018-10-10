@@ -7,33 +7,155 @@
     <link rel="stylesheet" href="/static/style.css">
     <script src="/static/app.js?v0.1"></script>
     <style>
-        h1{
+        html{
+            background-color: #e5e5e5;
+        }
+        h2{
             position: absolute;
+            color: #423f3f;
+            font-family: 'Raleway',sans-serif;
+            font-size: 30px;
+            font-weight: 800;
+            line-height: 36px;
+            text-align: center;
+            text-transform: uppercase;
+        }
+        .h2-1{
             top: 500px;
         }
-        #forms{
+        .h2-2{
+            top: 800px;
+        }
+        .h2-3{
+            top: 1020px;
+        }
+        .save-table{
+            position: absolute;
+            top: 880px;
+            width: 700px;
+            height: 150px;
+            border: 1px solid black;
+        }
+        .delete-table{
+            position: absolute;
+            top: 1100px;
+            width: 700px;
+            height: 140px;
+            border: 1px solid black;
+        }
+        .table-toolbox{
             position: absolute;
             top: 580px;
+            width: 700px;
+            height: 230px;
+            border: 1px solid black;
         }
+        .table-box{
+            position: relative;
+            left: 3%;
+            margin-top: 10px;
+        }
+        .table-box p{
+            font-size: 1.2em;
+        }
+        .box1{
+            width: 60px;
+            height: 40px;
+            border:1px solid black;
+            background-color: black;
+        }
+        .box2 {
+            width: 100px;
+            height: 40px;
+            border: 1px solid black;
+            background-color: black;
+        }
+        .box3{
+            width: 160px;
+            height: 40px;
+            border:1px solid black;
+            background-color: black;
+        }
+        .box3:hover, .box2:hover, .box1:hover{
+            background-color: #53a846;
+        }
+
+        .submitbutton
+            {
+            padding: 10px 15px 11px !important;
+            font-size: 18px !important;
+            background-color: #57d6c7;
+            font-weight: bold;
+            text-shadow: 1px 1px #57D6C7;
+            color: #ffffff;
+            border-radius: 5px;
+            -moz-border-radius: 5px;
+            -webkit-border-radius: 5px;
+            border: 1px solid #57D6C7;
+            cursor: pointer;
+            box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5) inset;
+            -moz-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5) inset;
+            -webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5) inset;
+            }
+        .center-forms{
+            width:200px;
+            margin: auto;
+        }
+        .delete-table p{
+            text-align: center;
+        }
+        .save-table p{
+            text-align: center;
+        }
+        .text-input{
+            margin-bottom: 10px;
+        }
+        #response-text{
+            margin-top:3px;
+            color: green;
+        }
+
+
+
+
     </style>
 </head>
 <body>
     <div id="wrapper"></div>
-<h1>Admin page</h1>
-    <div id="forms">
+<h2 class="h2-1">Add/remove tables</h2>
 
- <label>Name: <input type="text" id="table-name" name="name"/> </label> <br>
- <label><input onclick="printTables()" name="submit_button" id="submitbutton" type="submit" value="Add table" /></label>
-            <h4> Delete a table </h4>
-                <form action="{{ url_for('admin') }}" method="post">
-  <label>Name: <input type="text" name="deletedname"/> </label> <br>
- <label><input name="submit_button" id ="submitbutton" type="submit" value="Delete table" /></label>
-
-        </form>
-<br><br>
-
-        <br><br><br><br><br><br><br><br>
+    <div class="table-toolbox">
+        <div class="table-box"> <p>Table sizes</p></div>
+        <div class="table-box box1" onclick="addTable(60,40)"></div>
+        <div class="table-box box2" onclick="addTable(100,40)"></div>
+        <div class="table-box box3" onclick="addTable(140,40)"></div>
         </div>
+
+<h2 class="h2-2">Save this table layout</h2>
+
+        <div class="save-table">
+            <p>Give this table layout a name and click on the save button</p>
+            <div class="center-forms">
+ <label>Name: <input class="text-input" type="text" id="table-name" name="name"/>  </label> <br>
+ <label><input onclick="saveTableSetup()" name="submit_button" class="submitbutton" type="submit" value="Save table layout" /></label>
+    </div>
+            <p id="response-text"></p>  
+            </div>
+
+    
+            <h2 class="h2-3"> Delete a table layout </h2>
+        <div class="delete-table">
+            <p>Enter the name of a table layout and click the delete button</p>
+            <div class="center-forms">
+                <form action="{{ url_for('admin') }}" method="post">
+  <label>Name: <input class="text-input" type="text" name="deletedname"/> </label> <br>
+ <label><input name="submit_button" class="submitbutton" type="submit" value="Delete table layout" /></label>
+        </form>
+                </div>
+</div>
+
+
+
 
 </body>
 </html>

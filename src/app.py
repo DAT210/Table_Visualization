@@ -23,7 +23,7 @@ def visualize():
     table_positions = {}
 
    # Last inn json filen vår som tegner selve rommet med vegger
-    with open('static/roomPlan.json') as f:
+    with open('src/static/roomPlan.json') as f:
         data = json.load(f)
 
    # Sett inn hvor bord skal være i json fila
@@ -54,7 +54,7 @@ def others(tablename):
     table_positions = {}
     ## Om det finnes et bordoppsett med innparameteren som er sendt inn, generer det
     if default_value:
-        with open('static/roomPlan.json') as f:
+        with open('src/static/roomPlan.json') as f:
             data = json.load(f)
 
         draw_tables = data["tables"]
@@ -90,15 +90,17 @@ def test():
             ypos = key["ypos"]
             width = key["width"]
             height = key["height"]
-            name = key["name"]
+            name = key["name"].lower()
+            if len(name) < 1:
+                return json.dumps("error")
             try:
                 table = Roomplan(int(id), int(xpos), int(ypos), int(width), int(height), name)
                 db.session.add(table)
                 db.session.commit()
             except:
                 print("Ikke gyldig innparametere")
-        return json.dumps("hei")
-    return json.dumps("hei")
+        return json.dumps("success")
+    return json.dumps("error")
 
 
 
@@ -110,7 +112,7 @@ def test():
 def admin():
     ### Hvis noen sletter et bordoppsett
     if request.method == 'POST':
-        if request.form['submit_button'] == 'Delete table':
+        if request.form['submit_button'] == 'Delete table layout':
             deleted_table = request.form.get("deletedname")
             deleted_rows = Roomplan.query.filter_by(name=deleted_table)
             try:
@@ -126,4 +128,5 @@ def admin():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+   app.run(host='0.0.0.0', port=80, debug=True) # debug kun i teste fasen
+   #app.run(debug=True)

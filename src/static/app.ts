@@ -1,6 +1,8 @@
 window.addEventListener("load", () => {
     path = window.location.pathname;
     substring = "/table/";
+
+    // Sjekk om det er default bordoppsett eller alternative som skal lastes inn
     if(path.includes(substring)){
         var res = path.split("/")[2];
     fetch("/othertables/" + res)
@@ -9,7 +11,8 @@ window.addEventListener("load", () => {
             let room: IRoom = <IRoom>roomPlan;
             init(room);
         })
-    } else{
+    }
+    else{
             fetch("/visualize")
         .then(r => { return r.json() })
         .then(roomPlan => {
@@ -277,7 +280,7 @@ class RoomVisualizer {
                 "table"
             );
             rect.OnClick = () => { console.log("Table " + table.id + " clicked!") };
-            rect.OnClick = () => { console.log("Table Position for table " + table.id +" " +  table.position.x) };
+            rect.OnClick = () => { console.log("Table Position for table " + table.id +" " +  table.position) };
             rect.OnMove = () => { this.updateTablePos(table.id, rect.Position) };
         }
     }
@@ -331,8 +334,8 @@ class SVGHelper {
 }
 
 
-
-function printTables(){
+// AJAX call hvor man går gjennom nåværende bordoppsett og sender det med json til serveren
+function saveTableSetup(){
     if (!rv.roomPlan) return;
     var dict = [];
     var TableName = (<HTMLInputElement>document.getElementById('table-name')).value;
@@ -352,9 +355,38 @@ function printTables(){
     xhr.setRequestHeader("Content-type", "application/json");
     xhr.onreadystatechange = function () {
         if (xhr.readyState == 4 && xhr.status == 200) {
+            // Sjekk om server klarte å legge inn bordoppsettet i databasen
             var json = JSON.parse(xhr.responseText);
+            var errorMsg = (<HTMLInputElement>document.getElementById('response-text'));
+            if (json == "error"){
+            errorMsg.style.color = "red";
+            errorMsg.innerHTML = "Could not save this table layout";
+            }
+            else{
+            errorMsg.style.color = "green";
+            errorMsg.innerHTML = TableName + " was successfully added";
+            }
         }
     }
     var data = JSON.stringify(dict);
     xhr.send(data);
+}
+
+
+
+function addTable(width, height){
+    if (!rv.roomPlan) return;
+    // Legger til et nytt element i sentrum, med størrelse lik innparameterene
+    var center = {"x":250, "y":250};
+       const newRect = rv.visualizer.AddRect(
+            width,
+            height,
+            center,
+            true,
+            "table"
+        );
+    var tableID = rv.roomPlan.tables.length+1;
+    rv.roomPlan.tables.push({"id":tableID, "width":width, "height": height, "position": center });
+    newRect.OnMove = () => { rv.updateTablePos(tableID, newRect.Position) };
+
 }

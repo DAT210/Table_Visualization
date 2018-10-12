@@ -13,6 +13,7 @@ function init(roomPlan: IRoom) {
     const visualizer = new InteractiveSVG();
     const rv = new RoomVisualizer(visualizer);
     rv.RoomPlan = roomPlan;
+    rv.example(2);
 }
 
 interface IPoint {
@@ -140,7 +141,19 @@ class InteractiveSVG implements IInteractiveVisualizer {
     }
 }
 
-abstract class InteractiveSVGElement {
+interface IInteractiveVisualizerElement {
+    SvgElement: SVGElement,
+    Position: IPoint,
+    Width: number,
+    Height: number,
+    PrevPosition: IPoint | undefined,
+    Movable: boolean,
+    OnClick: () => void,
+    OnMove: () => void,
+    Tag: string
+}
+
+abstract class InteractiveSVGElement implements IInteractiveVisualizerElement{
     public abstract SvgElement: SVGElement;
     public abstract Position: IPoint;
     public abstract Width: number;
@@ -228,6 +241,7 @@ class InteractiveSVGLine extends InteractiveSVGElement {
 class RoomVisualizer {
     private visualizer: IInteractiveVisualizer;
     private roomPlan: IRoom | undefined;
+    private tables: { [id: number]: IInteractiveVisualizerElement } = {};
 
     constructor(visualizer: IInteractiveVisualizer) {
         this.visualizer = visualizer;
@@ -239,6 +253,13 @@ class RoomVisualizer {
         this.visualizer.Width = this.roomPlan.width;
         this.visualizer.Height = this.roomPlan.height;
         this.drawRoom();
+    }
+
+    /** Example code to alter table color */
+    example(tableID: number) {
+        if (tableID in this.tables) {
+            this.tables[tableID].SvgElement.style.fill = "red";
+        }
     }
 
     private drawRoom(): void {
@@ -264,6 +285,7 @@ class RoomVisualizer {
             );
             rect.OnClick = () => { console.log("Table " + table.id + " clicked!") };
             rect.OnMove = () => { this.updateTablePos(table.id, rect.Position) };
+            this.tables[table.id] = rect;
         }
     }
     private updateTablePos(tableID: number, pos: IPoint): void {

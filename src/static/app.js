@@ -26,6 +26,7 @@ function init(roomPlan) {
     var visualizer = new InteractiveSVG();
     var rv = new RoomVisualizer(visualizer);
     rv.RoomPlan = roomPlan;
+    rv.example(2);
 }
 var InteractiveSVG = /** @class */ (function () {
     function InteractiveSVG(width, height) {
@@ -227,6 +228,7 @@ var InteractiveSVGLine = /** @class */ (function (_super) {
 }(InteractiveSVGElement));
 var RoomVisualizer = /** @class */ (function () {
     function RoomVisualizer(visualizer) {
+        this.tables = {};
         this.visualizer = visualizer;
         document.body.appendChild(this.visualizer.Wrapper);
     }
@@ -240,6 +242,12 @@ var RoomVisualizer = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
+    /** Example code to alter table color */
+    RoomVisualizer.prototype.example = function (tableID) {
+        if (tableID in this.tables) {
+            this.tables[tableID].SvgElement.style.fill = "red";
+        }
+    };
     RoomVisualizer.prototype.drawRoom = function () {
         this.visualizer.Reset();
         this.drawWalls();
@@ -261,6 +269,7 @@ var RoomVisualizer = /** @class */ (function () {
             var rect = this_1.visualizer.AddRect(table.width, table.height, table.position, true, "table");
             rect.OnClick = function () { console.log("Table " + table.id + " clicked!"); };
             rect.OnMove = function () { _this.updateTablePos(table.id, rect.Position); };
+            this_1.tables[table.id] = rect;
         };
         var this_1 = this;
         for (var _i = 0, _a = this.roomPlan.tables; _i < _a.length; _i++) {

@@ -7,7 +7,7 @@ import requests
 
 @app.route('/')
 def index():
-    return render_template("index.html")
+    return redirect("/table/oslo")
 
 @app.route('/table/<tablename>')
 def table(tablename):
@@ -54,7 +54,7 @@ def others(tablename):
     table_positions = {}
     ## Om det finnes et bordoppsett med innparameteren som er sendt inn, generer det
     if default_value:
-        with open('src/static/roomPlan.json') as f:
+        with open('static/roomPlan.json') as f:
             data = json.load(f)
 
         draw_tables = data["tables"]
@@ -128,5 +128,5 @@ def admin():
 
 
 if __name__ == '__main__':
-   app.run(host='0.0.0.0', port=80, debug=True) # debug kun i teste fasen
-   #app.run(debug=True)
+  # app.run(host='0.0.0.0', port=80, debug=True) # debug kun i teste fasen
+   app.run(debug=True)

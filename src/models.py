@@ -11,7 +11,6 @@ class Roomplan(db.Model):
     height = db.Column(db.Integer)
 
 
-
     def __init__(self, id, xpos,ypos,width, height,name):
         self.id = id
         self.xpos = xpos

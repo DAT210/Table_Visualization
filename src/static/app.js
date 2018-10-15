@@ -12,26 +12,16 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 window.addEventListener("load", function () {
+    console.log("Laste injn");
     path = window.location.pathname;
     substring = "/table/";
-    // Sjekk om det er default bordoppsett eller alternative som skal lastes inn
-    if (path.includes(substring)) {
-        var res = path.split("/")[2];
-        fetch("/othertables/" + res)
-            .then(function (r) { return r.json(); })
-            .then(function (roomPlan) {
-            var room = roomPlan;
-            init(room);
-        });
-    }
-    else {
-        fetch("/visualize")
-            .then(function (r) { return r.json(); })
-            .then(function (roomPlan) {
-            var room = roomPlan;
-            init(room);
-        });
-    }
+    var res = path.split("/")[2];
+    fetch("/othertables/" + res)
+        .then(function (r) { return r.json(); })
+        .then(function (roomPlan) {
+        var room = roomPlan;
+        init(room);
+    });
 });
 var rv;
 function init(roomPlan) {

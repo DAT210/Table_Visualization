@@ -1,25 +1,14 @@
 window.addEventListener("load", () => {
+    console.log("Laste inn");
     path = window.location.pathname;
     substring = "/table/";
-
-    // Sjekk om det er default bordoppsett eller alternative som skal lastes inn
-    if(path.includes(substring)){
-        var res = path.split("/")[2];
+    var res = path.split("/")[2];
     fetch("/othertables/" + res)
         .then(r => { return r.json() })
         .then(roomPlan => {
             let room: IRoom = <IRoom>roomPlan;
             init(room);
         })
-    }
-    else{
-            fetch("/visualize")
-        .then(r => { return r.json() })
-        .then(roomPlan => {
-            let room: IRoom = <IRoom>roomPlan;
-            init(room);
-        })
-    }
         });
 
 const rv;

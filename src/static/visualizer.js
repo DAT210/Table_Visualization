@@ -100,6 +100,7 @@ var InteractiveSVG = /** @class */ (function () {
     InteractiveSVG.prototype.registerMovableElement = function (element) {
         var _this = this;
         element.SvgElement.addEventListener("mousedown", function (e) {
+            e.preventDefault();
             _this.currentlyMoving = element;
             var elmPos = element.Position;
             _this.mouseOffset = { x: (e.layerX - elmPos.x), y: (e.layerY - elmPos.y) };

@@ -92,6 +92,7 @@ class InteractiveSVG implements IInteractiveVisualizer {
     }
     private registerMovableElement(element: InteractiveSVGElement) {
         element.SvgElement.addEventListener("mousedown", (e: MouseEvent) => {
+            e.preventDefault()
             this.currentlyMoving = element;
             const elmPos = element.Position;
             this.mouseOffset = { x: (e.layerX - elmPos.x), y: (e.layerY - elmPos.y) }

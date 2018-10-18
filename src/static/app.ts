@@ -1,9 +1,5 @@
 window.addEventListener("load", () => {
-    console.log("Laste inn");
-    path = window.location.pathname;
-    substring = "/table/";
-    var res = path.split("/")[2];
-    fetch("/othertables/" + res)
+    fetch("/load/json")
         .then(r => { return r.json() })
         .then(roomPlan => {
             let room: IRoom = <IRoom>roomPlan;
@@ -324,7 +320,7 @@ class SVGHelper {
 
 
 // AJAX call hvor man går gjennom nåværende bordoppsett og sender det med json til serveren
-function saveTableSetup(){
+function saveTableSetup(value){
     if (!rv.roomPlan) return;
     var dict = [];
     var TableName = (<HTMLInputElement>document.getElementById('table-name')).value;
@@ -335,8 +331,13 @@ function saveTableSetup(){
             "height": table.height,
             "xpos": table.position.x,
             "ypos": table.position.y,
-            "name": TableName
+            "name": TableName,
+            "status": value
         })
+    }
+    if (dict.length == 0){
+        (<HTMLInputElement>document.getElementById('save-response-text')).innerHTML = "You have to add tables";
+        return;
     }
     var xhr = new XMLHttpRequest();
     var url = "/newroom";
@@ -346,14 +347,19 @@ function saveTableSetup(){
         if (xhr.readyState == 4 && xhr.status == 200) {
             // Sjekk om server klarte å legge inn bordoppsettet i databasen
             var json = JSON.parse(xhr.responseText);
-            var errorMsg = (<HTMLInputElement>document.getElementById('response-text'));
-            if (json == "error"){
-            errorMsg.style.color = "red";
-            errorMsg.innerHTML = "Could not save this table layout";
+            console.log(json);
+            var errorMsg = (<HTMLInputElement>document.getElementById('save-response-text'));
+            if (value == "update"){
+                var errorMsg = (<HTMLInputElement>document.getElementById('update-response-text'));
             }
-            else{
+            var jsonStatus = json["status"]
+            if (jsonStatus == "error"){
+            errorMsg.style.color = "red";
+            errorMsg.innerHTML = json["message"];
+            }
+            if(jsonStatus == "success"){
             errorMsg.style.color = "green";
-            errorMsg.innerHTML = TableName + " was successfully added";
+            errorMsg.innerHTML = json["message"];
             }
         }
     }

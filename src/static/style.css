@@ -10,6 +10,7 @@ line {
 body {
     display: flex;
     justify-content: center;
+    min-height: 1200px;
 }
 
 #InteractiveSVGWrapper {
@@ -20,42 +21,18 @@ body {
         html{
             background-color: #e5e5e5;
         }
-        h2{
-            position: absolute;
-            color: #423f3f;
-            font-family: 'Raleway',sans-serif;
-            font-size: 30px;
-            font-weight: 800;
-            line-height: 36px;
-            text-align: center;
-            text-transform: uppercase;
-        }
-        .h2-1{
-            top: 500px;
-        }
-        .h2-2{
-            top: 800px;
-        }
-        .h2-3{
-            top: 1020px;
-        }
-        .save-table{
-            position: absolute;
-            top: 880px;
+
+        .save-new-box, .update-box{
             width: 700px;
             height: 150px;
             border: 1px solid black;
         }
-        .delete-table{
-            position: absolute;
-            top: 1100px;
+        .delete-box{
             width: 700px;
             height: 140px;
             border: 1px solid black;
         }
-        .table-toolbox{
-            position: absolute;
-            top: 780px;
+        .addtable-box{
             width: 700px;
             height: 230px;
             border: 1px solid black;
@@ -107,33 +84,144 @@ body {
             -moz-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5) inset;
             -webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5) inset;
             }
+         #load-btn{
+             absolute: relative;
+             left: 10px;
+
+        }
         .center-forms{
             width:200px;
             margin: auto;
         }
-        .delete-table p{
-            text-align: center;
-        }
-        .save-table p{
+        .delete-box p, .save-box p{
             text-align: center;
         }
         .text-input{
             margin-bottom: 10px;
         }
-        #response-text{
+        #save-response-text, #update-response-text{
             margin-top:3px;
             color: green;
         }
-        #load-tab{
-            position: absolute;
-            top: 30px;
-            left: 1100px;
-            height: 450px;
-            width: 250px;
-            border: 1px solid black;
+
+        .admin-box{
+            position:absolute;
+            top: 700px;
+
+        }
+        .load-box{
+
+
+        }
+        .load-position-box{
+            position: relative;
+            width: 700px;
+            height: auto;
+            border-top: 2px solid grey;
+            top: 10px;
+        }
+        .addtable-box, .save-new-box, .update-box, .delete-box, .create-box, .removetable-box, .addwalls-box{
+            visibility: hidden;
+        }
+        #current-roomplan{
+            position:absolute;
+            top: 480px;
+        }
+        .menu-bar{
+            position:absolute;
+            top:550px;
         }
 
 
+.area-header h3 {
+    font: 600 1.5em/1 'Raleway', sans-serif;
+    color: rgba(0,0,0,.5);
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: .5em;
+    position: absolute;
+    top: 25%;
+    width: 100%;
+}
+
+span, span:after {
+    font-weight: 900;
+    color: #efedce;
+    white-space: nowrap;
+    display: inline-block;
+    position: relative;
+    letter-spacing: .1em;
+    padding: .2em 0 .25em 0;
+}
+
+span {
+    font-size: 4em;
+    z-index: 100;
+    text-shadow: .04em .04em 0 #9cb8b3;
+}
+
+span:after {
+    content: attr(data-shadow-text);
+    color: rgba(0,0,0,.35);
+    text-shadow: none;
+    position: absolute;
+    left: .0875em;
+    top: .0875em;
+    z-index: -1;
+    -webkit-mask-image: url(//f.cl.ly/items/1t1C0W3y040g1J172r3h/mask.png);
+}
+
+/*the container must be positioned relative:*/
+.custom-select {
+  position: relative;
+  font-family: Arial;
+}
+.custom-select select {
+  display: none; /*hide original SELECT element:*/
+}
+.select-selected {
+  background-color: DodgerBlue;
+}
+/*style the arrow inside the select element:*/
+.select-selected:after {
+  position: absolute;
+  content: "";
+  top: 14px;
+  right: 10px;
+  width: 0;
+  height: 0;
+  border: 6px solid transparent;
+  border-color: #fff transparent transparent transparent;
+}
+/*point the arrow upwards when the select box is open (active):*/
+.select-selected.select-arrow-active:after {
+  border-color: transparent transparent #fff transparent;
+  top: 7px;
+}
+/*style the items (options), including the selected item:*/
+.select-items div,.select-selected {
+  color: #ffffff;
+  padding: 8px 16px;
+  border: 1px solid transparent;
+  border-color: transparent transparent rgba(0, 0, 0, 0.1) transparent;
+  cursor: pointer;
+}
+/*style items (options):*/
+.select-items {
+  position: absolute;
+  background-color: DodgerBlue;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 99;
+}
+/*hide the items when the select box is closed:*/
+.select-hide {
+  display: none;
+}
+.select-items div:hover, .same-as-selected {
+  background-color: rgba(0, 0, 0, 0.1);
+}
 
 
 
@@ -321,7 +409,3 @@ ul.primary li:hover > a{
     background: none;
   }
 }
-        .menu-bar{
-            position:absolute;
-            top:500px;
-        }

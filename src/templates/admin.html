@@ -17,24 +17,28 @@
 <nav>
   <ul class="primary">
     <li>
-      <a href="">Load a setup</a>
+      <a href="#load" id="load-setup">Load a setup</a>
     </li>
-    <li>
-      <a href="">Create new</a>
+    <li id="create-new">
+      <a href={{ url_for('clear') }}>Create new</a>
     </li>
       <li>
-  <a href="">Edit tools</a>
+  <a href="#edittools">Edit tools</a>
   <ul class="sub">
-    <li><a href="">Add walls</a></li>
-    <li><a href="">Add tables</a></li>
-    <li><a href="">Remove tables</a></li>
+    <li><a href="#addwalls" id="add-walls">Add walls</a></li>
+    <li><a href="#addtables" id="add-tables">Add tables</a></li>
+    <li><a href="#removetables" id="remove-tables">Remove tables</a></li>
+  </ul>
+</li>
+      <li>
+  <a href="#savesetup">Save</a>
+  <ul class="sub">
+    <li><a href="#savenew" id="save-new">Save as new</a></li>
+    <li><a href="#updatecurrent" id="update-current">Update current</a></li>
   </ul>
 </li>
     <li>
-      <a href="">Save</a>
-    </li>
-    <li>
-      <a href="">Delete</a>
+      <a href="#deletesetup" id="delete">Delete</a>
     </li>
   </ul>
 </nav>
@@ -42,5 +46,100 @@
 </div>
 
 
+
+
+
+    <div class="admin-box load-box">
+        <div class="load-position-box">
+<div class="custom-select" style="width:220px;">
+    <form action="{{ url_for('load') }}" method="post">
+  <select name="restaurants">
+      <option value="default">Select a restaurant</option>
+       {% for restaurant in restaurants %}
+    <option value={{restaurant}}>{{restaurant}}</option>
+        {% endfor %}
+  </select>
+        </div>
+ <input type="submit" class="submitbutton" id="load-btn" value="Confirm" />
+        </form>
+{% if tablesetup %}
+        {{tablesetup}}
+{% endif %}
+            </div>
+</div>
+
+
+    <div id="current-roomplan">
+        {% if session %}
+        <h3 class="area-header"><span data-shadow-text={{session}}>{{session}}</span></h3>
+        {% else %}
+        <h3 class="area-header"><span data-shadow-text="Admin page">Admin page</span></h3>
+        {% endif %}
+    </div>
+
+
+ <div class="admin-box addtable-box">
+        <div class="table-box"> <p>Table sizes</p></div>
+        <div class="table-box box1" onclick="addTable(60,40)"></div>
+        <div class="table-box box2" onclick="addTable(100,40)"></div>
+        <div class="table-box box3" onclick="addTable(140,40)"></div>
+        </div>
+ </div>
+
+
+
+<div class="admin-box save-new-box">
+                <p>Give this table layout a name and click on the save button</p>
+            <div class="center-forms">
+ <label>Name: <input class="text-input" type="text" id="table-name" name="name"/>  </label> <br>
+ <label><input onclick="saveTableSetup('new')" name="submit_button" class="submitbutton" type="submit" value="Save table layout" /></label>
+    </div>
+           <p id="save-response-text"></p>
+</div>
+
+
+<div class="admin-box update-box">
+    {% if session %}
+        <p>Are you sure you want to update the {{session}} layout?</p>
+                <div class="center-forms">
+ <label><input onclick="saveTableSetup('update')" name="submit_button" class="submitbutton" type="submit" value="Yes" /></label>
+    </div>
+    {% else %}
+    <p>This table setup is not stored</p>
+{% endif %}
+            <p id="update-response-text"></p>
+</div>
+
+
+
+<div class="admin-box delete-box">
+                <p>Enter the name of a table layout and click the delete button</p>
+            <div class="center-forms">
+                <form action="{{ url_for('admin') }}" method="post">
+  <label>Name: <input class="text-input" type="text" name="deletedname"/> </label> <br>
+ <label><input name="submit_button" class="submitbutton" type="submit" value="Delete table layout" /></label>
+        </form>
+                </div>
+</div>
+
+
+
+
+    <div class="admin-box create-box">
+        <p>Create new</p>
+    </div>
+
+
+        <div class="admin-box addwalls-box">
+        <p>Add walls</p>
+    </div>
+
+
+
+        <div class="admin-box removetable-box">
+        <p>Remove tables</p>
+    </div>
+<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+<script src="/static/admin.js"></script>
 </body>
 </html>

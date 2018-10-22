@@ -248,25 +248,32 @@ var RoomVisualizer = /** @class */ (function () {
     RoomVisualizer.prototype.drawWalls = function () {
         if (!this.roomPlan)
             return;
+        var _loop_1 = function (wall) {
+            var walli = this_1.visualizer.AddLine(wall.from, wall.to);
+            console.log(walli);
+            //this.visualizer.AddLine(wall.from, wall.to);
+
+        };
+        var this_1 = this;
         for (var _i = 0, _a = this.roomPlan.walls; _i < _a.length; _i++) {
             var wall = _a[_i];
-            this.visualizer.AddLine(wall.from, wall.to);
+            _loop_1(wall);
         }
     };
     RoomVisualizer.prototype.drawTables = function () {
         var _this = this;
         if (!this.roomPlan)
             return;
-        var _loop_1 = function (table) {
-            var rect = this_1.visualizer.AddRect(table.width, table.height, table.position, true, "table");
+        var _loop_2 = function (table) {
+            var rect = this_2.visualizer.AddRect(table.width, table.height, table.position, true, "table");
             rect.OnClick = function () { console.log("Table " + table.id + " clicked!"); };
             rect.OnClick = function () { console.log("Table Position for table " + table.id + " " + table.position); };
             rect.OnMove = function () { _this.updateTablePos(table.id, rect.Position); };
         };
-        var this_1 = this;
+        var this_2 = this;
         for (var _i = 0, _a = this.roomPlan.tables; _i < _a.length; _i++) {
             var table = _a[_i];
-            _loop_1(table);
+            _loop_2(table);
         }
     };
     RoomVisualizer.prototype.updateTablePos = function (tableID, pos) {
@@ -321,12 +328,10 @@ var SVGHelper = /** @class */ (function () {
     SVGHelper.svgNS = "http://www.w3.org/2000/svg";
     return SVGHelper;
 }());
-// AJAX call hvor man går gjennom nåværende bordoppsett og sender det med json til serveren
-function saveTableSetup(value) {
+function GetTableSetup(name, value) {
     if (!rv.roomPlan)
         return;
     var dict = [];
-    var TableName = document.getElementById('table-name').value;
     for (var _i = 0, _a = rv.roomPlan.tables; _i < _a.length; _i++) {
         var table = _a[_i];
         dict.push({
@@ -335,27 +340,54 @@ function saveTableSetup(value) {
             "height": table.height,
             "xpos": table.position.x,
             "ypos": table.position.y,
-            "name": TableName,
-            "status": value
+            "status": value,
+            "name": name
         });
     }
+    return dict;
+}
+function SaveTableLayout(value) {
+    var TableName = document.getElementById('table-name').value;
+    if (TableName.length < 1) {
+        document.getElementById('save-response-text').innerHTML = "The name is too short";
+        return;
+    }
+    var dict = GetTableSetup(TableName, value);
     if (dict.length == 0) {
         document.getElementById('save-response-text').innerHTML = "You have to add tables";
         return;
     }
     var xhr = new XMLHttpRequest();
-    var url = "/newroom";
-    xhr.open("POST", url, true);
+    xhr.open("POST", "/add", true);
     xhr.setRequestHeader("Content-type", "application/json");
     xhr.onreadystatechange = function () {
         if (xhr.readyState == 4 && xhr.status == 200) {
             // Sjekk om server klarte å legge inn bordoppsettet i databasen
             var json = JSON.parse(xhr.responseText);
-            console.log(json);
             var errorMsg = document.getElementById('save-response-text');
-            if (value == "update") {
-                var errorMsg = document.getElementById('update-response-text');
+            var jsonStatus = json["status"];
+            if (jsonStatus == "error") {
+                errorMsg.style.color = "red";
+                errorMsg.innerHTML = json["message"];
             }
+            if (jsonStatus == "success") {
+                location.reload();
+            }
+        }
+    };
+    var data = JSON.stringify(dict);
+    xhr.send(data);
+}
+function UpdateTableLayout(value) {
+    var dict = GetTableSetup("dummie", value);
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "update", true);
+    xhr.setRequestHeader("Content-type", "application/json");
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+            // Sjekk om server klarte å legge inn bordoppsettet i databasen
+            var json = JSON.parse(xhr.responseText);
+            var errorMsg = document.getElementById('update-response-text');
             var jsonStatus = json["status"];
             if (jsonStatus == "error") {
                 errorMsg.style.color = "red";

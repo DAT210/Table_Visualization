@@ -251,7 +251,13 @@ class RoomVisualizer {
     private drawWalls(): void {
         if (!this.roomPlan) return;
         for(let wall of this.roomPlan.walls) {
-            this.visualizer.AddLine(wall.from, wall.to);
+            const walli = this.visualizer.AddLine(
+                wall.from,
+                wall.to
+            );
+            //this.visualizer.AddLine(wall.from, wall.to);
+            walli.OnClick = () => { console.log("Wall " + wall.from + " clicked!") };
+
         }
     }
     private drawTables(): void {
@@ -276,6 +282,7 @@ class RoomVisualizer {
             }
         }
     }
+
 }
 
 class SVGHelper {
@@ -318,40 +325,71 @@ class SVGHelper {
     }
 }
 
-
-// AJAX call hvor man går gjennom nåværende bordoppsett og sender det med json til serveren
-function saveTableSetup(value){
+function GetTableSetup(name, value) {
     if (!rv.roomPlan) return;
     var dict = [];
-    var TableName = (<HTMLInputElement>document.getElementById('table-name')).value;
+
     for(let table of rv.roomPlan.tables) {
-        dict.push({
-            "id": table.id,
-            "width": table.width,
-            "height": table.height,
-            "xpos": table.position.x,
-            "ypos": table.position.y,
-            "name": TableName,
-            "status": value
-        })
-    }
-    if (dict.length == 0){
-        (<HTMLInputElement>document.getElementById('save-response-text')).innerHTML = "You have to add tables";
+    dict.push({
+        "id": table.id,
+        "width": table.width,
+        "height": table.height,
+        "xpos": table.position.x,
+        "ypos": table.position.y,
+        "status": value,
+        "name": name
+    })
+}
+    return dict;
+}
+
+
+function SaveTableLayout(value){
+    var TableName = (<HTMLInputElement>document.getElementById('table-name')).value;
+    if (TableName.length < 1) {
+        (<HTMLInputElement>document.getElementById('save-response-text')).innerHTML = "The name is too short";
         return;
     }
+    var dict = GetTableSetup(TableName, value);
+    if (dict.length == 0){
+    (<HTMLInputElement>document.getElementById('save-response-text')).innerHTML = "You have to add tables";
+    return;
+    }
     var xhr = new XMLHttpRequest();
-    var url = "/newroom";
-    xhr.open("POST", url, true);
+    xhr.open("POST", "/add", true);
     xhr.setRequestHeader("Content-type", "application/json");
     xhr.onreadystatechange = function () {
         if (xhr.readyState == 4 && xhr.status == 200) {
             // Sjekk om server klarte å legge inn bordoppsettet i databasen
             var json = JSON.parse(xhr.responseText);
-            console.log(json);
             var errorMsg = (<HTMLInputElement>document.getElementById('save-response-text'));
-            if (value == "update"){
-                var errorMsg = (<HTMLInputElement>document.getElementById('update-response-text'));
+            var jsonStatus = json["status"]
+            if (jsonStatus == "error"){
+            errorMsg.style.color = "red";
+            errorMsg.innerHTML = json["message"];
             }
+            if(jsonStatus == "success"){
+            location.reload();
+            }
+        }
+    }
+    var data = JSON.stringify(dict);
+    xhr.send(data);
+}
+
+
+
+
+function UpdateTableLayout(value){
+    var dict = GetTableSetup("dummie", value);
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "update", true);
+    xhr.setRequestHeader("Content-type", "application/json");
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+            // Sjekk om server klarte å legge inn bordoppsettet i databasen
+            var json = JSON.parse(xhr.responseText);
+            var errorMsg = (<HTMLInputElement>document.getElementById('update-response-text'));
             var jsonStatus = json["status"]
             if (jsonStatus == "error"){
             errorMsg.style.color = "red";
@@ -366,6 +404,7 @@ function saveTableSetup(value){
     var data = JSON.stringify(dict);
     xhr.send(data);
 }
+
 
 
 

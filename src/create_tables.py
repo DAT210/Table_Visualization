@@ -1,5 +1,5 @@
 from __init__ import db
-from models import Roomplan
+from models import Roomplan, Walls
 
 
 def start_tables():
@@ -8,8 +8,9 @@ def start_tables():
     table2 = Roomplan(2, 105, 225,60,40 ,"oslo")
     table3 = Roomplan(3, 450, 150,60,40, "oslo")
     table4 = Roomplan(4, 250, 50, 90, 40, "oslo")
+    wall1 =  Walls(1,"oslo", 200, 400, 100, 40)
 
-
+    db.session.add(wall1)
     db.session.add(table1)
     db.session.add(table2)
     db.session.add(table3)

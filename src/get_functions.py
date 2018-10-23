@@ -8,7 +8,7 @@ from sqlalchemy import update, func
 
 def get_json_setup(value):
         # Last inn json filen vår som tegner selve rommet med vegger
-        with open('static/roomPlan.json') as f:
+        with open('src/static/roomPlan.json') as f:
             data = json.load(f)
 
 

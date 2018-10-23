@@ -22,6 +22,8 @@ services:
             - POSTGRES_USER=postgres
             - POSTGRES_PW=dbpw
             - POSTGRES_DB=mydb
+            - APP_SETTINGS=config.DevelopmentConfig
+            - APP_KEY=kdkdk
         container_name: app
         ports:
             - "4000:80"

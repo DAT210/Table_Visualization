@@ -2,9 +2,10 @@ interface IInteractiveVisualizer {
     Wrapper: HTMLElement,
     Width: number,
     Height: number,
-    AddRect(w: number, h: number, pos: IPoint, movable?: boolean, tag?: string): InteractiveSVGRect,
-    AddLine(pos1: IPoint, pos2: IPoint): InteractiveSVGLine,
-    GetElements(tag: string): InteractiveSVGElement[],
+    AddRect(w: number, h: number, pos: IPoint, movable?: boolean, tag?: string): IInteractiveVisualizerElement,
+    AddLine(pos1: IPoint, pos2: IPoint): IInteractiveVisualizerElement,
+    AddPath(): IInteractiveVisualizerElement,
+    GetElements(tag: string): IInteractiveVisualizerElement[],
     Reset(): void
 }
 
@@ -47,6 +48,11 @@ class InteractiveSVG implements IInteractiveVisualizer {
     }
     public AddLine(pos1: IPoint, pos2: IPoint): InteractiveSVGLine {
         const elm = new InteractiveSVGLine(pos1, pos2);
+        this.addElement(elm);
+        return elm;
+    }
+    public AddPath() {
+        const elm = new InteractiveSVGPath([{x:100, y:100}, {x:300, y:100}, {x:300, y:200}]);
         this.addElement(elm);
         return elm;
     }
@@ -195,4 +201,39 @@ class InteractiveSVGLine extends InteractiveSVGElement {
     set Width(w: number) { throw new Error("Not implemented") }
     get Height(): number { return this.SvgElement.getBBox().height }
     set Height(w: number) { throw new Error("Not implemented") }
+}
+
+class InteractiveSVGPath extends InteractiveSVGElement {
+    SvgElement: SVGPathElement;
+    private points: IPoint[] = [];
+
+    constructor(points: IPoint[]) {
+        super();
+        this.SvgElement = SVGHelper.NewPath();
+        this.points = points;
+
+        this.createPath();
+    }
+
+    get Position(): IPoint {
+        const bbox = this.SvgElement.getBBox();
+        return { x: bbox.x, y: bbox.y };
+    }
+    get Width(): number { return this.SvgElement.getBBox().width; }
+    get Height(): number { return this.SvgElement.getBBox().height; }
+
+    private createPath() {
+        if (this.points.length < 2) return
+
+        const pointToString = (p: IPoint) => {
+            return p.x + " " + p.y;
+        }
+
+        let pathDef = "M" + pointToString(this.points[0])
+        for (let p of this.points.slice(1)) {
+            pathDef += " L" + pointToString(p);
+        }
+        
+        this.SvgElement.setAttribute("d", pathDef);
+    }
 }

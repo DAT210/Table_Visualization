@@ -54,6 +54,11 @@ var InteractiveSVG = /** @class */ (function () {
         this.addElement(elm);
         return elm;
     };
+    InteractiveSVG.prototype.AddPath = function () {
+        var elm = new InteractiveSVGPath([{ x: 100, y: 100 }, { x: 300, y: 100 }, { x: 300, y: 200 }]);
+        this.addElement(elm);
+        return elm;
+    };
     InteractiveSVG.prototype.GetElements = function (tag) {
         var elms = [];
         for (var _i = 0, _a = this.elements; _i < _a.length; _i++) {
@@ -210,4 +215,47 @@ var InteractiveSVGLine = /** @class */ (function (_super) {
         configurable: true
     });
     return InteractiveSVGLine;
+}(InteractiveSVGElement));
+var InteractiveSVGPath = /** @class */ (function (_super) {
+    __extends(InteractiveSVGPath, _super);
+    function InteractiveSVGPath(points) {
+        var _this = _super.call(this) || this;
+        _this.points = [];
+        _this.SvgElement = SVGHelper.NewPath();
+        _this.points = points;
+        _this.createPath();
+        return _this;
+    }
+    Object.defineProperty(InteractiveSVGPath.prototype, "Position", {
+        get: function () {
+            var bbox = this.SvgElement.getBBox();
+            return { x: bbox.x, y: bbox.y };
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(InteractiveSVGPath.prototype, "Width", {
+        get: function () { return this.SvgElement.getBBox().width; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(InteractiveSVGPath.prototype, "Height", {
+        get: function () { return this.SvgElement.getBBox().height; },
+        enumerable: true,
+        configurable: true
+    });
+    InteractiveSVGPath.prototype.createPath = function () {
+        if (this.points.length < 2)
+            return;
+        var pointToString = function (p) {
+            return p.x + " " + p.y;
+        };
+        var pathDef = "M" + pointToString(this.points[0]);
+        for (var _i = 0, _a = this.points.slice(1); _i < _a.length; _i++) {
+            var p = _a[_i];
+            pathDef += " L" + pointToString(p);
+        }
+        this.SvgElement.setAttribute("d", pathDef);
+    };
+    return InteractiveSVGPath;
 }(InteractiveSVGElement));

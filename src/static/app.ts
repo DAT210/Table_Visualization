@@ -68,6 +68,8 @@ class RoomVisualizer {
         this.visualizer.Reset();
         this.drawWalls();
         this.drawTables();
+
+        this.visualizer.AddPath();
     }
     private drawWalls(): void {
         if (!this.roomPlan) return;
@@ -116,6 +118,9 @@ class SVGHelper {
         const line = document.createElementNS(this.svgNS, "line") as SVGLineElement;
         this.SetLinePos(line, pos1, pos2);
         return line;
+    }
+    public static NewPath(): SVGPathElement {
+        return document.createElementNS(this.svgNS, "path");
     }
     public static SetSize(element: SVGElement, w: number, h: number) {
         element.setAttribute("width", w + "px");

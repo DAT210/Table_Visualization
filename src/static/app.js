@@ -41,6 +41,7 @@ var RoomVisualizer = /** @class */ (function () {
         this.visualizer.Reset();
         this.drawWalls();
         this.drawTables();
+        this.visualizer.AddPath();
     };
     RoomVisualizer.prototype.drawWalls = function () {
         if (!this.roomPlan)
@@ -94,6 +95,9 @@ var SVGHelper = /** @class */ (function () {
         var line = document.createElementNS(this.svgNS, "line");
         this.SetLinePos(line, pos1, pos2);
         return line;
+    };
+    SVGHelper.NewPath = function () {
+        return document.createElementNS(this.svgNS, "path");
     };
     SVGHelper.SetSize = function (element, w, h) {
         element.setAttribute("width", w + "px");

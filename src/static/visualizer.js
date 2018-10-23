@@ -118,14 +118,18 @@ var InteractiveSVGElement = /** @class */ (function () {
         this.Movable = false;
         this.OnClick = function () { };
         this.OnMove = function () { };
-        this.tag = "";
         if (movable)
             this.Movable = movable;
         if (tag)
-            this.tag = tag;
+            this.Tag = tag;
     }
-    Object.defineProperty(InteractiveSVGElement.prototype, "Tag", {
-        get: function () { return this.tag; },
+    Object.defineProperty(InteractiveSVGElement.prototype, "Fill", {
+        set: function (color) { this.SvgElement.style.fill = color; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(InteractiveSVGElement.prototype, "Stroke", {
+        set: function (color) { this.SvgElement.style.stroke = color; },
         enumerable: true,
         configurable: true
     });

@@ -13,7 +13,6 @@ function init(roomPlan: IRoom) {
     const visualizer = new InteractiveSVG();
     const rv = new RoomVisualizer(visualizer);
     rv.RoomPlan = roomPlan;
-    rv.example(2);
 }
 
 interface IPoint {
@@ -55,13 +54,6 @@ class RoomVisualizer {
         this.visualizer.Width = this.roomPlan.width;
         this.visualizer.Height = this.roomPlan.height;
         this.drawRoom();
-    }
-
-    /** Example code to alter table color */
-    example(tableID: number) {
-        if (tableID in this.tables) {
-            this.tables[tableID].SvgElement.style.fill = "red";
-        }
     }
 
     private drawRoom(): void {

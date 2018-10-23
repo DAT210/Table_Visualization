@@ -13,7 +13,6 @@ function init(roomPlan) {
     var visualizer = new InteractiveSVG();
     var rv = new RoomVisualizer(visualizer);
     rv.RoomPlan = roomPlan;
-    rv.example(2);
 }
 var RoomVisualizer = /** @class */ (function () {
     function RoomVisualizer(visualizer) {
@@ -31,12 +30,6 @@ var RoomVisualizer = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
-    /** Example code to alter table color */
-    RoomVisualizer.prototype.example = function (tableID) {
-        if (tableID in this.tables) {
-            this.tables[tableID].SvgElement.style.fill = "red";
-        }
-    };
     RoomVisualizer.prototype.drawRoom = function () {
         this.visualizer.Reset();
         //this.drawWalls();

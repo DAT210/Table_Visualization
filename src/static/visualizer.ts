@@ -107,15 +107,15 @@ class InteractiveSVG implements IInteractiveVisualizer {
 }
 
 interface IInteractiveVisualizerElement {
-    SvgElement: SVGElement,
-    Position: IPoint,
     Width: number,
     Height: number,
+    Position: IPoint,
     PrevPosition: IPoint | undefined,
     Movable: boolean,
+    Tag: string | undefined,
+    Fill: string;
     OnClick: () => void,
     OnMove: () => void,
-    Tag: string
 }
 
 abstract class InteractiveSVGElement implements IInteractiveVisualizerElement{
@@ -123,20 +123,20 @@ abstract class InteractiveSVGElement implements IInteractiveVisualizerElement{
     public abstract Position: IPoint;
     public abstract Width: number;
     public abstract Height: number;
-    
+        
     public PrevPosition: IPoint | undefined;
     public Movable: boolean = false;
+    public Tag: string | undefined;
     public OnClick: () => void = () => {};
     public OnMove: () => void = () => {};
 
-    private tag: string = "";
-
     constructor(movable?: boolean, tag?: string) {
         if (movable) this.Movable = movable;
-        if (tag) this.tag = tag;
+        if (tag) this.Tag = tag;
     }
 
-    get Tag(): string { return this.tag }
+    set Fill(color: string) { this.SvgElement.style.fill = color }
+    set Stroke(color: string) { this.SvgElement.style.stroke = color }
 }
 
 class InteractiveSVGRect extends InteractiveSVGElement {

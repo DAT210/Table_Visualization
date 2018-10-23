@@ -39,9 +39,9 @@ var RoomVisualizer = /** @class */ (function () {
     };
     RoomVisualizer.prototype.drawRoom = function () {
         this.visualizer.Reset();
-        this.drawWalls();
+        //this.drawWalls();
+        this.drawWallsAsPoly();
         this.drawTables();
-        this.visualizer.AddPath();
     };
     RoomVisualizer.prototype.drawWalls = function () {
         if (!this.roomPlan)
@@ -50,6 +50,12 @@ var RoomVisualizer = /** @class */ (function () {
             var wall = _a[_i];
             this.visualizer.AddLine(wall.from, wall.to);
         }
+    };
+    RoomVisualizer.prototype.drawWallsAsPoly = function () {
+        if (!this.roomPlan)
+            return;
+        var wallPoints = this.roomPlan.walls.map(function (w) { return w.from; });
+        this.visualizer.AddPoly(wallPoints);
     };
     RoomVisualizer.prototype.drawTables = function () {
         var _this = this;

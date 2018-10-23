@@ -1,5 +1,5 @@
 svg {
-    background-color: whitesmoke;
+    background-color: white;
     border: 1px solid gray;
 }
 
@@ -8,8 +8,8 @@ line {
 }
 
 path {
-    fill: none;
-    stroke: black;
+    fill: whitesmoke;
+    stroke: none;
 }
 
 body {

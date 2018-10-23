@@ -66,16 +66,20 @@ class RoomVisualizer {
 
     private drawRoom(): void {
         this.visualizer.Reset();
-        this.drawWalls();
+        //this.drawWalls();
+        this.drawWallsAsPoly();
         this.drawTables();
-
-        this.visualizer.AddPath();
     }
     private drawWalls(): void {
         if (!this.roomPlan) return;
         for(let wall of this.roomPlan.walls) {
             this.visualizer.AddLine(wall.from, wall.to);
         }
+    }
+    private drawWallsAsPoly(): void {
+        if (!this.roomPlan) return;
+        const wallPoints = this.roomPlan.walls.map(w => w.from);
+        this.visualizer.AddPoly(wallPoints);
     }
     private drawTables(): void {
         if (!this.roomPlan) return;

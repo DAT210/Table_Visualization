@@ -54,8 +54,8 @@ var InteractiveSVG = /** @class */ (function () {
         this.addElement(elm);
         return elm;
     };
-    InteractiveSVG.prototype.AddPath = function () {
-        var elm = new InteractiveSVGPath([{ x: 100, y: 100 }, { x: 300, y: 100 }, { x: 300, y: 200 }]);
+    InteractiveSVG.prototype.AddPoly = function (points, pos, movable) {
+        var elm = new InteractiveSVGPoly(points, pos, movable);
         this.addElement(elm);
         return elm;
     };
@@ -216,36 +216,57 @@ var InteractiveSVGLine = /** @class */ (function (_super) {
     });
     return InteractiveSVGLine;
 }(InteractiveSVGElement));
-var InteractiveSVGPath = /** @class */ (function (_super) {
-    __extends(InteractiveSVGPath, _super);
-    function InteractiveSVGPath(points) {
-        var _this = _super.call(this) || this;
+var InteractiveSVGPoly = /** @class */ (function (_super) {
+    __extends(InteractiveSVGPoly, _super);
+    function InteractiveSVGPoly(points, pos, movable) {
+        var _this = _super.call(this, movable) || this;
         _this.points = [];
         _this.SvgElement = SVGHelper.NewPath();
-        _this.points = points;
-        _this.createPath();
+        _this.Points = points;
+        if (pos)
+            _this.Position = pos;
         return _this;
     }
-    Object.defineProperty(InteractiveSVGPath.prototype, "Position", {
-        get: function () {
-            var bbox = this.SvgElement.getBBox();
-            return { x: bbox.x, y: bbox.y };
+    Object.defineProperty(InteractiveSVGPoly.prototype, "Points", {
+        get: function () { return this.points; },
+        set: function (points) {
+            this.points = points;
+            this.createPath();
         },
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(InteractiveSVGPath.prototype, "Width", {
+    Object.defineProperty(InteractiveSVGPoly.prototype, "Position", {
+        get: function () {
+            var bbox = this.SvgElement.getBBox();
+            return { x: bbox.x, y: bbox.y };
+        },
+        set: function (pos) {
+            var deltaX = pos.x - this.Position.x;
+            var deltaY = pos.y - this.Position.y;
+            var newPoints = this.points.slice(0);
+            for (var _i = 0, newPoints_1 = newPoints; _i < newPoints_1.length; _i++) {
+                var p = newPoints_1[_i];
+                p.x += deltaX;
+                p.y += deltaY;
+            }
+            this.Points = newPoints;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(InteractiveSVGPoly.prototype, "Width", {
         get: function () { return this.SvgElement.getBBox().width; },
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(InteractiveSVGPath.prototype, "Height", {
+    Object.defineProperty(InteractiveSVGPoly.prototype, "Height", {
         get: function () { return this.SvgElement.getBBox().height; },
         enumerable: true,
         configurable: true
     });
-    InteractiveSVGPath.prototype.createPath = function () {
-        if (this.points.length < 2)
+    InteractiveSVGPoly.prototype.createPath = function () {
+        if (this.points.length === 0)
             return;
         var pointToString = function (p) {
             return p.x + " " + p.y;
@@ -257,5 +278,5 @@ var InteractiveSVGPath = /** @class */ (function (_super) {
         }
         this.SvgElement.setAttribute("d", pathDef);
     };
-    return InteractiveSVGPath;
+    return InteractiveSVGPoly;
 }(InteractiveSVGElement));

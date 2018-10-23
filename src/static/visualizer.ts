@@ -4,7 +4,7 @@ interface IInteractiveVisualizer {
     Height: number,
     AddRect(w: number, h: number, pos: IPoint, movable?: boolean, tag?: string): IInteractiveVisualizerElement,
     AddLine(pos1: IPoint, pos2: IPoint): IInteractiveVisualizerElement,
-    AddPath(): IInteractiveVisualizerElement,
+    AddPoly(points: IPoint[], pos?: IPoint, movable?: boolean): IInteractiveVisualizerElement,
     GetElements(tag: string): IInteractiveVisualizerElement[],
     Reset(): void
 }
@@ -51,8 +51,8 @@ class InteractiveSVG implements IInteractiveVisualizer {
         this.addElement(elm);
         return elm;
     }
-    public AddPath() {
-        const elm = new InteractiveSVGPath([{x:100, y:100}, {x:300, y:100}, {x:300, y:200}]);
+    public AddPoly(points: IPoint[], pos?: IPoint, movable?: boolean) {
+        const elm = new InteractiveSVGPoly(points, pos, movable);
         this.addElement(elm);
         return elm;
     }
@@ -203,18 +203,33 @@ class InteractiveSVGLine extends InteractiveSVGElement {
     set Height(w: number) { throw new Error("Not implemented") }
 }
 
-class InteractiveSVGPath extends InteractiveSVGElement {
+class InteractiveSVGPoly extends InteractiveSVGElement {
     SvgElement: SVGPathElement;
     private points: IPoint[] = [];
 
-    constructor(points: IPoint[]) {
-        super();
+    constructor(points: IPoint[], pos?: IPoint, movable?: boolean) {
+        super(movable);
         this.SvgElement = SVGHelper.NewPath();
-        this.points = points;
+        this.Points = points;
+        if (pos) this.Position = pos;
+    }
 
+    get Points() { return this.points; }
+    set Points(points: IPoint[]) {
+        this.points = points;
         this.createPath();
     }
 
+    set Position(pos: IPoint) {
+        const deltaX = pos.x - this.Position.x;
+        const deltaY = pos.y - this.Position.y;
+        const newPoints = this.points.slice(0);
+        for (let p of newPoints) {
+            p.x += deltaX;
+            p.y += deltaY;
+        }
+        this.Points = newPoints;
+    }
     get Position(): IPoint {
         const bbox = this.SvgElement.getBBox();
         return { x: bbox.x, y: bbox.y };
@@ -223,7 +238,7 @@ class InteractiveSVGPath extends InteractiveSVGElement {
     get Height(): number { return this.SvgElement.getBBox().height; }
 
     private createPath() {
-        if (this.points.length < 2) return
+        if (this.points.length === 0) return;
 
         const pointToString = (p: IPoint) => {
             return p.x + " " + p.y;
@@ -236,4 +251,6 @@ class InteractiveSVGPath extends InteractiveSVGElement {
         
         this.SvgElement.setAttribute("d", pathDef);
     }
+
+
 }

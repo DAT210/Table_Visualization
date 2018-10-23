@@ -251,12 +251,8 @@ class RoomVisualizer {
     private drawWalls(): void {
         if (!this.roomPlan) return;
         for(let wall of this.roomPlan.walls) {
-            const walli = this.visualizer.AddLine(
-                wall.from,
-                wall.to
-            );
-            //this.visualizer.AddLine(wall.from, wall.to);
-            walli.OnClick = () => { console.log("Wall " + wall.from + " clicked!") };
+            this.visualizer.AddLine(wall.from, wall.to);
+
 
         }
     }

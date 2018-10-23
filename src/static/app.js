@@ -1,3 +1,4 @@
+"use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -19,12 +20,11 @@ window.addEventListener("load", function () {
         init(room);
     });
 });
-var rv;
 function init(roomPlan) {
     console.log("RoomPlan:");
     console.log(roomPlan);
     var visualizer = new InteractiveSVG();
-    rv = new RoomVisualizer(visualizer);
+    var rv = new RoomVisualizerAdmin(visualizer);
     rv.RoomPlan = roomPlan;
 }
 var InteractiveSVG = /** @class */ (function () {
@@ -280,6 +280,148 @@ var RoomVisualizer = /** @class */ (function () {
     };
     return RoomVisualizer;
 }());
+var RoomVisualizerAdmin = /** @class */ (function () {
+    function RoomVisualizerAdmin(visualizer) {
+        this.visualizer = visualizer;
+        document.body.appendChild(this.visualizer.Wrapper);
+    }
+    Object.defineProperty(RoomVisualizerAdmin.prototype, "RoomPlan", {
+        set: function (roomPlan) {
+            this.roomPlan = roomPlan;
+            this.visualizer.Width = this.roomPlan.width;
+            this.visualizer.Height = this.roomPlan.height;
+            this.drawRoom();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    RoomVisualizerAdmin.prototype.drawRoom = function () {
+        this.visualizer.Reset();
+        this.drawWalls();
+        this.drawTables();
+    };
+    RoomVisualizerAdmin.prototype.drawWalls = function () {
+        if (!this.roomPlan)
+            return;
+        for (var _i = 0, _a = this.roomPlan.walls; _i < _a.length; _i++) {
+            var wall = _a[_i];
+            this.visualizer.AddLine(wall.from, wall.to);
+        }
+    };
+    RoomVisualizerAdmin.prototype.drawTables = function () {
+        var _this = this;
+        if (!this.roomPlan)
+            return;
+        var _loop_2 = function (table) {
+            var rect = this_2.visualizer.AddRect(table.width, table.height, table.position, true, "table");
+            rect.OnClick = function () { console.log("Table " + table.id + " clicked!"); };
+            rect.OnClick = function () { console.log("Table Position for table " + table.id + " " + table.position); };
+            rect.OnMove = function () { _this.updateTablePos(table.id, rect.Position); };
+        };
+        var this_2 = this;
+        for (var _i = 0, _a = this.roomPlan.tables; _i < _a.length; _i++) {
+            var table = _a[_i];
+            _loop_2(table);
+        }
+    };
+    RoomVisualizerAdmin.prototype.updateTablePos = function (tableID, pos) {
+        if (this.roomPlan) {
+            for (var _i = 0, _a = this.roomPlan.tables; _i < _a.length; _i++) {
+                var t = _a[_i];
+                if (t.id == tableID)
+                    t.position = pos;
+            }
+        }
+    };
+    RoomVisualizerAdmin.prototype.getTableSetup = function (name, value) {
+        if (!this.roomPlan)
+            return;
+        var dict = [];
+        for (var _i = 0, _a = this.roomPlan.tables; _i < _a.length; _i++) {
+            var table = _a[_i];
+            dict.push({
+                "id": table.id,
+                "width": table.width,
+                "height": table.height,
+                "xpos": table.position.x,
+                "ypos": table.position.y,
+                "status": value,
+                "name": name
+            });
+        }
+        return dict;
+    };
+    RoomVisualizerAdmin.prototype.addTable = function (width, height) {
+        var _this = this;
+        if (!this.roomPlan)
+            return;
+        // Legger til et nytt element i sentrum, med størrelse lik innparameterene
+        var center = { "x": 250, "y": 250 };
+        var newRect = this.visualizer.AddRect(width, height, center, true, "table");
+        var tableID = this.roomPlan.tables.length + 1;
+        this.roomPlan.tables.push({ "id": tableID, "width": width, "height": height, "position": center });
+        newRect.OnMove = function () { _this.updateTablePos(tableID, newRect.Position); };
+    };
+    RoomVisualizerAdmin.prototype.saveTableLayout = function (value) {
+        var TableName = document.getElementById('table-name').value;
+        if (TableName.length < 1) {
+            document.getElementById('save-response-text').innerHTML = "The name is too short";
+            return;
+        }
+        var dict = this.getTableSetup(TableName, value);
+        if (dict) {
+            if (dict.length == 0) {
+                document.getElementById('save-response-text').innerHTML = "You have to add tables";
+                return;
+            }
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/add", true);
+            xhr.setRequestHeader("Content-type", "application/json");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    // Sjekk om server klarte å legge inn bordoppsettet i databasen
+                    var json = JSON.parse(xhr.responseText);
+                    var errorMsg = document.getElementById('save-response-text');
+                    var jsonStatus = json["status"];
+                    if (jsonStatus == "error") {
+                        errorMsg.style.color = "red";
+                        errorMsg.innerHTML = json["message"];
+                    }
+                    if (jsonStatus == "success") {
+                        location.reload();
+                    }
+                }
+            };
+            var data = JSON.stringify(dict);
+            xhr.send(data);
+        }
+    };
+    RoomVisualizerAdmin.prototype.updateTableLayout = function (value) {
+        var dict = this.getTableSetup("dummie", value);
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "update", true);
+        xhr.setRequestHeader("Content-type", "application/json");
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                // Sjekk om server klarte å legge inn bordoppsettet i databasen
+                var json = JSON.parse(xhr.responseText);
+                var errorMsg = document.getElementById('update-response-text');
+                var jsonStatus = json["status"];
+                if (jsonStatus == "error") {
+                    errorMsg.style.color = "red";
+                    errorMsg.innerHTML = json["message"];
+                }
+                if (jsonStatus == "success") {
+                    errorMsg.style.color = "green";
+                    errorMsg.innerHTML = json["message"];
+                }
+            }
+        };
+        var data = JSON.stringify(dict);
+        xhr.send(data);
+    };
+    return RoomVisualizerAdmin;
+}());
 var SVGHelper = /** @class */ (function () {
     function SVGHelper() {
     }
@@ -321,87 +463,3 @@ var SVGHelper = /** @class */ (function () {
     SVGHelper.svgNS = "http://www.w3.org/2000/svg";
     return SVGHelper;
 }());
-function GetTableSetup(name, value) {
-    if (!rv.roomPlan)
-        return;
-    var dict = [];
-    for (var _i = 0, _a = rv.roomPlan.tables; _i < _a.length; _i++) {
-        var table = _a[_i];
-        dict.push({
-            "id": table.id,
-            "width": table.width,
-            "height": table.height,
-            "xpos": table.position.x,
-            "ypos": table.position.y,
-            "status": value,
-            "name": name
-        });
-    }
-    return dict;
-}
-function SaveTableLayout(value) {
-    var TableName = document.getElementById('table-name').value;
-    if (TableName.length < 1) {
-        document.getElementById('save-response-text').innerHTML = "The name is too short";
-        return;
-    }
-    var dict = GetTableSetup(TableName, value);
-    if (dict.length == 0) {
-        document.getElementById('save-response-text').innerHTML = "You have to add tables";
-        return;
-    }
-    var xhr = new XMLHttpRequest();
-    xhr.open("POST", "/add", true);
-    xhr.setRequestHeader("Content-type", "application/json");
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState == 4 && xhr.status == 200) {
-            // Sjekk om server klarte å legge inn bordoppsettet i databasen
-            var json = JSON.parse(xhr.responseText);
-            var errorMsg = document.getElementById('save-response-text');
-            var jsonStatus = json["status"];
-            if (jsonStatus == "error") {
-                errorMsg.style.color = "red";
-                errorMsg.innerHTML = json["message"];
-            }
-            if (jsonStatus == "success") {
-                location.reload();
-            }
-        }
-    };
-    var data = JSON.stringify(dict);
-    xhr.send(data);
-}
-function UpdateTableLayout(value) {
-    var dict = GetTableSetup("dummie", value);
-    var xhr = new XMLHttpRequest();
-    xhr.open("POST", "update", true);
-    xhr.setRequestHeader("Content-type", "application/json");
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState == 4 && xhr.status == 200) {
-            // Sjekk om server klarte å legge inn bordoppsettet i databasen
-            var json = JSON.parse(xhr.responseText);
-            var errorMsg = document.getElementById('update-response-text');
-            var jsonStatus = json["status"];
-            if (jsonStatus == "error") {
-                errorMsg.style.color = "red";
-                errorMsg.innerHTML = json["message"];
-            }
-            if (jsonStatus == "success") {
-                errorMsg.style.color = "green";
-                errorMsg.innerHTML = json["message"];
-            }
-        }
-    };
-    var data = JSON.stringify(dict);
-    xhr.send(data);
-}
-function addTable(width, height) {
-    if (!rv.roomPlan)
-        return;
-    // Legger til et nytt element i sentrum, med størrelse lik innparameterene
-    var center = { "x": 250, "y": 250 };
-    var newRect = rv.visualizer.AddRect(width, height, center, true, "table");
-    var tableID = rv.roomPlan.tables.length + 1;
-    rv.roomPlan.tables.push({ "id": tableID, "width": width, "height": height, "position": center });
-    newRect.OnMove = function () { rv.updateTablePos(tableID, newRect.Position); };
-}

@@ -30,5 +30,5 @@ services:
         volumes:
             - .:/app
         depends_on:
-            - postgresql
+            - postgresqlxs
 

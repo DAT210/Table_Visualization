@@ -7,12 +7,12 @@ window.addEventListener("load", () => {
         })
         });
 
-const rv;
+
 function init(roomPlan: IRoom) {
     console.log("RoomPlan:");
     console.log(roomPlan);
     const visualizer = new InteractiveSVG();
-    rv = new RoomVisualizer(visualizer);
+    const rv = new RoomVisualizerAdmin(visualizer);
     rv.RoomPlan = roomPlan;
 }
 
@@ -281,6 +281,152 @@ class RoomVisualizer {
 
 }
 
+class RoomVisualizerAdmin {
+    private visualizer: IInteractiveVisualizer;
+    private roomPlan: IRoom | undefined;
+
+    constructor(visualizer: IInteractiveVisualizer) {
+        this.visualizer = visualizer;
+        document.body.appendChild(this.visualizer.Wrapper);
+    }
+
+    set RoomPlan(roomPlan: IRoom) {
+        this.roomPlan = roomPlan;
+        this.visualizer.Width = this.roomPlan.width;
+        this.visualizer.Height = this.roomPlan.height;
+        this.drawRoom();
+    }
+
+    private drawRoom(): void {
+        this.visualizer.Reset();
+        this.drawWalls();
+        this.drawTables();
+    }
+    private drawWalls(): void {
+        if (!this.roomPlan) return;
+        for(let wall of this.roomPlan.walls) {
+            this.visualizer.AddLine(wall.from, wall.to);
+
+
+    }
+    }
+    private drawTables(): void {
+        if (!this.roomPlan) return;
+        for(let table of this.roomPlan.tables) {
+            const rect = this.visualizer.AddRect(
+                table.width,
+                table.height,
+                table.position,
+                true,
+                "table"
+            );
+            rect.OnClick = () => { console.log("Table " + table.id + " clicked!") };
+            rect.OnClick = () => { console.log("Table Position for table " + table.id +" " +  table.position) };
+            rect.OnMove = () => { this.updateTablePos(table.id, rect.Position) };
+    }
+    }
+    private updateTablePos(tableID: number, pos: IPoint): void {
+        if (this.roomPlan) {
+            for (let t of this.roomPlan.tables) {
+                if (t.id == tableID) t.position = pos;
+    }
+    }
+}
+    private getTableSetup(name: string, value: string) {
+        if (!this.roomPlan) return;
+    var dict = [];
+
+        for(let table of this.roomPlan.tables) {
+    dict.push({
+        "id": table.id,
+        "width": table.width,
+        "height": table.height,
+        "xpos": table.position.x,
+        "ypos": table.position.y,
+        "status": value,
+        "name": name
+    })
+}
+    return dict;
+}
+
+    private addTable(width: number, height: number){
+        if (!this.roomPlan) return;
+        // Legger til et nytt element i sentrum, med størrelse lik innparameterene
+        var center = {"x":250, "y":250};
+           const newRect = this.visualizer.AddRect(
+                width,
+                height,
+                center,
+                true,
+                "table"
+            );
+        var tableID = this.roomPlan.tables.length+1;
+        this.roomPlan.tables.push({"id":tableID, "width":width, "height": height, "position": center });
+        newRect.OnMove = () => { this.updateTablePos(tableID, newRect.Position) };
+
+    }
+    
+    private saveTableLayout(value: string){
+    var TableName = (<HTMLInputElement>document.getElementById('table-name')).value;
+    if (TableName.length < 1) {
+        (<HTMLInputElement>document.getElementById('save-response-text')).innerHTML = "The name is too short";
+        return;
+    }
+    var dict = this.getTableSetup(TableName, value);
+    if (dict) {
+    if (dict.length == 0){
+    (<HTMLInputElement>document.getElementById('save-response-text')).innerHTML = "You have to add tables";
+    return;
+    }
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "/add", true);
+    xhr.setRequestHeader("Content-type", "application/json");
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+            // Sjekk om server klarte å legge inn bordoppsettet i databasen
+            var json = JSON.parse(xhr.responseText);
+            var errorMsg = (<HTMLInputElement>document.getElementById('save-response-text'));
+            var jsonStatus = json["status"]
+            if (jsonStatus == "error"){
+            errorMsg.style.color = "red";
+            errorMsg.innerHTML = json["message"];
+            }
+            if(jsonStatus == "success"){
+            location.reload();
+            }
+        }
+    }
+    var data = JSON.stringify(dict);
+    xhr.send(data);
+}
+    }
+    private updateTableLayout(value: string){
+        var dict = this.getTableSetup("dummie", value);
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "update", true);
+    xhr.setRequestHeader("Content-type", "application/json");
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+            // Sjekk om server klarte å legge inn bordoppsettet i databasen
+            var json = JSON.parse(xhr.responseText);
+            var errorMsg = (<HTMLInputElement>document.getElementById('update-response-text'));
+            var jsonStatus = json["status"]
+            if (jsonStatus == "error"){
+            errorMsg.style.color = "red";
+            errorMsg.innerHTML = json["message"];
+            }
+            if(jsonStatus == "success"){
+            errorMsg.style.color = "green";
+            errorMsg.innerHTML = json["message"];
+            }
+        }
+    }
+    var data = JSON.stringify(dict);
+    xhr.send(data);
+}
+}
+
 class SVGHelper {
     private static readonly svgNS = "http://www.w3.org/2000/svg";
 
@@ -319,104 +465,4 @@ class SVGHelper {
         element.setAttribute("x2", pos2.x + "px");
         element.setAttribute("y2", pos2.y + "px");
     }
-}
-
-function GetTableSetup(name, value) {
-    if (!rv.roomPlan) return;
-    var dict = [];
-
-    for(let table of rv.roomPlan.tables) {
-    dict.push({
-        "id": table.id,
-        "width": table.width,
-        "height": table.height,
-        "xpos": table.position.x,
-        "ypos": table.position.y,
-        "status": value,
-        "name": name
-    })
-}
-    return dict;
-}
-
-
-function SaveTableLayout(value){
-    var TableName = (<HTMLInputElement>document.getElementById('table-name')).value;
-    if (TableName.length < 1) {
-        (<HTMLInputElement>document.getElementById('save-response-text')).innerHTML = "The name is too short";
-        return;
-    }
-    var dict = GetTableSetup(TableName, value);
-    if (dict.length == 0){
-    (<HTMLInputElement>document.getElementById('save-response-text')).innerHTML = "You have to add tables";
-    return;
-    }
-    var xhr = new XMLHttpRequest();
-    xhr.open("POST", "/add", true);
-    xhr.setRequestHeader("Content-type", "application/json");
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState == 4 && xhr.status == 200) {
-            // Sjekk om server klarte å legge inn bordoppsettet i databasen
-            var json = JSON.parse(xhr.responseText);
-            var errorMsg = (<HTMLInputElement>document.getElementById('save-response-text'));
-            var jsonStatus = json["status"]
-            if (jsonStatus == "error"){
-            errorMsg.style.color = "red";
-            errorMsg.innerHTML = json["message"];
-            }
-            if(jsonStatus == "success"){
-            location.reload();
-            }
-        }
-    }
-    var data = JSON.stringify(dict);
-    xhr.send(data);
-}
-
-
-
-
-function UpdateTableLayout(value){
-    var dict = GetTableSetup("dummie", value);
-    var xhr = new XMLHttpRequest();
-    xhr.open("POST", "update", true);
-    xhr.setRequestHeader("Content-type", "application/json");
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState == 4 && xhr.status == 200) {
-            // Sjekk om server klarte å legge inn bordoppsettet i databasen
-            var json = JSON.parse(xhr.responseText);
-            var errorMsg = (<HTMLInputElement>document.getElementById('update-response-text'));
-            var jsonStatus = json["status"]
-            if (jsonStatus == "error"){
-            errorMsg.style.color = "red";
-            errorMsg.innerHTML = json["message"];
-            }
-            if(jsonStatus == "success"){
-            errorMsg.style.color = "green";
-            errorMsg.innerHTML = json["message"];
-            }
-        }
-    }
-    var data = JSON.stringify(dict);
-    xhr.send(data);
-}
-
-
-
-
-function addTable(width, height){
-    if (!rv.roomPlan) return;
-    // Legger til et nytt element i sentrum, med størrelse lik innparameterene
-    var center = {"x":250, "y":250};
-       const newRect = rv.visualizer.AddRect(
-            width,
-            height,
-            center,
-            true,
-            "table"
-        );
-    var tableID = rv.roomPlan.tables.length+1;
-    rv.roomPlan.tables.push({"id":tableID, "width":width, "height": height, "position": center });
-    newRect.OnMove = () => { rv.updateTablePos(tableID, newRect.Position) };
-
 }

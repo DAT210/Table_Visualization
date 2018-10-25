@@ -23,12 +23,12 @@ services:
             - POSTGRES_PW=dbpw
             - POSTGRES_DB=mydb
             - APP_SETTINGS=config.DevelopmentConfig
-            - APP_KEY=kdkdk
+            - APP_KEY=random
         container_name: app
         ports:
             - "4000:80"
         volumes:
             - .:/app
         depends_on:
-            - postgresqlxs
+            - postgresql
 

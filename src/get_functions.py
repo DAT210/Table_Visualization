@@ -25,11 +25,13 @@ def get_json_setup(value):
                 ypos = tables.ypos
                 width = tables.width
                 height = tables.height
+                capacity = tables.capacity
                 table_positions[id] = {
                     "id": id,
                     "width": width,
                     "height": height,
-                    "position": {"x": xpos, "y": ypos}
+                    "position": {"x": xpos, "y": ypos},
+                    "capacity": capacity
                 }
                 draw_tables.append(table_positions[id])
 
@@ -77,6 +79,13 @@ def get_db_status(name):
                 "message": "The name is too short"
             }
             return message
+        if (' ' in name) == True:
+            message = {
+                "status": "error",
+                "message": "The name should not contain space"
+            }
+            return message
+
         if roomplan:
             message = {
                 "status": "error",

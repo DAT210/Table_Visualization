@@ -9,16 +9,18 @@ class Roomplan(db.Model):
     ypos = db.Column(db.Integer)
     width = db.Column(db.Integer)
     height = db.Column(db.Integer)
+    capacity = db.Column(db.Integer)
 
 
 
-    def __init__(self, id, xpos,ypos,width, height,name):
+    def __init__(self, id, xpos,ypos,width, height,name,capacity):
         self.id = id
         self.xpos = xpos
         self.ypos = ypos
         self.width = width
         self.height = height
         self.name = name
+        self.capacity = capacity
 
 
     def __repr__(self):

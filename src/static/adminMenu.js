@@ -1,5 +1,4 @@
 
-
 $('form .submit-link').on({
     click: function (event) {
         event.preventDefault();
@@ -154,7 +153,6 @@ document.addEventListener("click", closeAllSelect);
 var widthSlider = document.getElementById("tableWidth");
 var heightSlider = document.getElementById("tableHeight");
 var output = document.getElementById("demo");
-
 
 // Update the current slider value (each time you drag the slider handle)
 widthSlider.oninput = function() {

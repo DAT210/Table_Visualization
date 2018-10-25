@@ -1,62 +1,46 @@
 from flask import Flask,request, session, jsonify
 from __init__ import app, db
-from models import Roomplan, Walls
+from models import Roomplan, Walls, Tables
 import json
 from sqlalchemy import update, func
 
 
 
 def get_json_setup(value):
-        # Last inn json filen vår som tegner selve rommet med vegger
-        with open('src/static/roomPlan.json') as f:
-            data = json.load(f)
-
-
         # Laster inn alle posisjoner og størrelser på bord fra databasen
-        table_values = Roomplan.query.filter_by(name=value)
-        table_positions = {}
+        try:
+            roomplan = Roomplan.query.filter_by(name=value).first()
+            data = {
+                "width": roomplan.width,
+                "height": roomplan.height,
+                "tables": [],
+                "walls": []
+            }
+            
+            for table in roomplan.tables:
+                data["tables"].append({
+                    "id": table.name,
+                    "width": table.width,
+                    "height": table.height,
+                    "position": {"x": table.xpos, "y": table.ypos},
+                    "capacity": table.capacity
+                })
+            
+            for wall in roomplan.walls:
+                data["walls"].append({
+                    "from": {"x": wall.x_start, "y": wall.y_start},
+                    "to": {"x": wall.x_end, "y": wall.y_end}
+                })
 
-        # Sett inn hvor bord skal være i json fila
-        draw_tables = data["tables"]
-        if table_values:
-            for tables in table_values:
-                id = tables.id
-                xpos = tables.xpos
-                ypos = tables.ypos
-                width = tables.width
-                height = tables.height
-                capacity = tables.capacity
-                table_positions[id] = {
-                    "id": id,
-                    "width": width,
-                    "height": height,
-                    "position": {"x": xpos, "y": ypos},
-                    "capacity": capacity
-                }
-                draw_tables.append(table_positions[id])
-
-
-        walls = Walls.query.filter_by(name=value)
-        wall_positions = {}
-        draw_walls = data["walls"]
-        if walls:
-            for wall in walls:
-                id = wall.id
-                x_start = wall.x_start
-                x_end = wall.x_end
-                y_start = wall.y_start
-                y_end = wall.y_end
-                wall_positions[id] = {
-                    "from": {"x": x_start, "y": y_start},
-                    "to": {"x": x_end, "y": y_end}
-
-                }
-                draw_walls.append(wall_positions[id])
-
-
-        return json.dumps(data)
-
-
+            return json.dumps(data)
+        except:
+             data = {
+                "width": 700,
+                "height": 500,
+                "tables": [],
+                "walls": []
+            }
+             return json.dumps(data)
 
 def get_restaurants():
         restaurant_list = []

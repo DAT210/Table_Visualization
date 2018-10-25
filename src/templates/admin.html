@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TableVisTest</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="/static/app.js"></script>
+        <script src="/static/visualizer.js"></script>
+</head>
+<body>
+    <div id="wrapper"></div>
+
+
+<div class="menu-bar">
+    <div class="wrap">
+<span class="decor"></span>
+<nav>
+  <ul class="primary">
+    <li>
+      <a href="#load" id="load-setup">Load a setup</a>
+    </li>
+    <li id="create-new">
+      <a href={{ url_for('admin.clear') }}>Create new</a>
+    </li>
+      <li>
+  <a href="#edittools">Edit tools</a>
+  <ul class="sub">
+    <li><a href="#addwalls" id="add-walls">Add walls</a></li>
+    <li><a href="#addtables" id="add-tables">Add tables</a></li>
+    <li><a href="#removetables" id="remove-tables">Remove tables</a></li>
+  </ul>
+</li>
+      <li>
+  <a href="#savesetup">Save</a>
+  <ul class="sub">
+    <li><a href="#savenew" id="save-new">Save as new</a></li>
+    <li><a href="#updatecurrent" id="update-current">Update current</a></li>
+  </ul>
+</li>
+    <li>
+      <a href="#deletesetup" id="delete">Delete</a>
+    </li>
+  </ul>
+</nav>
+</div>
+</div>
+
+
+
+
+
+    <div class="admin-box load-box">
+        <div class="load-position-box">
+<div class="custom-select" style="width:220px;">
+    <form action="{{ url_for('admin.load') }}" method="post">
+  <select name="restaurants">
+      <option value="default">Select a restaurant</option>
+       {% for restaurant in restaurants %}
+    <option value={{restaurant}}>{{restaurant}}</option>
+        {% endfor %}
+  </select>
+        </div>
+ <input type="submit" class="submitbutton" id="load-btn" value="Confirm" />
+        </form>
+{% if tablesetup %}
+        {{tablesetup}}
+{% endif %}
+            </div>
+</div>
+
+
+    <div id="current-roomplan">
+        {% if session %}
+        <h3 class="area-header"><span data-shadow-text={{session}}>{{session}}</span></h3>
+        {% else %}
+        <h3 class="area-header"><span data-shadow-text="Admin page">Admin page</span></h3>
+        {% endif %}
+    </div>
+
+
+ <div class="admin-box addtable-box">
+
+     <div class="slidecontainer">
+         <p>Width of table</p>
+  <input type="range" min="40" max="500" value="40" class="slider" id="tableWidth">
+</div>
+
+         <div class="slidecontainer">
+         <p>Height of table</p>
+  <input type="range" min="40" max="500" value="40" class="slider" id="tableHeight">
+</div>
+<p>Capasity of this table</p>
+     <select  id="capacityList">
+  <option value="2">2</option>
+  <option value="4">4</option>
+  <option value="6">6</option>
+  <option value="8">8</option>
+  <option value="10">10</option>
+  <option value="12">12</option>
+  <option value="14">14</option>
+  <option value="16">16</option>
+  <option value="18">18</option>
+   <option value="20">20</option>
+</select>
+
+        <div class="table-box" id="box1"></div>
+        </div>
+ </div>
+
+
+
+<div class="admin-box save-new-box">
+                <p>Give this table layout a name and click on the save button</p>
+            <div class="center-forms">
+ <label>Name: <input class="text-input" type="text" id="table-name" name="name"/>  </label> <br>
+ <label><input name="submit_button" class="submitbutton saveBtn" type="submit" value="Save table layout" /></label>
+    </div>
+           <p id="save-response-text"></p>
+</div>
+
+
+<div class="admin-box update-box">
+    {% if session %}
+        <p>Are you sure you want to update the {{session}} layout?</p>
+                <div class="center-forms">
+ <label><input name="submit_button" class="submitbutton updateBtn" type="submit" value="Yes" /></label>
+    </div>
+    {% else %}
+    <p>This table setup is not stored</p>
+     <label><input style="visibility:hidden" name="submit_button" class="submitbutton updateBtn" type="submit" value="Yes" /></label>
+{% endif %}
+            <p id="update-response-text"></p>
+</div>
+
+
+
+<div class="admin-box delete-box">
+                <p>Enter the name of a table layout and click the delete button</p>
+            <div class="center-forms">
+                <form action="{{ url_for('admin.admin') }}" method="post">
+  <label>Name: <input class="text-input" type="text" name="deletedname"/> </label> <br>
+ <label><input name="submit_button" class="submitbutton" type="submit" value="Delete table layout" /></label>
+        </form>
+                </div>
+</div>
+
+
+
+
+    <div class="admin-box create-box">
+        <p>Create new</p>
+    </div>
+
+
+        <div class="admin-box addwalls-box">
+        <p>Add walls</p>
+    </div>
+
+
+
+        <div class="admin-box removetable-box">
+        <p>Remove tables</p>
+    </div>
+<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+<script src="/static/admin.js"></script>
+</body>
+</html>

@@ -284,3 +284,47 @@ var InteractiveSVGPoly = /** @class */ (function (_super) {
     };
     return InteractiveSVGPoly;
 }(InteractiveSVGElement));
+var SVGHelper = /** @class */ (function () {
+    function SVGHelper() {
+    }
+    SVGHelper.NewSVG = function (width, height) {
+        var svg = document.createElementNS(this.svgNS, "svg");
+        this.SetSize(svg, width, height);
+        return svg;
+    };
+    SVGHelper.NewRect = function (width, height) {
+        var rect = document.createElementNS(this.svgNS, "rect");
+        this.SetSize(rect, width, height);
+        return rect;
+    };
+    SVGHelper.NewLine = function (pos1, pos2) {
+        var line = document.createElementNS(this.svgNS, "line");
+        this.SetLinePos(line, pos1, pos2);
+        return line;
+    };
+    SVGHelper.NewPath = function () {
+        return document.createElementNS(this.svgNS, "path");
+    };
+    SVGHelper.SetSize = function (element, w, h) {
+        element.setAttribute("width", w + "px");
+        element.setAttribute("height", h + "px");
+    };
+    SVGHelper.GetWidth = function (element) {
+        return element.width.baseVal.value;
+    };
+    SVGHelper.GetHeight = function (element) {
+        return element.height.baseVal.value;
+    };
+    SVGHelper.SetPosition = function (element, pos) {
+        element.setAttribute("x", pos.x + "px");
+        element.setAttribute("y", pos.y + "px");
+    };
+    SVGHelper.SetLinePos = function (element, pos1, pos2) {
+        element.setAttribute("x1", pos1.x + "px");
+        element.setAttribute("y1", pos1.y + "px");
+        element.setAttribute("x2", pos2.x + "px");
+        element.setAttribute("y2", pos2.y + "px");
+    };
+    SVGHelper.svgNS = "http://www.w3.org/2000/svg";
+    return SVGHelper;
+}());

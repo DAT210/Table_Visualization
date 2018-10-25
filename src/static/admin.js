@@ -1,168 +1,184 @@
-
-
-$('form .submit-link').on({
-    click: function (event) {
-        event.preventDefault();
-        $(this).closest('form').submit();
-    }
-});
-
-
-$("#load-setup").click(function() {
-    location.reload();
-});
-
-
-$("#create-new").click(function() {
-    $(".addtable-box, .save-new-box, .update-box, .delete-box, .load-box, .removetable-box, .addwalls-box").css({
-       'visibility' : 'hidden'
-});
-    $(".create-box").css({
-       'visibility' : 'visible'
-});
-});
-
-
-$("#save-new").click(function() {
-    $(".addtable-box, .load-box, .delete-box, .create-box, .removetable-box, .addwalls-box, .update-box").css({
-       'visibility' : 'hidden'
-});
-    $(".save-new-box").css({
-       'visibility' : 'visible'
-});
-});
-
-
-
-$("#update-current").click(function() {
-    $(".addtable-box, .load-box, .delete-box, .create-box, .removetable-box, .addwalls-box, .save-new-box").css({
-       'visibility' : 'hidden'
-});
-    $(".update-box").css({
-       'visibility' : 'visible'
-});
-});
-
-
-
-$("#delete").click(function() {
-    $(".addtable-box, .load-box, .save-new-box, .update-box, .create-box, .removetable-box, .addwalls-box").css({
-       'visibility' : 'hidden'
-});
-    $(".delete-box").css({
-       'visibility' : 'visible'
-});
-});
-
-$("#add-walls").click(function() {
-    $(".addtable-box, .save-new-box, .update-box, .delete-box, .create-box, .removetable-box, .load-box").css({
-       'visibility' : 'hidden'
-});
-    $(".addwalls-box").css({
-       'visibility' : 'visible'
-});
-});
-
-$("#add-tables").click(function() {
-    $(".load-box, .save-new-box, .update-box, .delete-box, .create-box, .removetable-box, .addwalls-box").css({
-       'visibility' : 'hidden'
-});
-
-    $(".addtable-box").css({
-       'visibility' : 'visible'
-});
-});
-
-$("#remove-tables").click(function() {
-    $(".addtable-box, .save-new-box, .update-box, .delete-box, .create-box, .load-box, .addwalls-box").css({
-       'visibility' : 'hidden'
-});
-    $(".removetable-box").css({
-       'visibility' : 'visible'
-});
-});
-
-
-
-
-
-
-
-var x, i, j, selElmnt, a, b, c;
-x = document.getElementsByClassName("custom-select");
-for (i = 0; i < x.length; i++) {
-  selElmnt = x[i].getElementsByTagName("select")[0];
-  a = document.createElement("DIV");
-  a.setAttribute("class", "select-selected");
-  a.innerHTML = selElmnt.options[selElmnt.selectedIndex].innerHTML;
-  x[i].appendChild(a);
-  b = document.createElement("DIV");
-  b.setAttribute("class", "select-items select-hide");
-  for (j = 1; j < selElmnt.length; j++) {
-    c = document.createElement("DIV");
-    c.innerHTML = selElmnt.options[j].innerHTML;
-    c.addEventListener("click", function(e) {
-        var y, i, k, s, h;
-        s = this.parentNode.parentNode.getElementsByTagName("select")[0];
-        h = this.parentNode.previousSibling;
-        for (i = 0; i < s.length; i++) {
-          if (s.options[i].innerHTML == this.innerHTML) {
-            s.selectedIndex = i;
-            h.innerHTML = this.innerHTML;
-            y = this.parentNode.getElementsByClassName("same-as-selected");
-            for (k = 0; k < y.length; k++) {
-              y[k].removeAttribute("class");
-            }
-            this.setAttribute("class", "same-as-selected");
-            break;
-          }
-        }
-        h.click();
+"use strict";
+window.addEventListener("load", function () {
+    fetch("/load/json")
+        .then(function (r) { return r.json(); })
+        .then(function (roomPlan) {
+        var room = roomPlan;
+        initAdmin(room);
     });
-    b.appendChild(c);
-  }
-  x[i].appendChild(b);
-  a.addEventListener("click", function(e) {
-      e.stopPropagation();
-      closeAllSelect(this);
-      this.nextSibling.classList.toggle("select-hide");
-      this.classList.toggle("select-arrow-active");
-  });
+});
+function initAdmin(roomPlan) {
+    console.log("RoomPlan:");
+    console.log(roomPlan);
+    var visualizer = new InteractiveSVG();
+    var rv = new RoomVisualizerAdmin(visualizer);
+    rv.RoomPlan = roomPlan;
 }
-function closeAllSelect(elmnt) {
-  var x, y, i, arrNo = [];
-  x = document.getElementsByClassName("select-items");
-  y = document.getElementsByClassName("select-selected");
-  for (i = 0; i < y.length; i++) {
-    if (elmnt == y[i]) {
-      arrNo.push(i)
-    } else {
-      y[i].classList.remove("select-arrow-active");
+var RoomVisualizerAdmin = /** @class */ (function () {
+    function RoomVisualizerAdmin(visualizer) {
+        var _this = this;
+        this.tables = {};
+        this.visualizer = visualizer;
+        document.body.appendChild(this.visualizer.Wrapper);
+        var box = document.getElementById('box1');
+        var savebtn = document.getElementsByClassName('saveBtn')[0];
+        var updatebtn = document.getElementsByClassName('updateBtn')[0];
+        box.style.width = 60 + "px";
+        box.style.height = 40 + "px";
+        box.onclick = function () { _this.addTable(); };
+        savebtn.onclick = function () { _this.saveTableLayout('add'); };
+        updatebtn.onclick = function () { _this.updateTableLayout('update'); };
     }
-  }
-  for (i = 0; i < x.length; i++) {
-    if (arrNo.indexOf(i)) {
-      x[i].classList.add("select-hide");
-    }
-  }
-}
-document.addEventListener("click", closeAllSelect);
-
-
-
-
-var widthSlider = document.getElementById("tableWidth");
-var heightSlider = document.getElementById("tableHeight");
-var output = document.getElementById("demo");
-
-
-// Update the current slider value (each time you drag the slider handle)
-widthSlider.oninput = function() {
-   console.log(this.value);
-   document.getElementById("box1").style.width = this.value + "px";
-}
-
-heightSlider.oninput = function() {
-   console.log(this.value);
-   document.getElementById("box1").style.height = this.value + "px";
-}
+    Object.defineProperty(RoomVisualizerAdmin.prototype, "RoomPlan", {
+        set: function (roomPlan) {
+            this.roomPlan = roomPlan;
+            this.visualizer.Width = this.roomPlan.width;
+            this.visualizer.Height = this.roomPlan.height;
+            this.drawRoom();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    RoomVisualizerAdmin.prototype.drawRoom = function () {
+        this.visualizer.Reset();
+        //this.drawWalls();
+        this.drawWallsAsPoly();
+        this.drawTables();
+    };
+    RoomVisualizerAdmin.prototype.drawWalls = function () {
+        if (!this.roomPlan)
+            return;
+        for (var _i = 0, _a = this.roomPlan.walls; _i < _a.length; _i++) {
+            var wall = _a[_i];
+            this.visualizer.AddLine(wall.from, wall.to);
+        }
+    };
+    RoomVisualizerAdmin.prototype.drawWallsAsPoly = function () {
+        if (!this.roomPlan)
+            return;
+        var wallPoints = this.roomPlan.walls.map(function (w) { return w.from; });
+        this.visualizer.AddPoly(wallPoints);
+    };
+    RoomVisualizerAdmin.prototype.drawTables = function () {
+        var _this = this;
+        if (!this.roomPlan)
+            return;
+        var _loop_1 = function (table) {
+            var rect = this_1.visualizer.AddRect(table.width, table.height, table.position, true, "table");
+            rect.OnClick = function () { console.log("Table " + table.id + " clicked!"); };
+            rect.OnClick = function () { console.log("Table Position for table " + table.id + " " + table.position); };
+            rect.OnMove = function () { _this.updateTablePos(table.id, rect.Position); };
+            this_1.tables[table.id] = rect;
+        };
+        var this_1 = this;
+        for (var _i = 0, _a = this.roomPlan.tables; _i < _a.length; _i++) {
+            var table = _a[_i];
+            _loop_1(table);
+        }
+    };
+    RoomVisualizerAdmin.prototype.updateTablePos = function (tableID, pos) {
+        if (this.roomPlan) {
+            for (var _i = 0, _a = this.roomPlan.tables; _i < _a.length; _i++) {
+                var t = _a[_i];
+                if (t.id == tableID)
+                    t.position = pos;
+            }
+        }
+    };
+    RoomVisualizerAdmin.prototype.getTableSetup = function (name, value) {
+        if (!this.roomPlan)
+            return;
+        var dict = [];
+        for (var _i = 0, _a = this.roomPlan.tables; _i < _a.length; _i++) {
+            var table = _a[_i];
+            dict.push({
+                "id": table.id,
+                "width": table.width,
+                "height": table.height,
+                "xpos": table.position.x,
+                "ypos": table.position.y,
+                "status": value,
+                "name": name
+            });
+        }
+        return dict;
+    };
+    RoomVisualizerAdmin.prototype.addTable = function () {
+        var _this = this;
+        if (!this.roomPlan)
+            return;
+        var box = document.getElementById('box1');
+        if (box) {
+            var height = box.height;
+            var width = box.width;
+            var e = document.getElementById('capacityList');
+            var strUser = e.options[e.selectedIndex].value;
+            console.log(strUser);
+            // Legger til et nytt element i sentrum, med størrelse lik innparameterene
+            var center = { "x": 250, "y": 250 };
+            var newRect_1 = this.visualizer.AddRect(width, height, center, true, "table");
+            var tableID = this.roomPlan.tables.length + 1;
+            this.roomPlan.tables.push({ "id": tableID, "width": width, "height": height, "position": center });
+            newRect_1.OnMove = function () { _this.updateTablePos(tableID, newRect_1.Position); };
+        }
+    };
+    RoomVisualizerAdmin.prototype.saveTableLayout = function (value) {
+        var TableName = document.getElementById('table-name').value;
+        if (TableName.length < 1) {
+            document.getElementById('save-response-text').innerHTML = "The name is too short";
+            return;
+        }
+        var dict = this.getTableSetup(TableName, value);
+        if (dict) {
+            if (dict.length == 0) {
+                document.getElementById('save-response-text').innerHTML = "You have to add tables";
+                return;
+            }
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/add", true);
+            xhr.setRequestHeader("Content-type", "application/json");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    // Sjekk om server klarte å legge inn bordoppsettet i databasen
+                    var json = JSON.parse(xhr.responseText);
+                    var errorMsg = document.getElementById('save-response-text');
+                    var jsonStatus = json["status"];
+                    if (jsonStatus == "error") {
+                        errorMsg.style.color = "red";
+                        errorMsg.innerHTML = json["message"];
+                    }
+                    if (jsonStatus == "success") {
+                        location.reload();
+                    }
+                }
+            };
+            var data = JSON.stringify(dict);
+            xhr.send(data);
+        }
+    };
+    RoomVisualizerAdmin.prototype.updateTableLayout = function (value) {
+        var dict = this.getTableSetup("dummie", value);
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "update", true);
+        xhr.setRequestHeader("Content-type", "application/json");
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                // Sjekk om server klarte å legge inn bordoppsettet i databasen
+                var json = JSON.parse(xhr.responseText);
+                var errorMsg = document.getElementById('update-response-text');
+                var jsonStatus = json["status"];
+                if (jsonStatus == "error") {
+                    errorMsg.style.color = "red";
+                    errorMsg.innerHTML = json["message"];
+                }
+                if (jsonStatus == "success") {
+                    errorMsg.style.color = "green";
+                    errorMsg.innerHTML = json["message"];
+                }
+            }
+        };
+        var data = JSON.stringify(dict);
+        xhr.send(data);
+    };
+    return RoomVisualizerAdmin;
+}());

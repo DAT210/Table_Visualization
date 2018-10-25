@@ -254,3 +254,46 @@ class InteractiveSVGPoly extends InteractiveSVGElement {
 
 
 }
+
+class SVGHelper {
+    private static readonly svgNS = "http://www.w3.org/2000/svg";
+
+    public static NewSVG(width: number, height: number): SVGElement {
+        const svg = document.createElementNS(this.svgNS, "svg") as SVGElement;
+        this.SetSize(svg, width, height);
+        return svg;
+    }
+    public static NewRect(width: number, height: number): SVGRectElement {
+        const rect = document.createElementNS(this.svgNS, "rect") as SVGRectElement;
+        this.SetSize(rect, width, height);
+        return rect;
+    }
+    public static NewLine(pos1: IPoint, pos2: IPoint): SVGLineElement {
+        const line = document.createElementNS(this.svgNS, "line") as SVGLineElement;
+        this.SetLinePos(line, pos1, pos2);
+        return line;
+    }
+    public static NewPath(): SVGPathElement {
+        return document.createElementNS(this.svgNS, "path");
+    }
+    public static SetSize(element: SVGElement, w: number, h: number) {
+        element.setAttribute("width", w + "px");
+        element.setAttribute("height", h + "px");
+    }
+    public static GetWidth(element: SVGRectElement): number {
+        return element.width.baseVal.value;
+    }
+    public static GetHeight(element: SVGRectElement): number {
+        return element.height.baseVal.value;
+    }
+    public static SetPosition(element: SVGElement, pos: IPoint) {
+        element.setAttribute("x", pos.x + "px");
+        element.setAttribute("y", pos.y + "px");
+    }
+    public static SetLinePos(element: SVGLineElement, pos1: IPoint, pos2: IPoint) {
+        element.setAttribute("x1", pos1.x + "px");
+        element.setAttribute("y1", pos1.y + "px");
+        element.setAttribute("x2", pos2.x + "px");
+        element.setAttribute("y2", pos2.y + "px");
+    }
+}

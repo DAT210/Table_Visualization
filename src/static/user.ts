@@ -3,14 +3,16 @@ window.addEventListener("load", () => {
         .then(r => { return r.json() })
         .then(roomPlan => {
             let room: IRoom = <IRoom>roomPlan;
-            init(room);
+            initUser(room);
         })
+        .catch(err => console.error(JSON.stringify(err)));
 });
 
-function init(roomPlan: IRoom) {
+function initUser(roomPlan: IRoom) {
     console.log("RoomPlan:");
     console.log(roomPlan);
     const visualizer = new InteractiveSVG();
     const rv = new RoomVisualizer(visualizer);
-    rv.RoomPlan = roomPlan;
+    rv.OnTableClick = (id: number) => { console.log("Table " + id + " clicked") }
+    rv.SetRoomPlan(roomPlan);
 }

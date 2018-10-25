@@ -31,8 +31,8 @@ function initAdmin(roomPlan: IRoom) {
 function addTable() {
     let box = <HTMLInputElement>document.getElementById('box1');
     if (!box) return;
-    let height = box.height;
-    let width = box.width;
+    let height = box.clientHeight;
+    let width = box.clientWidth;
     let e = document.getElementById('capacityList') as HTMLSelectElement;
     let strUser = e.options[e.selectedIndex].value;
     

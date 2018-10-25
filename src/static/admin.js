@@ -29,8 +29,8 @@ function addTable() {
     var box = document.getElementById('box1');
     if (!box)
         return;
-    var height = box.height;
-    var width = box.width;
+    var height = box.clientHeight;
+    var width = box.clientWidth;
     var e = document.getElementById('capacityList');
     var strUser = e.options[e.selectedIndex].value;
     // Legger til et nytt element i sentrum, med størrelse lik innparameterene

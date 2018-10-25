@@ -19,7 +19,7 @@ def get_json_setup(value):
             
             for table in roomplan.tables:
                 data["tables"].append({
-                    "id": table.name,
+                    "id": table.id,
                     "width": table.width,
                     "height": table.height,
                     "position": {"x": table.xpos, "y": table.ypos},

@@ -1,5 +1,5 @@
 from __init__ import db
-from models import Roomplan
+from models import Roomplan, Tables
 from sqlalchemy import update, func
 
 

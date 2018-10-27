@@ -19,10 +19,8 @@ admin_blueprint = Blueprint('admin', __name__)
 def update():
     if request.method == 'POST':
         data = request.get_json()
-        table_status = data[0]["status"]
         table_name = session.get('admin-roomplan')
-        if table_status == 'update':
-            return update_roomplan(table_name, data)
+        return update_roomplan(table_name, data)
 
 
 
@@ -31,22 +29,21 @@ def update():
 def add():
     if request.method == 'POST':
         data = request.get_json()
-        table_name = data[0]["name"]
-        table_status = data[0]["status"]
+        print(data)
+        table_name = data["name"]
+        response = get_db_status(table_name)
+        if response["status"] == "error":
+            print(response)
+            return json.dumps(response)
+        
+        insert_roomplan(table_name.lower(),data)
 
-        if table_status == "add":
-            response = get_db_status(table_name)
-            if response["status"] == "error":
-                return json.dumps(response)
-
-            insert_roomplan(table_name.lower(),data)
-
-            session["admin-roomplan"] = table_name
-            message = {
-                "status": "success",
-                "message": "Successfully added to database"
-            }
-            return json.dumps(message)
+        session["admin-roomplan"] = table_name
+        message = {
+            "status": "success",
+            "message": "Successfully added to database"
+        }
+        return json.dumps(message)
 
 
 

@@ -156,11 +156,9 @@ var output = document.getElementById("demo");
 
 // Update the current slider value (each time you drag the slider handle)
 widthSlider.oninput = function() {
-   console.log(this.value);
    document.getElementById("box1").style.width = this.value + "px";
 }
 
 heightSlider.oninput = function() {
-   console.log(this.value);
    document.getElementById("box1").style.height = this.value + "px";
 }

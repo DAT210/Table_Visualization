@@ -19,7 +19,8 @@ interface IRoom {
     width: number,
     height: number,
     tables: ITable[],
-    walls: IWall[]
+    walls: IWall[],
+    name: string
 }
 
 class RoomVisualizer {

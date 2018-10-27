@@ -5,7 +5,6 @@ import json
 from sqlalchemy import update, func
 
 
-
 def get_json_setup(value):
         # Laster inn alle posisjoner og størrelser på bord fra databasen
         try:
@@ -14,7 +13,8 @@ def get_json_setup(value):
                 "width": roomplan.width,
                 "height": roomplan.height,
                 "tables": [],
-                "walls": []
+                "walls": [],
+                "name": roomplan.name
             }
             
             for table in roomplan.tables:

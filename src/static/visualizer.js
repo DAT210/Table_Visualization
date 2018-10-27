@@ -133,6 +133,7 @@ var InteractiveSVGElement = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
+    InteractiveSVGElement.prototype.ToggleClass = function (className) { this.SvgElement.classList.toggle(className); };
     return InteractiveSVGElement;
 }());
 var InteractiveSVGRect = /** @class */ (function (_super) {

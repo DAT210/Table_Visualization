@@ -19,7 +19,7 @@ var RoomVisualizer = /** @class */ (function () {
         this.drawRoom();
     };
     RoomVisualizer.prototype.AddTable = function (w, h) {
-        var pos = { x: this.visualizer.Height / 2, y: this.visualizer.Height / 2 };
+        var pos = { x: this.visualizer.Width / 2, y: this.visualizer.Height / 2 };
         var id = this.drawTable(w, h, pos);
         if (this.roomPlan) {
             this.roomPlan.tables.push({ width: w, height: h, position: pos, id: id });

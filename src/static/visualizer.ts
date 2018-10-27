@@ -11,7 +11,7 @@ interface IInteractiveVisualizer {
 
 class InteractiveSVG implements IInteractiveVisualizer {
     public Wrapper: HTMLElement;
-    private svg: SVGElement;
+    private svg: SVGSVGElement;
     private width: number;
     private height: number;
     private elements: InteractiveSVGElement[] = [];
@@ -25,7 +25,7 @@ class InteractiveSVG implements IInteractiveVisualizer {
         this.height = height;
         this.Wrapper = document.createElement("div");
         this.Wrapper.id = "InteractiveSVGWrapper";
-        this.svg = SVGHelper.NewSVG(this.width, this.height)
+        this.svg = SVGHelper.NewSVG(this.width, this.height) as SVGSVGElement;
         this.Wrapper.appendChild(this.svg);
         this.registerEventListeners();
     }
@@ -65,7 +65,7 @@ class InteractiveSVG implements IInteractiveVisualizer {
     }
     public Reset(): void {
         this.elements = [];
-        this.svg = SVGHelper.NewSVG(this.width, this.height);
+        this.svg = SVGHelper.NewSVG(this.width, this.height) as SVGSVGElement;
         this.Wrapper.innerHTML = "";
         this.Wrapper.appendChild(this.svg);
         this.registerEventListeners();
@@ -114,6 +114,7 @@ interface IInteractiveVisualizerElement {
     Movable: boolean,
     Tag: string | undefined,
     Fill: string;
+    ToggleClass(className: string): void,
     OnClick: () => void,
     OnMove: () => void,
 }
@@ -137,6 +138,8 @@ abstract class InteractiveSVGElement implements IInteractiveVisualizerElement{
 
     set Fill(color: string) { this.SvgElement.style.fill = color }
     set Stroke(color: string) { this.SvgElement.style.stroke = color }
+
+    public ToggleClass(className: string) { this.SvgElement.classList.toggle(className) }
 }
 
 class InteractiveSVGRect extends InteractiveSVGElement {

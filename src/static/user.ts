@@ -1,5 +1,5 @@
 window.addEventListener("load", () => {
-    fetch("/load/json")
+    fetch("/bookedTables")
         .then(r => { return r.json() })
         .then(roomPlan => {
             let room: IRoom = <IRoom>roomPlan;

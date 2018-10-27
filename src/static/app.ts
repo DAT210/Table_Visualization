@@ -7,7 +7,8 @@ interface ITable {
     id: number,
     width: number,
     height: number,
-    position: IPoint
+    position: IPoint,
+    booked: number
 }
 
 interface IWall {
@@ -27,7 +28,7 @@ class RoomVisualizer {
     private roomPlan: IRoom | undefined;
     private tables: { [id: number]: IInteractiveVisualizerElement } = {};
 
-    public OnTableClick: (id: number) => void = (id) => {};
+    public OnTableClick: (id: number) => void = (id) => { };
 
     constructor(visualizer: IInteractiveVisualizer) {
         this.visualizer = visualizer;
@@ -48,7 +49,7 @@ class RoomVisualizer {
         const pos = { x: this.visualizer.Height / 2, y: this.visualizer.Height / 2 };
         const id = this.drawTable(w, h, pos);
         if (this.roomPlan) {
-            this.roomPlan.tables.push({ width: w, height: h, position: pos, id: id });
+            this.roomPlan.tables.push({ width: w, height: h, position: pos, id: id, booked: 0 });
         }
     }
 
@@ -59,7 +60,7 @@ class RoomVisualizer {
     }
     private drawWallsAsLines(): void {
         if (!this.roomPlan) return;
-        for(let wall of this.roomPlan.walls) {
+        for (let wall of this.roomPlan.walls) {
             this.visualizer.AddLine(wall.from, wall.to);
         }
     }
@@ -70,12 +71,12 @@ class RoomVisualizer {
     }
     private drawTables(): void {
         if (!this.roomPlan) return;
-        for(let table of this.roomPlan.tables) {
-            this.drawTable(table.width, table.height, table.position, table.id);
+        for (let table of this.roomPlan.tables) {
+            this.drawTable(table.width, table.height, table.position, table.id, table.booked);
         }
     }
-    private drawTable(w: number, h: number, pos: IPoint, id?: number): number {
-        const rect = this.visualizer.AddRect(w, h, pos, true, "table");
+    private drawTable(w: number, h: number, pos: IPoint, id?: number, booked?: number): number {
+        const rect = this.visualizer.AddRect(w, h, pos, true, "table", booked);
         let tableId = id ? id : this.generateId();
         rect.OnClick = () => { this.OnTableClick(tableId) };
         rect.OnMove = () => { this.updateTablePos(tableId, rect.Position) };
@@ -83,10 +84,22 @@ class RoomVisualizer {
 
         return tableId;
     }
+
+    private colorizeTables() {
+        if (this.roomPlan) {
+            let len = this.roomPlan.tables.length;
+            for (var i = 0; i < len; i++) {
+                if (this.tables[i].Booked == 1) {
+                    this.tables[i].Fill = "red";
+                }
+            }
+        }
+    }
+
     private generateId(): number {
         let id: number;
-        do { 
-            id = Math.floor((Math.random() * 1000)) 
+        do {
+            id = Math.floor((Math.random() * 1000))
         }
         while (id in this.tables)
         console.log("Generated table ID: " + id);

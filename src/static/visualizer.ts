@@ -17,6 +17,8 @@ class InteractiveSVG implements IInteractiveVisualizer {
     private elements: InteractiveSVGElement[] = [];
     private mousePos: IPoint | undefined;
     
+    private scale: number = 1.0;
+    
     private currentlyMoving: InteractiveSVGElement | undefined;
     private mouseOffset: IPoint | undefined;
 
@@ -25,9 +27,8 @@ class InteractiveSVG implements IInteractiveVisualizer {
         this.height = height;
         this.Wrapper = document.createElement("div");
         this.Wrapper.id = "InteractiveSVGWrapper";
-        this.svg = SVGHelper.NewSVG(this.width, this.height) as SVGSVGElement;
-        this.Wrapper.appendChild(this.svg);
-        this.registerEventListeners();
+        this.svg = SVGHelper.NewSVG(this.width, this.height);
+        this.init();
     }
 
     get Width(): number { return this.width }
@@ -65,12 +66,16 @@ class InteractiveSVG implements IInteractiveVisualizer {
     }
     public Reset(): void {
         this.elements = [];
-        this.svg = SVGHelper.NewSVG(this.width, this.height) as SVGSVGElement;
         this.Wrapper.innerHTML = "";
+        this.init();
+    }
+
+    private init(): void {
+        this.svg = SVGHelper.NewSVG(this.width, this.height);
+        SVGHelper.SetViewBox(this.svg, 0, 0, this.width, this.height);
         this.Wrapper.appendChild(this.svg);
         this.registerEventListeners();
     }
-
     private registerEventListeners(): void {
         this.svg.addEventListener("mousemove", (e: MouseEvent) => {
             this.mousePos = { x: e.layerX, y: e.layerY };
@@ -78,7 +83,8 @@ class InteractiveSVG implements IInteractiveVisualizer {
                 if (this.mouseOffset) {
                     const newX = this.mousePos.x - this.mouseOffset.x;
                     const newY = this.mousePos.y - this.mouseOffset.y;
-                    this.currentlyMoving.Position = { x: newX, y: newY };
+                    const newPos = { x: newX/this.scale, y: newY/this.scale };
+                    this.currentlyMoving.Position = newPos;
                 }
             }
         });
@@ -101,7 +107,7 @@ class InteractiveSVG implements IInteractiveVisualizer {
             e.preventDefault()
             this.currentlyMoving = element;
             const elmPos = element.Position;
-            this.mouseOffset = { x: (e.layerX - elmPos.x), y: (e.layerY - elmPos.y) }
+            this.mouseOffset = { x: (e.layerX - elmPos.x*this.scale), y: (e.layerY - elmPos.y*this.scale) }
         });
     }
 }
@@ -113,7 +119,7 @@ interface IInteractiveVisualizerElement {
     PrevPosition: IPoint | undefined,
     Movable: boolean,
     Tag: string | undefined,
-    Fill: string;
+    Selected: boolean;
     ToggleClass(className: string): void,
     OnClick: () => void,
     OnMove: () => void,
@@ -128,6 +134,7 @@ abstract class InteractiveSVGElement implements IInteractiveVisualizerElement{
     public PrevPosition: IPoint | undefined;
     public Movable: boolean = false;
     public Tag: string | undefined;
+    public Selected: boolean = false;
     public OnClick: () => void = () => {};
     public OnMove: () => void = () => {};
 
@@ -261,7 +268,13 @@ class InteractiveSVGPoly extends InteractiveSVGElement {
 class SVGHelper {
     private static readonly svgNS = "http://www.w3.org/2000/svg";
 
-    public static NewSVG(width: number, height: number): SVGElement {
+    public static NewSVG(width: number, height: number): SVGSVGElement {
+        const svg = document.createElementNS(this.svgNS, "svg") as SVGSVGElement;
+        this.SetSize(svg, width, height);
+        this.SetViewBox(svg, 0, 0, width, height);
+        return svg;
+    }
+    public static NewSVGElement(width: number, height: number): SVGElement {
         const svg = document.createElementNS(this.svgNS, "svg") as SVGElement;
         this.SetSize(svg, width, height);
         return svg;
@@ -298,5 +311,8 @@ class SVGHelper {
         element.setAttribute("y1", pos1.y + "px");
         element.setAttribute("x2", pos2.x + "px");
         element.setAttribute("y2", pos2.y + "px");
+    }
+    public static SetViewBox(element: SVGSVGElement, x: number, y: number, w: number, h: number) {
+        element.setAttribute("viewBox", `${x} ${y} ${w} ${h}`);
     }
 }

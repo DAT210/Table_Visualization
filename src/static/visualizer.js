@@ -17,13 +17,13 @@ var InteractiveSVG = /** @class */ (function () {
         if (width === void 0) { width = 500; }
         if (height === void 0) { height = 500; }
         this.elements = [];
+        this.scale = 1.0;
         this.width = width;
         this.height = height;
         this.Wrapper = document.createElement("div");
         this.Wrapper.id = "InteractiveSVGWrapper";
         this.svg = SVGHelper.NewSVG(this.width, this.height);
-        this.Wrapper.appendChild(this.svg);
-        this.registerEventListeners();
+        this.init();
     }
     Object.defineProperty(InteractiveSVG.prototype, "Width", {
         get: function () { return this.width; },
@@ -70,8 +70,12 @@ var InteractiveSVG = /** @class */ (function () {
     };
     InteractiveSVG.prototype.Reset = function () {
         this.elements = [];
-        this.svg = SVGHelper.NewSVG(this.width, this.height);
         this.Wrapper.innerHTML = "";
+        this.init();
+    };
+    InteractiveSVG.prototype.init = function () {
+        this.svg = SVGHelper.NewSVG(this.width, this.height);
+        SVGHelper.SetViewBox(this.svg, 0, 0, this.width, this.height);
         this.Wrapper.appendChild(this.svg);
         this.registerEventListeners();
     };
@@ -83,7 +87,8 @@ var InteractiveSVG = /** @class */ (function () {
                 if (_this.mouseOffset) {
                     var newX = _this.mousePos.x - _this.mouseOffset.x;
                     var newY = _this.mousePos.y - _this.mouseOffset.y;
-                    _this.currentlyMoving.Position = { x: newX, y: newY };
+                    var newPos = { x: newX / _this.scale, y: newY / _this.scale };
+                    _this.currentlyMoving.Position = newPos;
                 }
             }
         });
@@ -108,7 +113,7 @@ var InteractiveSVG = /** @class */ (function () {
             e.preventDefault();
             _this.currentlyMoving = element;
             var elmPos = element.Position;
-            _this.mouseOffset = { x: (e.layerX - elmPos.x), y: (e.layerY - elmPos.y) };
+            _this.mouseOffset = { x: (e.layerX - elmPos.x * _this.scale), y: (e.layerY - elmPos.y * _this.scale) };
         });
     };
     return InteractiveSVG;
@@ -116,6 +121,7 @@ var InteractiveSVG = /** @class */ (function () {
 var InteractiveSVGElement = /** @class */ (function () {
     function InteractiveSVGElement(movable, tag) {
         this.Movable = false;
+        this.Selected = false;
         this.OnClick = function () { };
         this.OnMove = function () { };
         if (movable)
@@ -291,6 +297,12 @@ var SVGHelper = /** @class */ (function () {
     SVGHelper.NewSVG = function (width, height) {
         var svg = document.createElementNS(this.svgNS, "svg");
         this.SetSize(svg, width, height);
+        this.SetViewBox(svg, 0, 0, width, height);
+        return svg;
+    };
+    SVGHelper.NewSVGElement = function (width, height) {
+        var svg = document.createElementNS(this.svgNS, "svg");
+        this.SetSize(svg, width, height);
         return svg;
     };
     SVGHelper.NewRect = function (width, height) {
@@ -325,6 +337,9 @@ var SVGHelper = /** @class */ (function () {
         element.setAttribute("y1", pos1.y + "px");
         element.setAttribute("x2", pos2.x + "px");
         element.setAttribute("y2", pos2.y + "px");
+    };
+    SVGHelper.SetViewBox = function (element, x, y, w, h) {
+        element.setAttribute("viewBox", x + " " + y + " " + w + " " + h);
     };
     SVGHelper.svgNS = "http://www.w3.org/2000/svg";
     return SVGHelper;

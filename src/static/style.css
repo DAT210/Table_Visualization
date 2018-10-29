@@ -3,21 +3,21 @@ svg {
     border: 1px solid gray;
 }
 
-line {
-    stroke: darkgrey;
-}
-
-path {
-    fill: whitesmoke;
-    stroke: none;
-}
-
 body {
     display: flex;
     justify-content: center;
-    min-height: 1200px;
 }
 
 #InteractiveSVGWrapper {
     position: absolute;
+}
+.table {
+    fill: black;
+}
+.table-selected {
+    stroke: red;
+    stroke-width: 2px;
+}
+.room {
+    fill: darkgray;
 }

@@ -13,6 +13,12 @@ function initUser(roomPlan) {
     console.log(roomPlan);
     var visualizer = new InteractiveSVG();
     var rv = new RoomVisualizer(visualizer);
-    rv.OnTableClick = function (id) { console.log("Table " + id + " clicked"); };
     rv.SetRoomPlan(roomPlan);
+    // temp button for testing
+    var button = document.createElement("input");
+    button.type = "button";
+    button.value = "Click Me";
+    button.style.marginTop = "600px";
+    button.onclick = function () { console.log(rv.GetSelected()); };
+    document.body.appendChild(button);
 }

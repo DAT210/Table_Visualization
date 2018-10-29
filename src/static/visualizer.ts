@@ -98,16 +98,19 @@ class InteractiveSVG implements IInteractiveVisualizer {
         });
     }
     private addElement(element: InteractiveSVGElement): void {
-        this.svg.appendChild(element.SvgElement)
-        if (element.Movable) this.registerMovableElement(element);
         this.elements.push(element);
-    }
-    private registerMovableElement(element: InteractiveSVGElement) {
+        this.svg.appendChild(element.SvgElement)
+        
         element.SvgElement.addEventListener("mousedown", (e: MouseEvent) => {
-            e.preventDefault()
-            this.currentlyMoving = element;
-            const elmPos = element.Position;
-            this.mouseOffset = { x: (e.layerX - elmPos.x*this.scale), y: (e.layerY - elmPos.y*this.scale) }
+            if (element.Movable) {
+                e.preventDefault()
+                this.currentlyMoving = element;
+                const elmPos = element.Position;
+                this.mouseOffset = { 
+                    x: (e.layerX - elmPos.x * this.scale),
+                    y: (e.layerY - elmPos.y * this.scale)
+                }
+            }
         });
     }
 }
@@ -147,6 +150,17 @@ abstract class InteractiveSVGElement implements IInteractiveVisualizerElement{
     set Stroke(color: string) { this.SvgElement.style.stroke = color }
 
     public ToggleClass(className: string) { this.SvgElement.classList.toggle(className) }
+
+    protected registerEventListeners(): void {
+        this.SvgElement.addEventListener("mousedown", () => {
+            this.PrevPosition = this.Position;
+        });
+        this.SvgElement.addEventListener("mouseup", () => {
+            if (this.PrevPosition == this.Position) {
+                this.OnClick();
+            }
+        });
+    }
 }
 
 class InteractiveSVGRect extends InteractiveSVGElement {
@@ -163,15 +177,7 @@ class InteractiveSVGRect extends InteractiveSVGElement {
         else this.Position = { x: 0, y: 0 };
         this.width = w;
         this.height = h;
-        
-        this.SvgElement.addEventListener("mousedown", () => {
-            this.PrevPosition = this.pos;
-        });
-        this.SvgElement.addEventListener("mouseup", () => {
-            if (this.PrevPosition == this.pos) {
-                this.OnClick();
-            }
-        });
+        this.registerEventListeners();        
     }
 
     set Position(pos: IPoint) {
@@ -199,6 +205,7 @@ class InteractiveSVGLine extends InteractiveSVGElement {
     constructor(pos1: IPoint, pos2: IPoint, movable?: boolean, tag?: string) {
         super(movable, tag);
         this.SvgElement = SVGHelper.NewLine(pos1, pos2);
+        this.registerEventListeners();
     }
 
     get Position(): IPoint { 
@@ -222,6 +229,7 @@ class InteractiveSVGPoly extends InteractiveSVGElement {
         this.SvgElement = SVGHelper.NewPath();
         this.Points = points;
         if (pos) this.Position = pos;
+        this.registerEventListeners();
     }
 
     get Points() { return this.points; }

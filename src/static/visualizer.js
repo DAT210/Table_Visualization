@@ -102,18 +102,19 @@ var InteractiveSVG = /** @class */ (function () {
         });
     };
     InteractiveSVG.prototype.addElement = function (element) {
-        this.svg.appendChild(element.SvgElement);
-        if (element.Movable)
-            this.registerMovableElement(element);
-        this.elements.push(element);
-    };
-    InteractiveSVG.prototype.registerMovableElement = function (element) {
         var _this = this;
+        this.elements.push(element);
+        this.svg.appendChild(element.SvgElement);
         element.SvgElement.addEventListener("mousedown", function (e) {
-            e.preventDefault();
-            _this.currentlyMoving = element;
-            var elmPos = element.Position;
-            _this.mouseOffset = { x: (e.layerX - elmPos.x * _this.scale), y: (e.layerY - elmPos.y * _this.scale) };
+            if (element.Movable) {
+                e.preventDefault();
+                _this.currentlyMoving = element;
+                var elmPos = element.Position;
+                _this.mouseOffset = {
+                    x: (e.layerX - elmPos.x * _this.scale),
+                    y: (e.layerY - elmPos.y * _this.scale)
+                };
+            }
         });
     };
     return InteractiveSVG;
@@ -140,6 +141,17 @@ var InteractiveSVGElement = /** @class */ (function () {
         configurable: true
     });
     InteractiveSVGElement.prototype.ToggleClass = function (className) { this.SvgElement.classList.toggle(className); };
+    InteractiveSVGElement.prototype.registerEventListeners = function () {
+        var _this = this;
+        this.SvgElement.addEventListener("mousedown", function () {
+            _this.PrevPosition = _this.Position;
+        });
+        this.SvgElement.addEventListener("mouseup", function () {
+            if (_this.PrevPosition == _this.Position) {
+                _this.OnClick();
+            }
+        });
+    };
     return InteractiveSVGElement;
 }());
 var InteractiveSVGRect = /** @class */ (function (_super) {
@@ -156,14 +168,7 @@ var InteractiveSVGRect = /** @class */ (function (_super) {
             _this.Position = { x: 0, y: 0 };
         _this.width = w;
         _this.height = h;
-        _this.SvgElement.addEventListener("mousedown", function () {
-            _this.PrevPosition = _this.pos;
-        });
-        _this.SvgElement.addEventListener("mouseup", function () {
-            if (_this.PrevPosition == _this.pos) {
-                _this.OnClick();
-            }
-        });
+        _this.registerEventListeners();
         return _this;
     }
     Object.defineProperty(InteractiveSVGRect.prototype, "Position", {
@@ -202,6 +207,7 @@ var InteractiveSVGLine = /** @class */ (function (_super) {
     function InteractiveSVGLine(pos1, pos2, movable, tag) {
         var _this = _super.call(this, movable, tag) || this;
         _this.SvgElement = SVGHelper.NewLine(pos1, pos2);
+        _this.registerEventListeners();
         return _this;
     }
     Object.defineProperty(InteractiveSVGLine.prototype, "Position", {
@@ -236,6 +242,7 @@ var InteractiveSVGPoly = /** @class */ (function (_super) {
         _this.Points = points;
         if (pos)
             _this.Position = pos;
+        _this.registerEventListeners();
         return _this;
     }
     Object.defineProperty(InteractiveSVGPoly.prototype, "Points", {

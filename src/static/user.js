@@ -13,7 +13,7 @@ function initUser(roomPlan) {
     var visualizer = new InteractiveSVG();
     var rv = new RoomVisualizer(visualizer);
     rv.SetRoomPlan(roomPlan);
-    var bookings = test();
+    var bookings = getBookings();
     rv.SetTableAvailability(bookings.tablesIDs);
     // temp button for testing
     var button = document.createElement("input");
@@ -23,6 +23,10 @@ function initUser(roomPlan) {
     button.onclick = function () { console.log(rv.GetSelected()); };
     document.body.appendChild(button);
 }
-function test() {
+function getBookings() {
+    // fetch (GET): get bookings from server
     return { tablesIDs: [0, 2, 3], people: 3 };
+}
+function postTables(tableIDs) {
+    //fetch (POST): send tableIDs to server
 }

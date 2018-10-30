@@ -7,7 +7,8 @@ interface ITable {
     id: number,
     width: number,
     height: number,
-    position: IPoint
+    position: IPoint,
+    booked: number
 }
 
 interface IWall {
@@ -50,7 +51,7 @@ class RoomVisualizer {
         const pos = { x: this.visualizer.Width / 2, y: this.visualizer.Height / 2 };
         const id = this.drawTable(w, h, pos);
         if (this.roomPlan) {
-            this.roomPlan.tables.push({ width: w, height: h, position: pos, id: id });
+            this.roomPlan.tables.push({ width: w, height: h, position: pos, id: id, booked: 0 });
         }
     }
     public GetSelected(): number[] {
@@ -68,7 +69,7 @@ class RoomVisualizer {
     }
     private drawWallsAsLines(): void {
         if (!this.roomPlan) return;
-        for(let wall of this.roomPlan.walls) {
+        for (let wall of this.roomPlan.walls) {
             this.visualizer.AddLine(wall.from, wall.to);
         }
     }
@@ -110,8 +111,8 @@ class RoomVisualizer {
     }
     private generateId(): number {
         let id: number;
-        do { 
-            id = Math.floor((Math.random() * 1000)) 
+        do {
+            id = Math.floor((Math.random() * 1000))
         }
         while (id in this.tables)
         console.log("Generated table ID: " + id);

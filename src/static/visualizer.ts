@@ -2,7 +2,7 @@ interface IInteractiveVisualizer {
     Wrapper: HTMLElement,
     Width: number,
     Height: number,
-    AddRect(w: number, h: number, pos: IPoint, movable?: boolean, tag?: string): IInteractiveVisualizerElement,
+    AddRect(w: number, h: number, pos: IPoint, movable?: boolean, tag?: string, booked?: number): IInteractiveVisualizerElement,
     AddLine(pos1: IPoint, pos2: IPoint): IInteractiveVisualizerElement,
     AddPoly(points: IPoint[], pos?: IPoint, movable?: boolean): IInteractiveVisualizerElement,
     GetElements(tag: string): IInteractiveVisualizerElement[],
@@ -36,7 +36,7 @@ class InteractiveSVG implements IInteractiveVisualizer {
     }
 
     get Width(): number { return this.width }
-    set Width(w: number) { 
+    set Width(w: number) {
         this.width = w;
         //SVGHelper.SetSize(this.svg, this.width, this.height);
         SVGHelper.SetViewBox(this.svg, 0, 0, this.width, this.height);
@@ -48,8 +48,8 @@ class InteractiveSVG implements IInteractiveVisualizer {
         SVGHelper.SetViewBox(this.svg, 0, 0, this.width, this.height);
     }
 
-    public AddRect(w: number, h: number, pos: IPoint, movable: boolean = false, tag?: string): InteractiveSVGRect {
-        const elm = new InteractiveSVGRect(w, h, pos, movable, tag);
+    public AddRect(w: number, h: number, pos: IPoint, movable: boolean = false, tag?: string, booked?: number): InteractiveSVGRect {
+        const elm = new InteractiveSVGRect(w, h, pos, movable, tag, booked);
         this.addElement(elm);
         return elm;
     }
@@ -141,12 +141,12 @@ interface IInteractiveVisualizerElement {
     OnMove: () => void,
 }
 
-abstract class InteractiveSVGElement implements IInteractiveVisualizerElement{
+abstract class InteractiveSVGElement implements IInteractiveVisualizerElement {
     public abstract SvgElement: SVGElement;
     public abstract Position: IPoint;
     public abstract Width: number;
     public abstract Height: number;
-        
+
     public PrevPosition: IPoint | undefined;
     public Movable: boolean = false;
     public Tag: string | undefined;
@@ -178,16 +178,18 @@ abstract class InteractiveSVGElement implements IInteractiveVisualizerElement{
 
 class InteractiveSVGRect extends InteractiveSVGElement {
     public SvgElement: SVGRectElement;
-    
+
     private pos: IPoint = { x: 0, y: 0 };
     private width: number = 0;
     private height: number = 0;
+    public booked: number = 0;
 
-    constructor(w: number, h: number, position?: IPoint, movable?: boolean, tag?: string) {
+    constructor(w: number, h: number, position?: IPoint, movable?: boolean, tag?: string, booked?: number) {
         super(movable, tag);
         this.SvgElement = SVGHelper.NewRect(w, h);
         if (position) this.Position = position;
         else this.Position = { x: 0, y: 0 };
+        if (booked) this.booked = booked;
         this.width = w;
         this.height = h;
         this.registerEventListeners();        
@@ -214,14 +216,14 @@ class InteractiveSVGRect extends InteractiveSVGElement {
 
 class InteractiveSVGLine extends InteractiveSVGElement {
     public SvgElement: SVGLineElement;
-    
+
     constructor(pos1: IPoint, pos2: IPoint, movable?: boolean, tag?: string) {
         super(movable, tag);
         this.SvgElement = SVGHelper.NewLine(pos1, pos2);
         this.registerEventListeners();
     }
 
-    get Position(): IPoint { 
+    get Position(): IPoint {
         const bBox = this.SvgElement.getBBox();
         return { x: bBox.x, y: bBox.y }
     }
@@ -279,7 +281,7 @@ class InteractiveSVGPoly extends InteractiveSVGElement {
         for (let p of this.points.slice(1)) {
             pathDef += " L" + pointToString(p);
         }
-        
+
         this.SvgElement.setAttribute("d", pathDef);
     }
 

@@ -5,16 +5,14 @@ window.addEventListener("load", function () {
         .then(function (roomPlan) {
         var room = roomPlan;
         initAdmin(room);
-    })
-        .catch(function (err) { return console.error(JSON.stringify(err)); });
+    });
 });
 var rv;
 function initAdmin(roomPlan) {
     console.log("RoomPlan:");
     console.log(roomPlan);
     var visualizer = new InteractiveSVG();
-    rv = new RoomVisualizer(visualizer);
-    rv.OnTableClick = function (id) { console.log("Table " + id + " clicked"); };
+    rv = new RoomVisualizer(visualizer, true);
     rv.SetRoomPlan(roomPlan);
     var box = document.getElementById('box1');
     var savebtn = document.getElementsByClassName('saveBtn')[0];

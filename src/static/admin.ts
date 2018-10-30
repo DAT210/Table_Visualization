@@ -4,8 +4,7 @@ window.addEventListener("load", () => {
         .then(roomPlan => {
             let room: IRoom = <IRoom>roomPlan;
             initAdmin(room);
-        })
-        .catch(err => console.error(JSON.stringify(err)));
+        });
 });
 
 let rv: RoomVisualizer;
@@ -14,9 +13,8 @@ function initAdmin(roomPlan: IRoom) {
     console.log("RoomPlan:");
     console.log(roomPlan);
     const visualizer = new InteractiveSVG();
-    rv = new RoomVisualizer(visualizer);
-    rv.OnTableClick = (id: number) => { console.log("Table " + id + " clicked") }
-    rv.SetRoomPlan(roomPlan);    
+    rv = new RoomVisualizer(visualizer, true);
+    rv.SetRoomPlan(roomPlan);
 
     let box = (<HTMLInputElement>document.getElementById('box1'));
     let savebtn = (<HTMLInputElement>document.getElementsByClassName('saveBtn')[0]);

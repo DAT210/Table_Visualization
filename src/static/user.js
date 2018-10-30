@@ -5,14 +5,19 @@ window.addEventListener("load", function () {
         .then(function (roomPlan) {
         var room = roomPlan;
         initUser(room);
-    })
-        .catch(function (err) { return console.error(JSON.stringify(err)); });
+    });
 });
 function initUser(roomPlan) {
     console.log("RoomPlan:");
     console.log(roomPlan);
     var visualizer = new InteractiveSVG();
     var rv = new RoomVisualizer(visualizer);
-    rv.OnTableClick = function (id) { console.log("Table " + id + " clicked"); };
     rv.SetRoomPlan(roomPlan);
+    // temp button for testing
+    var button = document.createElement("input");
+    button.type = "button";
+    button.value = "Print selected tables";
+    button.style.zIndex = "10";
+    button.onclick = function () { console.log(rv.GetSelected()); };
+    document.body.appendChild(button);
 }

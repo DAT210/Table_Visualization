@@ -14,7 +14,7 @@ function initUser(roomPlan: IRoom) {
     const rv = new RoomVisualizer(visualizer);
     rv.SetRoomPlan(roomPlan);
 
-    const bookings = test();
+    const bookings = getBookings();
     rv.SetTableAvailability(bookings.tablesIDs);
     
     // temp button for testing
@@ -31,6 +31,10 @@ interface IBookings {
     people: number;
 }
 
-function test(): IBookings {
+function getBookings(): IBookings {
+    // fetch (GET): get bookings from server
     return { tablesIDs: [0, 2, 3], people: 3 };
+}
+function postTables(tableIDs: number[]): void {
+    //fetch (POST): send tableIDs to server
 }

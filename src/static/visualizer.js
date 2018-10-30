@@ -74,6 +74,30 @@ var InteractiveSVG = /** @class */ (function () {
         }
         return elms;
     };
+    InteractiveSVG.prototype.CenterContent = function () {
+        var left = this.width;
+        var right = 0;
+        var top = this.height;
+        var bottom = 0;
+        for (var _i = 0, _a = this.elements; _i < _a.length; _i++) {
+            var e = _a[_i];
+            var elementLeft = e.Position.x;
+            var elementRight = e.Position.x + e.Width;
+            var elementTop = e.Position.y;
+            var elementBottom = e.Position.y + e.Height;
+            if (elementLeft < left)
+                left = elementLeft;
+            if (elementRight > right)
+                right = elementRight;
+            if (elementTop < top)
+                top = elementTop;
+            if (elementBottom > bottom)
+                bottom = elementBottom;
+        }
+        var diffX = Math.abs((this.width - right) - left);
+        var diffY = Math.abs((this.height - bottom) - top);
+        SVGHelper.SetViewBox(this.svg, diffX / 2, diffY / 2, this.width, this.height);
+    };
     InteractiveSVG.prototype.Reset = function () {
         this.elements = [];
         this.Wrapper.innerHTML = "";

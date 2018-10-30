@@ -48,7 +48,7 @@ class RoomVisualizer {
     }
     public AddTable(w: number, h: number) {
         const pos = { x: this.visualizer.Width / 2, y: this.visualizer.Height / 2 };
-        const id = this.drawTable(w, h, pos,undefined,true);
+        const id = this.drawTable(w, h, pos, undefined, true);
         if (this.roomPlan) {
             this.roomPlan.tables.push({ width: w, height: h, position: pos, id: id });
         }
@@ -74,6 +74,7 @@ class RoomVisualizer {
         this.visualizer.Reset();
         this.drawWallsAsPoly();
         this.drawTables();
+        this.visualizer.CenterContent();
     }
     private drawWallsAsLines(): void {
         if (!this.roomPlan) return;

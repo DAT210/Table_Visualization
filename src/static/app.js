@@ -50,6 +50,7 @@ var RoomVisualizer = /** @class */ (function () {
         this.visualizer.Reset();
         this.drawWallsAsPoly();
         this.drawTables();
+        this.visualizer.CenterContent();
     };
     RoomVisualizer.prototype.drawWallsAsLines = function () {
         if (!this.roomPlan)

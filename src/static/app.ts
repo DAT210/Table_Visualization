@@ -49,7 +49,7 @@ class RoomVisualizer {
     }
     public AddTable(w: number, h: number) {
         const pos = { x: this.visualizer.Width / 2, y: this.visualizer.Height / 2 };
-        const id = this.drawTable(w, h, pos);
+        const id = this.drawTable(w, h, pos,undefined,true);
         if (this.roomPlan) {
             this.roomPlan.tables.push({ width: w, height: h, position: pos, id: id });
         }

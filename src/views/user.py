@@ -16,7 +16,7 @@ def index():
 
 @user_blueprint.route('/test')
 def testing():
-    return render_template("index.html")
+    return render_template("test.html")
 
 
 @user_blueprint.route('/table/<tablename>')

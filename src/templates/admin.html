@@ -14,9 +14,18 @@
 </head>
 
 <body>
+    
     <div id="wrapper"></div>
 
+    <div id="current-roomplan">
+            {% if session %}
+            <h3 class="area-header"><span data-shadow-text={{session}}>{{session}}</span></h3>
+            {% else %}
+            <h3 class="area-header"><span data-shadow-text="Admin page">Admin page</span></h3>
+            {% endif %}
+        </div>
 
+        
     <div class="menu-bar">
         <div class="wrap">
             <span class="decor"></span>
@@ -71,15 +80,6 @@
     </div>
 
 
-    <div id="current-roomplan">
-        {% if session %}
-        <h3 class="area-header"><span data-shadow-text={{session}}>{{session}}</span></h3>
-        {% else %}
-        <h3 class="area-header"><span data-shadow-text="Admin page">Admin page</span></h3>
-        {% endif %}
-    </div>
-
-
     <div class="admin-box addtable-box">
 
         <div class="slidecontainer">
@@ -89,7 +89,7 @@
 
         <div class="slidecontainer">
             <p>Height of table</p>
-            <input type="range" min="40" max="500" value="40" class="slider" id="tableHeight">
+            <input type="range" min="40" max="400" value="40" class="slider" id="tableHeight">
         </div>
         <p>Capasity of this table</p>
         <select id="capacityList">

@@ -66,8 +66,8 @@ html{
 }
 
 .admin-box{
-    position:absolute;
-    top: 700px;
+    display: inline-block;
+    clear: both;
 
 }
 #InteractiveSVGWrapper {
@@ -93,6 +93,17 @@ html{
     top:550px;
 }
 
+@media only screen and (max-width: 600px) {
+  .menu-bar{
+    top:450px;
+  }
+}
+
+@media only screen and (max-width: 480px) {
+  .menu-bar{
+    top:350px;
+  }
+}
 
 .area-header h3 {
   font: 600 1.5em/1 'Raleway', sans-serif;

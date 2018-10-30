@@ -32,10 +32,10 @@ function addTable() {
     let height = box.clientHeight;
     let width = box.clientWidth;
     let e = document.getElementById('capacityList') as HTMLSelectElement;
-    let strUser = e.options[e.selectedIndex].value;
+    let cap = e.options[e.selectedIndex].value;
     
     // Legger til et nytt element i sentrum, med størrelse lik innparameterene
-    rv.AddTable(width, height);
+    rv.AddTable(width, height,parseInt(cap));
 }
 
 function saveTableLayout() {

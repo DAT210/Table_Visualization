@@ -20,11 +20,12 @@ var RoomVisualizer = /** @class */ (function () {
         this.visualizer.Height = this.roomPlan.height;
         this.drawRoom();
     };
-    RoomVisualizer.prototype.AddTable = function (w, h) {
+    RoomVisualizer.prototype.AddTable = function (w, h, capacity) {
         var pos = { x: this.visualizer.Width / 2, y: this.visualizer.Height / 2 };
         var id = this.drawTable(w, h, pos, undefined, true);
         if (this.roomPlan) {
-            this.roomPlan.tables.push({ width: w, height: h, position: pos, id: id });
+            this.roomPlan.tables.push({ width: w, height: h, position: pos, id: id, capacity: capacity });
+            console.log(this.roomPlan);
         }
     };
     RoomVisualizer.prototype.GetSelected = function () {

@@ -7,7 +7,8 @@ interface ITable {
     id: number,
     width: number,
     height: number,
-    position: IPoint
+    position: IPoint,
+    capacity?: number
 }
 
 interface IWall {
@@ -47,11 +48,12 @@ class RoomVisualizer {
         this.visualizer.Height = this.roomPlan.height;
         this.drawRoom();
     }
-    public AddTable(w: number, h: number) {
+    public AddTable(w: number, h: number, capacity: number) {
         const pos = { x: this.visualizer.Width / 2, y: this.visualizer.Height / 2 };
         const id = this.drawTable(w, h, pos,undefined,true);
         if (this.roomPlan) {
-            this.roomPlan.tables.push({ width: w, height: h, position: pos, id: id });
+            this.roomPlan.tables.push({ width: w, height: h, position: pos, id: id, capacity:capacity });
+            console.log(this.roomPlan);
         }
     }
     public GetSelected(): number[] {

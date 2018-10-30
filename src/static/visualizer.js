@@ -16,6 +16,7 @@ var InteractiveSVG = /** @class */ (function () {
     function InteractiveSVG(width, height) {
         if (width === void 0) { width = 500; }
         if (height === void 0) { height = 500; }
+        var _this = this;
         this.elements = [];
         this.scale = 1.0;
         this.width = width;
@@ -23,13 +24,17 @@ var InteractiveSVG = /** @class */ (function () {
         this.Wrapper = document.createElement("div");
         this.Wrapper.id = "InteractiveSVGWrapper";
         this.svg = SVGHelper.NewSVG(this.width, this.height);
+        window.addEventListener("resize", function () { return _this.onResize(); });
         this.init();
+        // calc scale after everything is loaded
+        setTimeout(function () { return _this.calcScale(); }, 500);
     }
     Object.defineProperty(InteractiveSVG.prototype, "Width", {
         get: function () { return this.width; },
         set: function (w) {
             this.width = w;
-            SVGHelper.SetSize(this.svg, this.width, this.height);
+            //SVGHelper.SetSize(this.svg, this.width, this.height);
+            SVGHelper.SetViewBox(this.svg, 0, 0, this.width, this.height);
         },
         enumerable: true,
         configurable: true
@@ -38,7 +43,8 @@ var InteractiveSVG = /** @class */ (function () {
         get: function () { return this.height; },
         set: function (h) {
             this.height = h;
-            SVGHelper.SetSize(this.svg, this.width, this.height);
+            //SVGHelper.SetSize(this.svg, this.width, this.height);
+            SVGHelper.SetViewBox(this.svg, 0, 0, this.width, this.height);
         },
         enumerable: true,
         configurable: true
@@ -116,6 +122,13 @@ var InteractiveSVG = /** @class */ (function () {
                 };
             }
         });
+    };
+    InteractiveSVG.prototype.onResize = function () {
+        this.calcScale();
+    };
+    InteractiveSVG.prototype.calcScale = function () {
+        var newScale = this.Wrapper.clientWidth / this.width;
+        this.scale = newScale;
     };
     return InteractiveSVG;
 }());
@@ -303,7 +316,7 @@ var SVGHelper = /** @class */ (function () {
     }
     SVGHelper.NewSVG = function (width, height) {
         var svg = document.createElementNS(this.svgNS, "svg");
-        this.SetSize(svg, width, height);
+        //this.SetSize(svg, width, height);
         this.SetViewBox(svg, 0, 0, width, height);
         return svg;
     };

@@ -28,18 +28,24 @@ class InteractiveSVG implements IInteractiveVisualizer {
         this.Wrapper = document.createElement("div");
         this.Wrapper.id = "InteractiveSVGWrapper";
         this.svg = SVGHelper.NewSVG(this.width, this.height);
+        window.addEventListener("resize", () => this.onResize());
         this.init();
+        
+        // calc scale after everything is loaded
+        setTimeout(() => this.calcScale(), 500);
     }
 
     get Width(): number { return this.width }
     set Width(w: number) { 
         this.width = w;
-        SVGHelper.SetSize(this.svg, this.width, this.height);
+        //SVGHelper.SetSize(this.svg, this.width, this.height);
+        SVGHelper.SetViewBox(this.svg, 0, 0, this.width, this.height);
     }    
     get Height(): number { return this.height }
     set Height(h: number) {
         this.height = h;
-        SVGHelper.SetSize(this.svg, this.width, this.height);
+        //SVGHelper.SetSize(this.svg, this.width, this.height);
+        SVGHelper.SetViewBox(this.svg, 0, 0, this.width, this.height);
     }
 
     public AddRect(w: number, h: number, pos: IPoint, movable: boolean = false, tag?: string): InteractiveSVGRect {
@@ -112,6 +118,13 @@ class InteractiveSVG implements IInteractiveVisualizer {
                 }
             }
         });
+    }
+    private onResize(): void {
+        this.calcScale();
+    }
+    private calcScale(): void {
+        const newScale = this.Wrapper.clientWidth / this.width ;
+        this.scale = newScale;
     }
 }
 
@@ -278,7 +291,7 @@ class SVGHelper {
 
     public static NewSVG(width: number, height: number): SVGSVGElement {
         const svg = document.createElementNS(this.svgNS, "svg") as SVGSVGElement;
-        this.SetSize(svg, width, height);
+        //this.SetSize(svg, width, height);
         this.SetViewBox(svg, 0, 0, width, height);
         return svg;
     }

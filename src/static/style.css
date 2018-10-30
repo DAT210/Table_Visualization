@@ -1,6 +1,5 @@
 svg {
     background-color: white;
-    border: 1px solid gray;
 }
 
 body {
@@ -10,6 +9,8 @@ body {
 
 #InteractiveSVGWrapper {
     position: absolute;
+    --mywidth: calc(100%);
+    width: var(--mywidth);
 }
 .table {
     fill: black;

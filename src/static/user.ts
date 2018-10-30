@@ -4,8 +4,7 @@ window.addEventListener("load", () => {
         .then(roomPlan => {
             let room: IRoom = <IRoom>roomPlan;
             initUser(room);
-        })
-        .catch(err => console.error(JSON.stringify(err)));
+});
 });
 
 function initUser(roomPlan: IRoom) {
@@ -18,8 +17,8 @@ function initUser(roomPlan: IRoom) {
     // temp button for testing
     const button = document.createElement("input");
     button.type = "button";
-    button.value = "Click Me";
-    button.style.marginTop = "600px";
+    button.value = "Print selected tables";
+    button.style.zIndex = "10";
     button.onclick = () => { console.log(rv.GetSelected()) };
     document.body.appendChild(button);
 }

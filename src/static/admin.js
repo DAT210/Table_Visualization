@@ -5,8 +5,7 @@ window.addEventListener("load", function () {
         .then(function (roomPlan) {
         var room = roomPlan;
         initAdmin(room);
-    })
-        .catch(function (err) { return console.error(JSON.stringify(err)); });
+    });
 });
 var rv;
 function initAdmin(roomPlan) {

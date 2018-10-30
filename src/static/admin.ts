@@ -4,8 +4,7 @@ window.addEventListener("load", () => {
         .then(roomPlan => {
             let room: IRoom = <IRoom>roomPlan;
             initAdmin(room);
-        })
-        .catch(err => console.error(JSON.stringify(err)));
+        });
 });
 
 let rv: RoomVisualizer;

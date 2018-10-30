@@ -27,14 +27,13 @@ class RoomVisualizer {
     private visualizer: IInteractiveVisualizer;
     private roomPlan: IRoom | undefined;
     private tables: { [id: number]: IInteractiveVisualizerElement } = {};
-    private room: IInteractiveVisualizerElement | undefined;
+    private bookedTables: number[] = [];
     private movableTables: boolean;
-    private unavailableTables: number[] = [];
 
     constructor(visualizer: IInteractiveVisualizer, movableTables: boolean = false) {
+        this.movableTables = movableTables;
         this.visualizer = visualizer;
         document.body.appendChild(this.visualizer.Wrapper);
-        this.movableTables = movableTables;
     }
 
     public GetRoomPlan(): IRoom | null {
@@ -61,14 +60,13 @@ class RoomVisualizer {
         }
         return selected;
     }
-    public SetTableAvailability(tableIDs: number[]): void {
-        this.unavailableTables = tableIDs;
-        console.log(tableIDs);
-        for (let tableID of tableIDs) {
-            console.log(tableID);
-            if (tableID in this.tables) {
-                this.tables[tableID].ToggleClass("table-booked");
+    public MarkTablesAsBooked(tableIDs: number[]): void {
+        this.bookedTables = tableIDs;
+        for (let id of tableIDs) {
+            if (id in this.tables) {
+                this.tables[id].ToggleClass("table-booked");
             }
+            else console.warn("Trying to mark non-existent table as booked. ID = " + id);
         }
     }
 
@@ -86,8 +84,8 @@ class RoomVisualizer {
     private drawWallsAsPoly(): void {
         if (!this.roomPlan) return;
         const wallPoints = this.roomPlan.walls.map(w => w.from);
-        this.room = this.visualizer.AddPoly(wallPoints);
-        this.room.ToggleClass("room");
+        const room = this.visualizer.AddPoly(wallPoints);
+        room.ToggleClass("room");
     }
     private drawTables(): void {
         if (!this.roomPlan) return;
@@ -107,7 +105,7 @@ class RoomVisualizer {
         return tableId;
     }
     private onTableClick(id: number): void {
-        for (let table of this.unavailableTables) {
+        for (let table of this.bookedTables) {
             if (table === id) return;
         }
         console.log("Table " + id + " clicked!");

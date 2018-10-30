@@ -6,6 +6,8 @@ import requests
 from get_functions import *
 from insert_functions import *
 from update_functions import *
+from delete_functions import *
+from sqlalchemy import delete
 
 admin_blueprint = Blueprint('admin', __name__)
 
@@ -46,14 +48,25 @@ def add():
         return json.dumps(message)
 
 
+@admin_blueprint.route('/delete', methods=['POST'])
+def delete():
+    if request.method == 'POST':
+        ### Hvis noen prøver slette et bordoppsett
+        if request.form['submit_button'] == 'Delete table layout':
+            deleted_table = request.form.get("deletedname")
+            delete_roomplan(deleted_table)
+        return redirect("/admin")
+    else:
+        return redirect("/admin")
 
 
-@admin_blueprint.route('/clear/session', methods=['POST', 'GET'])
+
+
+@admin_blueprint.route('/clear/session', methods=['GET'])
 def clear():
     if request.method == 'GET':
         session.clear()
         return redirect('/admin')
-
     else:
         return redirect('/admin')
 
@@ -62,28 +75,15 @@ def clear():
 ############ Admin route brukes til å slette og lage bordoppsett #######################
 ########################################################################################
 
-@admin_blueprint.route('/admin', methods=['GET', 'POST'])
+@admin_blueprint.route('/admin')
 def admin():
     session.pop('user-roomplan', None)
     restaurant_list = get_restaurants()
-    if request.method == 'POST':
-        ### Hvis noen prøver slette et bordoppsett
-        if request.form['submit_button'] == 'Delete table layout':
-            deleted_table = request.form.get("deletedname")
-            deleted_rows = Roomplan.query.filter_by(name=deleted_table)
-            try:
-                deleted_rows.delete()
-                db.session.commit()
-                session.clear()
-            except:
-                print("error")
-        return redirect("/admin")
+    if 'admin-roomplan' in session:
+        sessionResponse = session.get('admin-roomplan')
+        return render_template("admin.html", restaurants=restaurant_list, session=sessionResponse)
     else:
-        if 'admin-roomplan' in session:
-            sessionResponse = session.get('admin-roomplan')
-            return render_template("admin.html", restaurants=restaurant_list, session=sessionResponse)
-        else:
-            return render_template("admin.html", restaurants=restaurant_list)
+        return render_template("admin.html", restaurants=restaurant_list)
 
 
 

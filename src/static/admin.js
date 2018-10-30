@@ -38,6 +38,7 @@ function addTable() {
 }
 function saveTableLayout() {
     var roomName = document.getElementById('table-name').value;
+    var errorMsg = document.getElementById('save-response-text');
     if (roomName.length < 1) {
         document.getElementById('save-response-text').innerHTML = "The name is too short";
         return;
@@ -45,19 +46,21 @@ function saveTableLayout() {
     var roomPlan = rv.GetRoomPlan();
     if (!roomPlan)
         throw Error("rv has no roomplan");
+    roomPlan.name = roomName;
     roomPlanPOST("/add", roomPlan)
         .then(function (res) { return res.json(); })
-        .then(function (res) { return console.log("Success: " + JSON.stringify(res)); })
+        .then(function (res) { return errorMsg.innerHTML = res["message"]; })
         .catch(function (err) { return console.log("Error:" + JSON.stringify(err)); });
     // add code to update GUI on success/not success
 }
 function updateTableLayout() {
+    var errorMsg = document.getElementById('update-response-text');
     var roomPlan = rv.GetRoomPlan();
     if (!roomPlan)
         throw Error("rv has no roomplan");
     roomPlanPOST("/update", roomPlan)
         .then(function (res) { return res.json(); })
-        .then(function (res) { return console.log("Success: " + JSON.stringify(res)); })
+        .then(function (res) { return errorMsg.innerHTML = res["message"]; })
         .catch(function (err) { return console.log("Error:" + JSON.stringify(err)); });
     // add code to update GUI on success/not success
 }

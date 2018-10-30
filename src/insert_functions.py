@@ -1,22 +1,30 @@
 from __init__ import db
-from models import Roomplan, Tables
+from models import Roomplan, Tables, Walls
 from sqlalchemy import update, func
 
 
-
-
 def insert_roomplan(name,data):
-    for key in data:
-        id = key["id"]
-        xpos = key["xpos"]
-        ypos = key["ypos"]
-        width = key["width"]
-        height = key["height"]
-        try:
-            table = Roomplan(int(id), int(xpos), int(ypos), int(width), int(height), name)
+    try:
+        table = Roomplan(name)
+        db.session.add(table)
+        for key in data['tables']:
+            id = key["id"]
+            xpos = key["position"]['x']
+            ypos = key["position"]['y']
+            width = key["width"]
+            height = key["height"]
+            table = Tables(id,xpos,ypos,width,height,name,1)
             db.session.add(table)
-            db.session.commit()
-        except:
-            print("Ikke gyldig innparametere")
-
+        i = 1
+        for wall in data['walls']:
+            x_start = wall["from"]['x']
+            x_end = wall["to"]['x']
+            y_start = wall["from"]['y']
+            y_end = wall["to"]['y']
+            new_wall = Walls(i,name,x_start,x_end,y_start,y_end)
+            db.session.add(new_wall)
+            i += 1
+        db.session.commit()
+    except:
+        return
 

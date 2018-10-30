@@ -42,6 +42,7 @@ def get_json_setup(value):
             }
              return json.dumps(data)
 
+
 def get_restaurants():
         restaurant_list = []
         all_restaurants = Roomplan.query.all()

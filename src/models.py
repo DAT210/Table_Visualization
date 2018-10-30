@@ -1,4 +1,5 @@
 from __init__ import db
+from sqlalchemy.orm import backref
 
 class Roomplan(db.Model):
     __tablename__ = 'roomplan'
@@ -6,8 +7,8 @@ class Roomplan(db.Model):
     name = db.Column(db.String, primary_key=True)
     width = db.Column(db.Integer, default=700)
     height = db.Column(db.Integer, default=500)
-    tables = db.relationship('Tables', backref='table', lazy=True)
-    walls = db.relationship('Walls', backref='wall', lazy=True)
+    tables = db.relationship('Tables', cascade='all,delete', backref='tables', lazy=True)
+    walls = db.relationship('Walls', cascade='all,delete', backref='walls', lazy=True)
 
 
     def __init__(self, name):
@@ -20,10 +21,10 @@ class Roomplan(db.Model):
 
 
 class Tables(db.Model):
-    __tablename__ = 'table'
+    __tablename__ = 'tables'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, db.ForeignKey('roomplan.name'), nullable=False)
+    name = db.Column(db.String, db.ForeignKey('roomplan.name'), nullable=False, primary_key=True)
     xpos = db.Column(db.Integer)
     ypos = db.Column(db.Integer)
     width = db.Column(db.Integer)
@@ -50,7 +51,7 @@ class Walls(db.Model):
     __tablename__ = 'wall'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, db.ForeignKey('roomplan.name'), nullable=False)
+    name = db.Column(db.String, db.ForeignKey('roomplan.name'), nullable=False, primary_key=True)
     x_start = db.Column(db.Integer)
     x_end = db.Column(db.Integer)
     y_start = db.Column(db.Integer)

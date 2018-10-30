@@ -42,28 +42,32 @@ function addTable() {
 
 function saveTableLayout() {
     const roomName = (<HTMLInputElement>document.getElementById('table-name')).value;
+    const errorMsg = (<HTMLInputElement>document.getElementById('save-response-text'));
     if (roomName.length < 1) {
         (<HTMLInputElement>document.getElementById('save-response-text')).innerHTML = "The name is too short";
         return;
     }
+    
     let roomPlan = rv.GetRoomPlan();
     if (!roomPlan) throw Error("rv has no roomplan");
+    roomPlan.name = roomName;
     
     roomPlanPOST("/add", roomPlan)
         .then(res => res.json())
-        .then(res => console.log("Success: " + JSON.stringify(res)))
+        .then(res => errorMsg.innerHTML = res["message"])
         .catch(err => console.log("Error:" + JSON.stringify(err)))
 
     // add code to update GUI on success/not success
 }
 
 function updateTableLayout() {
+    const errorMsg = (<HTMLInputElement>document.getElementById('update-response-text'));
     let roomPlan = rv.GetRoomPlan();
     if (!roomPlan) throw Error("rv has no roomplan");
     
     roomPlanPOST("/update", roomPlan)
         .then(res => res.json())
-        .then(res => console.log("Success: " + JSON.stringify(res)))
+        .then(res => errorMsg.innerHTML = res["message"] )
         .catch(err => console.log("Error:" + JSON.stringify(err)))
 
     // add code to update GUI on success/not success

@@ -16,20 +16,25 @@ var InteractiveSVG = /** @class */ (function () {
     function InteractiveSVG(width, height) {
         if (width === void 0) { width = 500; }
         if (height === void 0) { height = 500; }
+        var _this = this;
         this.elements = [];
+        this.scale = 1.0;
         this.width = width;
         this.height = height;
         this.Wrapper = document.createElement("div");
         this.Wrapper.id = "InteractiveSVGWrapper";
         this.svg = SVGHelper.NewSVG(this.width, this.height);
-        this.Wrapper.appendChild(this.svg);
-        this.registerEventListeners();
+        window.addEventListener("resize", function () { return _this.onResize(); });
+        this.init();
+        // calc scale after everything is loaded
+        setTimeout(function () { return _this.calcScale(); }, 500);
     }
     Object.defineProperty(InteractiveSVG.prototype, "Width", {
         get: function () { return this.width; },
         set: function (w) {
             this.width = w;
-            SVGHelper.SetSize(this.svg, this.width, this.height);
+            //SVGHelper.SetSize(this.svg, this.width, this.height);
+            SVGHelper.SetViewBox(this.svg, 0, 0, this.width, this.height);
         },
         enumerable: true,
         configurable: true
@@ -38,7 +43,8 @@ var InteractiveSVG = /** @class */ (function () {
         get: function () { return this.height; },
         set: function (h) {
             this.height = h;
-            SVGHelper.SetSize(this.svg, this.width, this.height);
+            //SVGHelper.SetSize(this.svg, this.width, this.height);
+            SVGHelper.SetViewBox(this.svg, 0, 0, this.width, this.height);
         },
         enumerable: true,
         configurable: true
@@ -70,8 +76,12 @@ var InteractiveSVG = /** @class */ (function () {
     };
     InteractiveSVG.prototype.Reset = function () {
         this.elements = [];
-        this.svg = SVGHelper.NewSVG(this.width, this.height);
         this.Wrapper.innerHTML = "";
+        this.init();
+    };
+    InteractiveSVG.prototype.init = function () {
+        this.svg = SVGHelper.NewSVG(this.width, this.height);
+        SVGHelper.SetViewBox(this.svg, 0, 0, this.width, this.height);
         this.Wrapper.appendChild(this.svg);
         this.registerEventListeners();
     };
@@ -83,7 +93,8 @@ var InteractiveSVG = /** @class */ (function () {
                 if (_this.mouseOffset) {
                     var newX = _this.mousePos.x - _this.mouseOffset.x;
                     var newY = _this.mousePos.y - _this.mouseOffset.y;
-                    _this.currentlyMoving.Position = { x: newX, y: newY };
+                    var newPos = { x: newX / _this.scale, y: newY / _this.scale };
+                    _this.currentlyMoving.Position = newPos;
                 }
             }
         });
@@ -97,25 +108,34 @@ var InteractiveSVG = /** @class */ (function () {
         });
     };
     InteractiveSVG.prototype.addElement = function (element) {
-        this.svg.appendChild(element.SvgElement);
-        if (element.Movable)
-            this.registerMovableElement(element);
-        this.elements.push(element);
-    };
-    InteractiveSVG.prototype.registerMovableElement = function (element) {
         var _this = this;
+        this.elements.push(element);
+        this.svg.appendChild(element.SvgElement);
         element.SvgElement.addEventListener("mousedown", function (e) {
-            e.preventDefault();
-            _this.currentlyMoving = element;
-            var elmPos = element.Position;
-            _this.mouseOffset = { x: (e.layerX - elmPos.x), y: (e.layerY - elmPos.y) };
+            if (element.Movable) {
+                e.preventDefault();
+                _this.currentlyMoving = element;
+                var elmPos = element.Position;
+                _this.mouseOffset = {
+                    x: (e.layerX - elmPos.x * _this.scale),
+                    y: (e.layerY - elmPos.y * _this.scale)
+                };
+            }
         });
+    };
+    InteractiveSVG.prototype.onResize = function () {
+        this.calcScale();
+    };
+    InteractiveSVG.prototype.calcScale = function () {
+        var newScale = this.Wrapper.clientWidth / this.width;
+        this.scale = newScale;
     };
     return InteractiveSVG;
 }());
 var InteractiveSVGElement = /** @class */ (function () {
     function InteractiveSVGElement(movable, tag) {
         this.Movable = false;
+        this.Selected = false;
         this.OnClick = function () { };
         this.OnMove = function () { };
         if (movable)
@@ -133,6 +153,18 @@ var InteractiveSVGElement = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
+    InteractiveSVGElement.prototype.ToggleClass = function (className) { this.SvgElement.classList.toggle(className); };
+    InteractiveSVGElement.prototype.registerEventListeners = function () {
+        var _this = this;
+        this.SvgElement.addEventListener("mousedown", function () {
+            _this.PrevPosition = _this.Position;
+        });
+        this.SvgElement.addEventListener("mouseup", function () {
+            if (_this.PrevPosition == _this.Position) {
+                _this.OnClick();
+            }
+        });
+    };
     return InteractiveSVGElement;
 }());
 var InteractiveSVGRect = /** @class */ (function (_super) {
@@ -149,14 +181,7 @@ var InteractiveSVGRect = /** @class */ (function (_super) {
             _this.Position = { x: 0, y: 0 };
         _this.width = w;
         _this.height = h;
-        _this.SvgElement.addEventListener("mousedown", function () {
-            _this.PrevPosition = _this.pos;
-        });
-        _this.SvgElement.addEventListener("mouseup", function () {
-            if (_this.PrevPosition == _this.pos) {
-                _this.OnClick();
-            }
-        });
+        _this.registerEventListeners();
         return _this;
     }
     Object.defineProperty(InteractiveSVGRect.prototype, "Position", {
@@ -195,6 +220,7 @@ var InteractiveSVGLine = /** @class */ (function (_super) {
     function InteractiveSVGLine(pos1, pos2, movable, tag) {
         var _this = _super.call(this, movable, tag) || this;
         _this.SvgElement = SVGHelper.NewLine(pos1, pos2);
+        _this.registerEventListeners();
         return _this;
     }
     Object.defineProperty(InteractiveSVGLine.prototype, "Position", {
@@ -229,6 +255,7 @@ var InteractiveSVGPoly = /** @class */ (function (_super) {
         _this.Points = points;
         if (pos)
             _this.Position = pos;
+        _this.registerEventListeners();
         return _this;
     }
     Object.defineProperty(InteractiveSVGPoly.prototype, "Points", {
@@ -289,6 +316,12 @@ var SVGHelper = /** @class */ (function () {
     }
     SVGHelper.NewSVG = function (width, height) {
         var svg = document.createElementNS(this.svgNS, "svg");
+        //this.SetSize(svg, width, height);
+        this.SetViewBox(svg, 0, 0, width, height);
+        return svg;
+    };
+    SVGHelper.NewSVGElement = function (width, height) {
+        var svg = document.createElementNS(this.svgNS, "svg");
         this.SetSize(svg, width, height);
         return svg;
     };
@@ -324,6 +357,9 @@ var SVGHelper = /** @class */ (function () {
         element.setAttribute("y1", pos1.y + "px");
         element.setAttribute("x2", pos2.x + "px");
         element.setAttribute("y2", pos2.y + "px");
+    };
+    SVGHelper.SetViewBox = function (element, x, y, w, h) {
+        element.setAttribute("viewBox", x + " " + y + " " + w + " " + h);
     };
     SVGHelper.svgNS = "http://www.w3.org/2000/svg";
     return SVGHelper;

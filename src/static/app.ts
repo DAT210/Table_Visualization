@@ -27,12 +27,13 @@ class RoomVisualizer {
     private visualizer: IInteractiveVisualizer;
     private roomPlan: IRoom | undefined;
     private tables: { [id: number]: IInteractiveVisualizerElement } = {};
+    private room: IInteractiveVisualizerElement | undefined;
+    private movableTables: boolean;
 
-    public OnTableClick: (id: number) => void = (id) => { };
-
-    constructor(visualizer: IInteractiveVisualizer) {
+    constructor(visualizer: IInteractiveVisualizer, movableTables: boolean = false) {
         this.visualizer = visualizer;
         document.body.appendChild(this.visualizer.Wrapper);
+        this.movableTables = movableTables;
     }
 
     public GetRoomPlan(): IRoom | null {
@@ -46,11 +47,18 @@ class RoomVisualizer {
         this.drawRoom();
     }
     public AddTable(w: number, h: number) {
-        const pos = { x: this.visualizer.Height / 2, y: this.visualizer.Height / 2 };
+        const pos = { x: this.visualizer.Width / 2, y: this.visualizer.Height / 2 };
         const id = this.drawTable(w, h, pos);
         if (this.roomPlan) {
             this.roomPlan.tables.push({ width: w, height: h, position: pos, id: id, booked: 0 });
         }
+    }
+    public GetSelected(): number[] {
+        const selected: number[] = [];
+        for (let id in this.tables) {
+            if (this.tables[id].Selected) selected.push(+id);
+        }
+        return selected;
     }
 
     private drawRoom(): void {
@@ -67,35 +75,39 @@ class RoomVisualizer {
     private drawWallsAsPoly(): void {
         if (!this.roomPlan) return;
         const wallPoints = this.roomPlan.walls.map(w => w.from);
-        this.visualizer.AddPoly(wallPoints);
+        this.room = this.visualizer.AddPoly(wallPoints);
+        this.room.ToggleClass("room");
     }
     private drawTables(): void {
         if (!this.roomPlan) return;
-        for (let table of this.roomPlan.tables) {
-            this.drawTable(table.width, table.height, table.position, table.id, table.booked);
+        for(let table of this.roomPlan.tables) {
+            this.drawTable(table.width, table.height, table.position, table.id, this.movableTables);
         }
     }
-    private drawTable(w: number, h: number, pos: IPoint, id?: number, booked?: number): number {
-        const rect = this.visualizer.AddRect(w, h, pos, true, "table", booked);
-        let tableId = id ? id : this.generateId();
-        rect.OnClick = () => { this.OnTableClick(tableId) };
-        rect.OnMove = () => { this.updateTablePos(tableId, rect.Position) };
+    private drawTable(w: number, h: number, pos: IPoint, id?: number, movable: boolean = false): number {
+        const tableId = id ? id : this.generateId();
+        
+        const rect = this.visualizer.AddRect(w, h, pos, movable, "table");
+        rect.OnClick = () => { this.onTableClick(tableId) };
+        rect.OnMove = () => { this.updateRoomPlan(tableId, rect.Position) };
+        rect.ToggleClass("table");
         this.tables[tableId] = rect;
-
+        
         return tableId;
     }
-
-    private colorizeTables() {
+    private onTableClick(id: number): void {
+        console.log("Table " + id + " clicked!");
+        this.tables[id].Selected = !this.tables[id].Selected;
+        this.tables[id].ToggleClass("table-selected");
+    }
+    /** Updates table position in roomPlan */
+    private updateRoomPlan(tableID: number, pos: IPoint): void {
         if (this.roomPlan) {
-            let len = this.roomPlan.tables.length;
-            for (var i = 0; i < len; i++) {
-                if (this.tables[i].Booked == 1) {
-                    this.tables[i].Fill = "red";
-                }
+            for (let t of this.roomPlan.tables) {
+                if (t.id == tableID) t.position = pos;
             }
         }
     }
-
     private generateId(): number {
         let id: number;
         do {
@@ -104,12 +116,5 @@ class RoomVisualizer {
         while (id in this.tables)
         console.log("Generated table ID: " + id);
         return id;
-    }
-    private updateTablePos(tableID: number, pos: IPoint): void {
-        if (this.roomPlan) {
-            for (let t of this.roomPlan.tables) {
-                if (t.id == tableID) t.position = pos;
-            }
-        }
     }
 }

@@ -14,6 +14,10 @@ user_blueprint = Blueprint('user', __name__)
 def index():
     return redirect("/table/oslo")
 
+@user_blueprint.route('/test')
+def testing():
+    return render_template("index.html")
+
 
 @user_blueprint.route('/table/<tablename>')
 def table(tablename):
@@ -22,12 +26,10 @@ def table(tablename):
     return render_template("index.html")
 
 
-"""Legger til booked-status i jsonfila fra databasen, utifra det vi får fra booking API"""
 @user_blueprint.route('/bookedTables')
 def getTables():
     tableIDs = []
     rawData = apiTest()
-    """Må load jsonfila for å letter kunne endre på den, mulig dette er unødvendig"""
     bookingData = json.loads(rawData)
     restaurant = bookingData["restaurant"]
     bookedTables = bookingData["tables"]
@@ -47,8 +49,7 @@ def getTables():
     return json.dumps(dbData)
 
 
-"""Simulerer json fila vi får fra booking API-en"""
-@user_blueprint.route('/api/booking')
+@user_blueprint.route('/api/booking/<restname>')
 def apiTest():
-    data = {"tables": [1, 3], "restaurant": "oslo"}
+    data = {"tables": [1, 3], "nrofp": 2}
     return json.dumps(data)

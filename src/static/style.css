@@ -9,15 +9,17 @@ body {
 
 #InteractiveSVGWrapper {
     position: absolute;
-    --mywidth: calc(100%);
-    width: var(--mywidth);
+    width: 100%;
 }
 .table {
-    fill: black;
+    fill: green;
 }
 .table-selected {
-    stroke: red;
+    stroke: blue;
     stroke-width: 2px;
+}
+.table-booked {
+    fill: red;
 }
 .room {
     fill: darkgray;

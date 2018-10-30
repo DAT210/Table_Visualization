@@ -1,10 +1,10 @@
 window.addEventListener("load", () => {
-    fetch("/bookedTables")
+    fetch("/load/json")
         .then(r => { return r.json() })
         .then(roomPlan => {
             let room: IRoom = <IRoom>roomPlan;
             initUser(room);
-});
+        });
 });
 
 function initUser(roomPlan: IRoom) {
@@ -13,6 +13,9 @@ function initUser(roomPlan: IRoom) {
     const visualizer = new InteractiveSVG();
     const rv = new RoomVisualizer(visualizer);
     rv.SetRoomPlan(roomPlan);
+
+    const bookings = test();
+    rv.SetTableAvailability(bookings.tablesIDs);
     
     // temp button for testing
     const button = document.createElement("input");
@@ -21,4 +24,13 @@ function initUser(roomPlan: IRoom) {
     button.style.zIndex = "10";
     button.onclick = () => { console.log(rv.GetSelected()) };
     document.body.appendChild(button);
+}
+
+interface IBookings {
+    tablesIDs: number[];
+    people: number;
+}
+
+function test(): IBookings {
+    return { tablesIDs: [0, 2, 3], people: 3 };
 }

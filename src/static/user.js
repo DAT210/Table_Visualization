@@ -13,6 +13,8 @@ function initUser(roomPlan) {
     var visualizer = new InteractiveSVG();
     var rv = new RoomVisualizer(visualizer);
     rv.SetRoomPlan(roomPlan);
+    var bookings = test();
+    rv.SetTableAvailability(bookings.tablesIDs);
     // temp button for testing
     var button = document.createElement("input");
     button.type = "button";
@@ -20,4 +22,7 @@ function initUser(roomPlan) {
     button.style.zIndex = "10";
     button.onclick = function () { console.log(rv.GetSelected()); };
     document.body.appendChild(button);
+}
+function test() {
+    return { tablesIDs: [0, 2, 3], people: 3 };
 }

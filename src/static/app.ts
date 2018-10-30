@@ -7,8 +7,7 @@ interface ITable {
     id: number,
     width: number,
     height: number,
-    position: IPoint,
-    booked: number
+    position: IPoint
 }
 
 interface IWall {
@@ -30,6 +29,7 @@ class RoomVisualizer {
     private tables: { [id: number]: IInteractiveVisualizerElement } = {};
     private room: IInteractiveVisualizerElement | undefined;
     private movableTables: boolean;
+    private unavailableTables: number[] = [];
 
     constructor(visualizer: IInteractiveVisualizer, movableTables: boolean = false) {
         this.visualizer = visualizer;
@@ -51,7 +51,7 @@ class RoomVisualizer {
         const pos = { x: this.visualizer.Width / 2, y: this.visualizer.Height / 2 };
         const id = this.drawTable(w, h, pos);
         if (this.roomPlan) {
-            this.roomPlan.tables.push({ width: w, height: h, position: pos, id: id, booked: 0 });
+            this.roomPlan.tables.push({ width: w, height: h, position: pos, id: id });
         }
     }
     public GetSelected(): number[] {
@@ -60,6 +60,16 @@ class RoomVisualizer {
             if (this.tables[id].Selected) selected.push(+id);
         }
         return selected;
+    }
+    public SetTableAvailability(tableIDs: number[]): void {
+        this.unavailableTables = tableIDs;
+        console.log(tableIDs);
+        for (let tableID of tableIDs) {
+            console.log(tableID);
+            if (tableID in this.tables) {
+                this.tables[tableID].ToggleClass("table-booked");
+            }
+        }
     }
 
     private drawRoom(): void {
@@ -97,6 +107,9 @@ class RoomVisualizer {
         return tableId;
     }
     private onTableClick(id: number): void {
+        for (let table of this.unavailableTables) {
+            if (table === id) return;
+        }
         console.log("Table " + id + " clicked!");
         this.tables[id].Selected = !this.tables[id].Selected;
         this.tables[id].ToggleClass("table-selected");

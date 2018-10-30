@@ -3,6 +3,7 @@ var RoomVisualizer = /** @class */ (function () {
     function RoomVisualizer(visualizer, movableTables) {
         if (movableTables === void 0) { movableTables = false; }
         this.tables = {};
+        this.unavailableTables = [];
         this.visualizer = visualizer;
         document.body.appendChild(this.visualizer.Wrapper);
         this.movableTables = movableTables;
@@ -33,6 +34,17 @@ var RoomVisualizer = /** @class */ (function () {
                 selected.push(+id);
         }
         return selected;
+    };
+    RoomVisualizer.prototype.SetTableAvailability = function (tableIDs) {
+        this.unavailableTables = tableIDs;
+        console.log(tableIDs);
+        for (var _i = 0, tableIDs_1 = tableIDs; _i < tableIDs_1.length; _i++) {
+            var tableID = tableIDs_1[_i];
+            console.log(tableID);
+            if (tableID in this.tables) {
+                this.tables[tableID].ToggleClass("table-booked");
+            }
+        }
     };
     RoomVisualizer.prototype.drawRoom = function () {
         this.visualizer.Reset();
@@ -74,6 +86,11 @@ var RoomVisualizer = /** @class */ (function () {
         return tableId;
     };
     RoomVisualizer.prototype.onTableClick = function (id) {
+        for (var _i = 0, _a = this.unavailableTables; _i < _a.length; _i++) {
+            var table = _a[_i];
+            if (table === id)
+                return;
+        }
         console.log("Table " + id + " clicked!");
         this.tables[id].Selected = !this.tables[id].Selected;
         this.tables[id].ToggleClass("table-selected");

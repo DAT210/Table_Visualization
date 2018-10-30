@@ -2,7 +2,7 @@ interface IInteractiveVisualizer {
     Wrapper: HTMLElement,
     Width: number,
     Height: number,
-    AddRect(w: number, h: number, pos: IPoint, movable?: boolean, tag?: string, booked?: number): IInteractiveVisualizerElement,
+    AddRect(w: number, h: number, pos: IPoint, movable?: boolean, tag?: string): IInteractiveVisualizerElement,
     AddLine(pos1: IPoint, pos2: IPoint): IInteractiveVisualizerElement,
     AddPoly(points: IPoint[], pos?: IPoint, movable?: boolean): IInteractiveVisualizerElement,
     GetElements(tag: string): IInteractiveVisualizerElement[],
@@ -48,8 +48,8 @@ class InteractiveSVG implements IInteractiveVisualizer {
         SVGHelper.SetViewBox(this.svg, 0, 0, this.width, this.height);
     }
 
-    public AddRect(w: number, h: number, pos: IPoint, movable: boolean = false, tag?: string, booked?: number): InteractiveSVGRect {
-        const elm = new InteractiveSVGRect(w, h, pos, movable, tag, booked);
+    public AddRect(w: number, h: number, pos: IPoint, movable: boolean = false, tag?: string): InteractiveSVGRect {
+        const elm = new InteractiveSVGRect(w, h, pos, movable, tag);
         this.addElement(elm);
         return elm;
     }
@@ -182,14 +182,12 @@ class InteractiveSVGRect extends InteractiveSVGElement {
     private pos: IPoint = { x: 0, y: 0 };
     private width: number = 0;
     private height: number = 0;
-    public booked: number = 0;
 
-    constructor(w: number, h: number, position?: IPoint, movable?: boolean, tag?: string, booked?: number) {
+    constructor(w: number, h: number, position?: IPoint, movable?: boolean, tag?: string) {
         super(movable, tag);
         this.SvgElement = SVGHelper.NewRect(w, h);
         if (position) this.Position = position;
         else this.Position = { x: 0, y: 0 };
-        if (booked) this.booked = booked;
         this.width = w;
         this.height = h;
         this.registerEventListeners();        

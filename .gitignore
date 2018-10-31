@@ -114,3 +114,5 @@ dmypy.json
 .idea/
 
 /.vscode
+
+*.js.map

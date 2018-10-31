@@ -9,6 +9,9 @@
   },
   "compileOnSave": true,
   "include": [
-    "src/static/**/*"
+    "src/**/*"
+  ],
+  "exclude": [
+    "src/**/*.test.ts"
   ]
 }

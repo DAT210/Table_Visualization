@@ -3,10 +3,10 @@ var RoomVisualizer = /** @class */ (function () {
     function RoomVisualizer(visualizer, movableTables) {
         if (movableTables === void 0) { movableTables = false; }
         this.tables = {};
-        this.unavailableTables = [];
+        this.bookedTables = [];
+        this.movableTables = movableTables;
         this.visualizer = visualizer;
         document.body.appendChild(this.visualizer.Wrapper);
-        this.movableTables = movableTables;
     }
     RoomVisualizer.prototype.GetRoomPlan = function () {
         if (this.roomPlan)
@@ -36,21 +36,22 @@ var RoomVisualizer = /** @class */ (function () {
         }
         return selected;
     };
-    RoomVisualizer.prototype.SetTableAvailability = function (tableIDs) {
-        this.unavailableTables = tableIDs;
-        console.log(tableIDs);
+    RoomVisualizer.prototype.MarkTablesAsBooked = function (tableIDs) {
+        this.bookedTables = tableIDs;
         for (var _i = 0, tableIDs_1 = tableIDs; _i < tableIDs_1.length; _i++) {
-            var tableID = tableIDs_1[_i];
-            console.log(tableID);
-            if (tableID in this.tables) {
-                this.tables[tableID].ToggleClass("table-booked");
+            var id = tableIDs_1[_i];
+            if (id in this.tables) {
+                this.tables[id].ToggleClass("table-booked");
             }
+            else
+                console.warn("Trying to mark non-existent table as booked. ID = " + id);
         }
     };
     RoomVisualizer.prototype.drawRoom = function () {
         this.visualizer.Reset();
         this.drawWallsAsPoly();
         this.drawTables();
+        this.visualizer.CenterContent();
     };
     RoomVisualizer.prototype.drawWallsAsLines = function () {
         if (!this.roomPlan)
@@ -64,8 +65,8 @@ var RoomVisualizer = /** @class */ (function () {
         if (!this.roomPlan)
             return;
         var wallPoints = this.roomPlan.walls.map(function (w) { return w.from; });
-        this.room = this.visualizer.AddPoly(wallPoints);
-        this.room.ToggleClass("room");
+        var room = this.visualizer.AddPoly(wallPoints);
+        room.ToggleClass("room");
     };
     RoomVisualizer.prototype.drawTables = function () {
         if (!this.roomPlan)
@@ -87,7 +88,7 @@ var RoomVisualizer = /** @class */ (function () {
         return tableId;
     };
     RoomVisualizer.prototype.onTableClick = function (id) {
-        for (var _i = 0, _a = this.unavailableTables; _i < _a.length; _i++) {
+        for (var _i = 0, _a = this.bookedTables; _i < _a.length; _i++) {
             var table = _a[_i];
             if (table === id)
                 return;

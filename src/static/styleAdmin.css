@@ -47,7 +47,7 @@ html{
   -webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5) inset;
   }
 #load-btn{
-    absolute: relative;
+    position: relative;
     left: 10px;
 
 }
@@ -66,8 +66,8 @@ html{
 }
 
 .admin-box{
-    display: inline-block;
-    clear: both;
+  position: relative;
+  margin-top: 100px;
 
 }
 #InteractiveSVGWrapper {
@@ -90,7 +90,8 @@ html{
 }
 .menu-bar{
     position:absolute;
-    top:550px;
+    top: 550px;
+
 }
 
 @media only screen and (max-width: 600px) {

@@ -7,7 +7,7 @@ from get_functions import *
 from insert_functions import *
 from update_functions import *
 from delete_functions import *
-from sqlalchemy import delete
+
 
 admin_blueprint = Blueprint('admin', __name__)
 
@@ -80,6 +80,7 @@ def admin():
 def load():
     if request.method == 'POST':
         restaurant = request.form.get("restaurants")
+        print(restaurant)
         session['admin-roomplan'] = restaurant
         return redirect("/admin")
     else:

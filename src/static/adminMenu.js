@@ -1,3 +1,6 @@
+$(".btn").click(function() {
+    console.log("HEH");
+});
 
 $('form .submit-link').on({
     click: function (event) {

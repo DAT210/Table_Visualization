@@ -21,7 +21,7 @@ var Admin;
         var updatebtn = document.getElementById('updateBtn');
         addBtn.onclick = function () { addTable(); };
         savebtn.onclick = function () { saveTableLayout(); };
-        //updatebtn.onclick = () => { updateTableLayout() };
+        updatebtn.onclick = function () { updateTableLayout(); };
     }
     function addTable() {
         var box = document.getElementById('resizable');

@@ -1,5 +1,5 @@
 #InteractiveSVGWrapper {
-  display: flex;
+  visibility: hidden;
   width: 100%;
   max-width: 700px;
   position: absolute;

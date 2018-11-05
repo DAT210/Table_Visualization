@@ -388,3 +388,4 @@ var SVGHelper = /** @class */ (function () {
     SVGHelper.svgNS = "http://www.w3.org/2000/svg";
     return SVGHelper;
 }());
+//# sourceMappingURL=visualizer.js.map

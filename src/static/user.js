@@ -34,3 +34,4 @@ var User;
         //fetch (POST): send tableIDs to server
     }
 })(User || (User = {}));
+//# sourceMappingURL=user.js.map

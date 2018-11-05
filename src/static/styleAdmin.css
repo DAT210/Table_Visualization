@@ -1,18 +1,20 @@
-html, body {
-  height: 100%;
-  margin: 0;
-  background: grey;
-  }
+
 #InteractiveSVGWrapper {
+  display: none;
+  width: 100%;
   max-width: 700px;
-  position: relative;;
-  bottom: -210px;
+  position: absolute;
+  border: 1px solid black;
+  margin-bottom: 50px;
 }
 .card-body .btn{
   margin-bottom: 5px;
 }
-.navbar{
-  min-width: 100%;
+.card-body{
+  padding: 0px;
+}
+.card-new{
+  padding-top: 10px;
 }
 svg {
   background-color: white;
@@ -22,12 +24,11 @@ body {
   display: flex;
   justify-content: center;
 }
-#InteractiveSVGWrapper {
-  position: absolute;
-  width: 100%;
-}
-.table {
+
+.tables {
   fill: green;
+  width: none;
+
 }
 .table-selected {
   stroke: blue;
@@ -44,3 +45,21 @@ body {
   padding: 0px;
   margin-bottom: -50px;
   }
+  #resizable {
+    min-width: 30px;
+    min-height: 30px;
+    padding: 0.5em;
+    background: #ccc;
+    max-width: 300px;
+    max-height: 200px;
+    margin:auto;
+ }
+.col-sm{
+  margin-bottom: 15px;
+}
+ .card-load,.card-add-tables,.card-add-walls, .card-update, .card-save, .card-delete {
+   display: none;
+}
+#update-response-text, #save-response-text{
+  visibility: hidden;
+}

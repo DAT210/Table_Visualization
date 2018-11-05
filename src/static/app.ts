@@ -49,6 +49,7 @@ class RoomVisualizer {
     }
     public AddTable(w: number, h: number, capacity: number) {
         const pos = { x: this.visualizer.Width / 2, y: this.visualizer.Height / 2 };
+        console.log(pos);
         const id = this.drawTable(w, h, pos, undefined, true);
         if (this.roomPlan) {
             this.roomPlan.tables.push({ width: w, height: h, position: pos, id: id, capacity:capacity });
@@ -102,7 +103,7 @@ class RoomVisualizer {
         const rect = this.visualizer.AddRect(w, h, pos, movable, "table");
         rect.OnClick = () => { this.onTableClick(tableId) };
         rect.OnMove = () => { this.updateRoomPlan(tableId, rect.Position) };
-        rect.ToggleClass("table");
+        rect.ToggleClass("tables");
         this.tables[tableId] = rect;
         
         return tableId;

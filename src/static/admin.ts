@@ -17,19 +17,18 @@ namespace Admin {
         const visualizer = new InteractiveSVG();
         rv = new RoomVisualizer(visualizer, true);
         rv.SetRoomPlan(roomPlan);
-
-        let box = (<HTMLInputElement>document.getElementById('box1'));
-        let savebtn = (<HTMLInputElement>document.getElementsByClassName('saveBtn')[0]);
+        let addBtn = (<HTMLInputElement>document.getElementById('addBtn'));
+        let savebtn = (<HTMLInputElement>document.getElementById('saveBtn'));
         let updatebtn = (<HTMLInputElement>document.getElementsByClassName('updateBtn')[0]);
-        box.style.width = 60 + "px";
-        box.style.height = 40 + "px";
-        box.onclick = () => { addTable() };
+        //box.style.width = 60 + "px";
+        //box.style.height = 40 + "px";
+        addBtn.onclick = () => { addTable() };
         savebtn.onclick = () => { saveTableLayout() };
         updatebtn.onclick = () => { updateTableLayout() };
     }
 
 function addTable() {
-    let box = <HTMLInputElement>document.getElementById('box1');
+    let box = <HTMLInputElement>document.getElementById('resizable');
     if (!box) return;
     let height = box.clientHeight;
     let width = box.clientWidth;
@@ -43,8 +42,9 @@ function addTable() {
 
 
     function saveTableLayout() {
-        const roomName = (<HTMLInputElement>document.getElementById('table-name')).value;
+        const roomName = (<HTMLInputElement>document.getElementById('tableNameForm')).value;
         const errorMsg = (<HTMLInputElement>document.getElementById('save-response-text'));
+        errorMsg.style.visibility = "visible";
         if (roomName.length < 1) {
             (<HTMLInputElement>document.getElementById('save-response-text')).innerHTML = "The name is too short";
             return;
@@ -66,12 +66,13 @@ function addTable() {
         const errorMsg = (<HTMLInputElement>document.getElementById('update-response-text'));
         let roomPlan = rv.GetRoomPlan();
         if (!roomPlan) throw Error("rv has no roomplan");
+        errorMsg.style.visibility = "visible";
 
         roomPlanPOST("/update", roomPlan)
             .then(res => res.json())
             .then(res => errorMsg.innerHTML = res["message"])
             .catch(err => console.log("Error:" + JSON.stringify(err)))
-
+            
         // add code to update GUI on success/not success
     }
 

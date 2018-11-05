@@ -24,9 +24,8 @@ def update():
 def add():
     if request.method == 'POST':
         data = request.get_json()
-        print(data)
         table_name = data["name"]
-        response = get_db_status(table_name)
+        response = get_db_status(table_name, data)
         if response["status"] == "error":
             print(response)
             return json.dumps(response)
@@ -71,7 +70,7 @@ def admin():
         sessionResponse = session.get('admin-roomplan')
         return render_template("admin.html", restaurants=restaurant_list, session=sessionResponse)
     else:
-        return render_template("admin.html", restaurants=restaurant_list)
+        return render_template("admin.html", restaurants=restaurant_list, newroomplan="ok")
 
 
 # Denne kalles fra html når man ønsker laste inn et eksisterende bordoppsett

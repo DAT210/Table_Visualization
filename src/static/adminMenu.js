@@ -30,7 +30,6 @@ var app = { // app is the class
   
   init: function(){ 
     app.roomplanPosition() 
-    $("#InteractiveSVGWrapper").css({'display' : 'initial'})
     for(i = 0; i<this.navOptions.length; i++){
       $(this.navOptions[i]).on( "click", { card: this.cards[i] }, this.viewBox );
     }
@@ -42,13 +41,14 @@ var app = { // app is the class
   },
   
   hideAllBoxes: function(){
+    $('.card-new').css({'display' : 'none'})
     for(i = 0; i<this.cards.length; i++){
-      $('.card-new').css({'display' : 'none'})
       $(this.cards[i]).css({'display' : 'none'})
 
     }
   },
   roomplanPosition: function(){
+    $("#InteractiveSVGWrapper").css({'display' : 'initial'})
     var element = $('.admin-panel').height();
     $("#InteractiveSVGWrapper").css({ 'top' : element+20});
   },

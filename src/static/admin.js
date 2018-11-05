@@ -18,12 +18,10 @@ var Admin;
         rv.SetRoomPlan(roomPlan);
         var addBtn = document.getElementById('addBtn');
         var savebtn = document.getElementById('saveBtn');
-        var updatebtn = document.getElementsByClassName('updateBtn')[0];
-        //box.style.width = 60 + "px";
-        //box.style.height = 40 + "px";
+        var updatebtn = document.getElementById('updateBtn');
         addBtn.onclick = function () { addTable(); };
         savebtn.onclick = function () { saveTableLayout(); };
-        updatebtn.onclick = function () { updateTableLayout(); };
+        //updatebtn.onclick = () => { updateTableLayout() };
     }
     function addTable() {
         var box = document.getElementById('resizable');

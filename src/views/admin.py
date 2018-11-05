@@ -43,10 +43,8 @@ def add():
 @admin_blueprint.route('/delete', methods=['POST'])
 def delete():
     if request.method == 'POST':
-        ### Hvis noen prøver slette et bordoppsett
-        if request.form['submit_button'] == 'Delete table layout':
-            deleted_table = request.form.get("deletedname")
-            delete_roomplan(deleted_table)
+        deleted_table = request.form.get("deletedname")
+        delete_roomplan(deleted_table)
         return redirect("/admin")
     else:
         return redirect("/admin")

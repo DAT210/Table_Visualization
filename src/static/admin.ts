@@ -19,9 +19,7 @@ namespace Admin {
         rv.SetRoomPlan(roomPlan);
         let addBtn = (<HTMLInputElement>document.getElementById('addBtn'));
         let savebtn = (<HTMLInputElement>document.getElementById('saveBtn'));
-        let updatebtn = (<HTMLInputElement>document.getElementsByClassName('updateBtn')[0]);
-        //box.style.width = 60 + "px";
-        //box.style.height = 40 + "px";
+        let updatebtn = (<HTMLInputElement>document.getElementById('updateBtn'));
         addBtn.onclick = () => { addTable() };
         savebtn.onclick = () => { saveTableLayout() };
         updatebtn.onclick = () => { updateTableLayout() };

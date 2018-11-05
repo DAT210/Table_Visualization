@@ -26,7 +26,7 @@ namespace User {
         button.type = "button";
         button.value = "Print selected tables";
         button.style.zIndex = "10";
-        button.onclick = () => { console.log(rv.GetSelected()) };
+        button.onclick = () => { alert("Selected tables: " + rv.GetSelected()) };
         document.body.appendChild(button);
     }
 

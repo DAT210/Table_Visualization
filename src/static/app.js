@@ -107,11 +107,17 @@ var RoomVisualizer = /** @class */ (function () {
         }
     };
     RoomVisualizer.prototype.generateId = function () {
-        var id;
+        /*let id: number;
         do {
-            id = Math.floor((Math.random() * 1000));
-        } while (id in this.tables);
+            id = Math.floor((Math.random() * 1000))
+        }
+        while (id in this.tables)
         console.log("Generated table ID: " + id);
+        return id;*/
+        var id = 0;
+        while (id in this.tables) {
+            id++;
+        }
         return id;
     };
     return RoomVisualizer;

@@ -122,12 +122,17 @@ class RoomVisualizer {
         }
     }
     private generateId(): number {
-        let id: number;
+        /*let id: number;
         do {
             id = Math.floor((Math.random() * 1000))
         }
         while (id in this.tables)
         console.log("Generated table ID: " + id);
+        return id;*/
+        let id = 0;
+        while (id in this.tables) {
+            id++;
+        }
         return id;
     }
 }

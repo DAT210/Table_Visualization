@@ -18,8 +18,11 @@ namespace User {
         rv = new RoomVisualizer(visualizer);
         rv.SetRoomPlan(roomPlan);
 
-        const bookings = getBookings();
-        rv.MarkTablesAsBooked(bookings.tablesIDs);
+        getBookings2(roomPlan.name).then(r => {
+            console.log(r);
+            rv.MarkTablesAsBooked(r.tables);
+        })
+        
         
         // temp button for testing
         const button = document.createElement("input");
@@ -31,14 +34,22 @@ namespace User {
     }
 
     interface IBookings {
-        tablesIDs: number[];
+        tables: number[];
         people: number;
     }
 
     function getBookings(): IBookings {
         // fetch (GET): get bookings from server
-        return { tablesIDs: [0, 2, 3], people: 3 };
+        return { tables: [0, 2, 3], people: 3 };
     }
+
+    function getBookings2(rName: string): Promise<IBookings> {
+        let url = "/api/booking/" + rName;
+        return fetch(url)
+        .then(r => { return r.json() })
+        .then(r => { return r as IBookings })
+    }
+
     function postTables(tableIDs: number[]): void {
         //fetch (POST): send tableIDs to server
     }

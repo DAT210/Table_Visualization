@@ -110,8 +110,19 @@ using the project.
 Describe and show how to run the tests with code examples.
 Explain what these tests test and why.
 
+<b>Typescript</b><br>
+
+Install mocha/chai and types:
+
 ```shell
-Give an example
+npm i -D chai mocha nyc ts-node typescript
+npm i -D @types/chai @types/mocha
+```
+
+Run Tests:
+
+```shell
+npm test
 ```
 
 ## Style guide

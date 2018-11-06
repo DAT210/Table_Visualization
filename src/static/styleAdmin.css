@@ -44,12 +44,12 @@ body {
   margin-bottom: -50px;
   }
   #resizable {
-    min-width: 30px;
-    min-height: 30px;
+    min-width: 35px;
+    min-height: 35px;
     padding: 0.5em;
     background: #ccc;
-    max-width: 300px;
-    max-height: 200px;
+    max-width: 238px;
+    max-height: 238px;
     margin:auto;
  }
 .col-sm{
@@ -60,4 +60,7 @@ body {
 }
 #update-response-text, #save-response-text{
   visibility: hidden;
+}
+.add-fluid{
+  min-height: 300px;
 }

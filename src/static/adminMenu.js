@@ -21,6 +21,10 @@ $('.navbar').click(function() {
   app.roomplanPosition()
 });
 
+$('#table-width, #table-height').change(function() {
+  app.resizeTableOnInput()
+ });
+
 
 var app = { // app is the class
 
@@ -71,7 +75,22 @@ var app = { // app is the class
   displayWidthHeight: function() {
       var width = $('#resizable').width();
       var height = $('#resizable').height();
-      $('#table-width').html(width);
-      $('#table-height').html(height);
+      $('#table-width').val(width);
+      $('#table-height').val(height);
+  },
+
+  resizeTableOnInput: function(){
+    var width = $('#table-width').val();
+    var height = $('#table-height').val();
+    if(width > 220){
+      var width = $('#table-width').val(220);
+    }
+    if(height > 220){
+      var width = $('#table-height').val(220);
+    }
+    $("#resizable").css({
+      'width': width,
+       'height': height
+        })
   },
 }

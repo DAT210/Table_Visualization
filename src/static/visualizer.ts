@@ -6,6 +6,7 @@ interface IInteractiveVisualizer {
     AddLine(pos1: IPoint, pos2: IPoint): IInteractiveVisualizerElement,
     AddPoly(points: IPoint[], pos?: IPoint, movable?: boolean): IInteractiveVisualizerElement,
     GetElements(tag: string): IInteractiveVisualizerElement[],
+    CenterContent(): void,
     Reset(): void
 }
 
@@ -16,9 +17,9 @@ class InteractiveSVG implements IInteractiveVisualizer {
     private height: number;
     private elements: InteractiveSVGElement[] = [];
     private mousePos: IPoint | undefined;
-    
+
     private scale: number = 1.0;
-    
+
     private currentlyMoving: InteractiveSVGElement | undefined;
     private mouseOffset: IPoint | undefined;
 
@@ -30,7 +31,7 @@ class InteractiveSVG implements IInteractiveVisualizer {
         this.svg = SVGHelper.NewSVG(this.width, this.height);
         window.addEventListener("resize", () => this.onResize());
         this.init();
-        
+
         // calc scale after everything is loaded
         setTimeout(() => this.calcScale(), 500);
     }
@@ -40,7 +41,7 @@ class InteractiveSVG implements IInteractiveVisualizer {
         this.width = w;
         //SVGHelper.SetSize(this.svg, this.width, this.height);
         SVGHelper.SetViewBox(this.svg, 0, 0, this.width, this.height);
-    }    
+    }
     get Height(): number { return this.height }
     set Height(h: number) {
         this.height = h;
@@ -70,6 +71,25 @@ class InteractiveSVG implements IInteractiveVisualizer {
         }
         return elms;
     }
+    public CenterContent(): void {
+        let left = this.width;
+        let right = 0;
+        let top = this.height;
+        let bottom = 0;
+        for (let e of this.elements) {
+            const elementLeft = e.Position.x;
+            const elementRight = e.Position.x + e.Width;
+            const elementTop = e.Position.y;
+            const elementBottom = e.Position.y + e.Height;
+            if (elementLeft < left) left = elementLeft;
+            if (elementRight > right) right = elementRight;
+            if (elementTop < top) top = elementTop;
+            if (elementBottom > bottom) bottom = elementBottom;
+        }
+        const diffX = Math.abs((this.width - right) - left);
+        const diffY = Math.abs((this.height - bottom) - top);
+        SVGHelper.SetViewBox(this.svg, diffX/2, diffY/2, this.width, this.height)
+    }
     public Reset(): void {
         this.elements = [];
         this.Wrapper.innerHTML = "";
@@ -89,7 +109,7 @@ class InteractiveSVG implements IInteractiveVisualizer {
                 if (this.mouseOffset) {
                     const newX = this.mousePos.x - this.mouseOffset.x;
                     const newY = this.mousePos.y - this.mouseOffset.y;
-                    const newPos = { x: newX/this.scale, y: newY/this.scale };
+                    const newPos = { x: newX / this.scale, y: newY / this.scale };
                     this.currentlyMoving.Position = newPos;
                 }
             }
@@ -106,13 +126,13 @@ class InteractiveSVG implements IInteractiveVisualizer {
     private addElement(element: InteractiveSVGElement): void {
         this.elements.push(element);
         this.svg.appendChild(element.SvgElement)
-        
+
         element.SvgElement.addEventListener("mousedown", (e: MouseEvent) => {
             if (element.Movable) {
                 e.preventDefault()
                 this.currentlyMoving = element;
                 const elmPos = element.Position;
-                this.mouseOffset = { 
+                this.mouseOffset = {
                     x: (e.layerX - elmPos.x * this.scale),
                     y: (e.layerY - elmPos.y * this.scale)
                 }
@@ -123,7 +143,7 @@ class InteractiveSVG implements IInteractiveVisualizer {
         this.calcScale();
     }
     private calcScale(): void {
-        const newScale = this.Wrapper.clientWidth / this.width ;
+        const newScale = this.Wrapper.clientWidth / this.width;
         this.scale = newScale;
     }
 }
@@ -151,8 +171,8 @@ abstract class InteractiveSVGElement implements IInteractiveVisualizerElement {
     public Movable: boolean = false;
     public Tag: string | undefined;
     public Selected: boolean = false;
-    public OnClick: () => void = () => {};
-    public OnMove: () => void = () => {};
+    public OnClick: () => void = () => { };
+    public OnMove: () => void = () => { };
 
     constructor(movable?: boolean, tag?: string) {
         if (movable) this.Movable = movable;
@@ -190,7 +210,7 @@ class InteractiveSVGRect extends InteractiveSVGElement {
         else this.Position = { x: 0, y: 0 };
         this.width = w;
         this.height = h;
-        this.registerEventListeners();        
+        this.registerEventListeners();
     }
 
     set Position(pos: IPoint) {

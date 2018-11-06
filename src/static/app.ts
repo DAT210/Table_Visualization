@@ -74,7 +74,10 @@ class RoomVisualizer {
         this.visualizer.Reset();
         this.drawWallsAsPoly();
         this.drawTables();
-        this.visualizer.CenterContent();
+        if (!this.roomPlan) return;
+        if (this.roomPlan.tables.length > 0 && this.roomPlan.walls.length > 0) {
+            this.visualizer.CenterContent();
+        }
     }
     private drawWallsAsLines(): void {
         if (!this.roomPlan) return;

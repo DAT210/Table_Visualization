@@ -1,0 +1,14 @@
+<h5 class="card-title">Load a setup</h5>
+<form action="{{ url_for('admin.load') }}" method="post">
+<select name="restaurants" class="custom-select mb-3" id="mydropdown">
+  <option value="Default">Select a restaurant</option>
+  {% for restaurant in restaurants %}
+  <option value={{restaurant}}>{{restaurant}}</option>
+  {% endfor %}
+</select>
+<button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+
+
+<h5 class="card-title">Use the edit tools to add items on this restaurant</h5>

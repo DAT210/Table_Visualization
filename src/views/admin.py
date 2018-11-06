@@ -7,16 +7,11 @@ from get_functions import *
 from insert_functions import *
 from update_functions import *
 from delete_functions import *
-from sqlalchemy import delete
+
 
 admin_blueprint = Blueprint('admin', __name__)
 
 
-######################################
-############ AJAX routes #############
-######################################
-
-# Denne kjøres når det kommer forespørsel om å sette inn nytt bordoppsett i databasen
 @admin_blueprint.route('/update', methods=['POST'])
 def update():
     if request.method == 'POST':
@@ -25,15 +20,12 @@ def update():
         return update_roomplan(table_name, data)
 
 
-
-# Denne kjøres når det kommer forespørsel om å sette inn nytt bordoppsett i databasen
 @admin_blueprint.route('/add', methods=['POST'])
 def add():
     if request.method == 'POST':
         data = request.get_json()
-        print(data)
         table_name = data["name"]
-        response = get_db_status(table_name)
+        response = get_db_status(table_name, data)
         if response["status"] == "error":
             print(response)
             return json.dumps(response)
@@ -51,14 +43,11 @@ def add():
 @admin_blueprint.route('/delete', methods=['POST'])
 def delete():
     if request.method == 'POST':
-        ### Hvis noen prøver slette et bordoppsett
-        if request.form['submit_button'] == 'Delete table layout':
-            deleted_table = request.form.get("deletedname")
-            delete_roomplan(deleted_table)
+        deleted_table = request.form.get("deletedname")
+        delete_roomplan(deleted_table)
         return redirect("/admin")
     else:
         return redirect("/admin")
-
 
 
 
@@ -71,10 +60,6 @@ def clear():
         return redirect('/admin')
 
 
-########################################################################################
-############ Admin route brukes til å slette og lage bordoppsett #######################
-########################################################################################
-
 @admin_blueprint.route('/admin')
 def admin():
     session.pop('user-roomplan', None)
@@ -83,13 +68,8 @@ def admin():
         sessionResponse = session.get('admin-roomplan')
         return render_template("admin.html", restaurants=restaurant_list, session=sessionResponse)
     else:
-        return render_template("admin.html", restaurants=restaurant_list)
+        return render_template("admin.html", restaurants=restaurant_list, newroomplan="ok")
 
-
-
-#####################################################################################################
-############ Forskjellige routes som brukes til å generere json bordoppsettet #######################
-#####################################################################################################
 
 # Denne kalles fra html når man ønsker laste inn et eksisterende bordoppsett
 # Setter session lik restauranten de valgte og redirecter til /admin som vil håndtere det å vise bordoppsettet
@@ -97,13 +77,22 @@ def admin():
 def load():
     if request.method == 'POST':
         restaurant = request.form.get("restaurants")
+        print(restaurant)
         session['admin-roomplan'] = restaurant
         return redirect("/admin")
     else:
         return redirect("/admin")
 
 
-
+@admin_blueprint.route('/search', methods=['POST'])
+def search():
+    if request.method == 'POST':
+        session.clear()
+        search = request.form.get("search").lower()
+        restaurants = get_restaurants()
+        if search in restaurants:
+            session['admin-roomplan'] = search
+    return redirect("/admin")    
 
 # Bare en route for å vise json fil til hvert bord
 @admin_blueprint.route('/api/<tablename>')
@@ -111,9 +100,6 @@ def api(tablename):
     return get_json_setup(tablename)
 
 
-
-# Dette er funksjonen som finner hvilket bordoppsett som skal sendes til javascripten som tegner bordet
-# Admin og brukeren har forskjellige session verdier for å ikke skape konflikter mellom dem
 @admin_blueprint.route('/load/json')
 def loadjson():
     if 'user-roomplan' in session:

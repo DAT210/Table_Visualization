@@ -56,12 +56,12 @@ def get_restaurants():
 
 
 
-def get_db_status(name):
+def get_db_status(name, data):
         roomplan = Roomplan.query.filter_by(name=name).first()
-        if len(name) < 1:
+        if len(data["tables"]) < 1:
             message = {
                 "status": "error",
-                "message": "The name is too short"
+                "message": "You have to add tables"
             }
             return message
         if (' ' in name) == True:

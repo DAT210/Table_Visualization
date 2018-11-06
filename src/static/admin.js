@@ -16,29 +16,28 @@ var Admin;
         var visualizer = new InteractiveSVG();
         rv = new RoomVisualizer(visualizer, true);
         rv.SetRoomPlan(roomPlan);
-        var box = document.getElementById('box1');
-        var savebtn = document.getElementsByClassName('saveBtn')[0];
-        var updatebtn = document.getElementsByClassName('updateBtn')[0];
-        box.style.width = 60 + "px";
-        box.style.height = 40 + "px";
-        box.onclick = function () { addTable(); };
+        var addBtn = document.getElementById('addBtn');
+        var savebtn = document.getElementById('saveBtn');
+        var updatebtn = document.getElementById('updateBtn');
+        addBtn.onclick = function () { addTable(); };
         savebtn.onclick = function () { saveTableLayout(); };
         updatebtn.onclick = function () { updateTableLayout(); };
     }
     function addTable() {
-        var box = document.getElementById('box1');
+        var box = document.getElementById('resizable');
         if (!box)
             return;
         var height = box.clientHeight;
         var width = box.clientWidth;
         var e = document.getElementById('capacityList');
-        var strUser = e.options[e.selectedIndex].value;
+        var cap = e.options[e.selectedIndex].value;
         // Legger til et nytt element i sentrum, med størrelse lik innparameterene
-        rv.AddTable(width, height);
+        rv.AddTable(width, height, parseInt(cap));
     }
     function saveTableLayout() {
-        var roomName = document.getElementById('table-name').value;
+        var roomName = document.getElementById('tableNameForm').value;
         var errorMsg = document.getElementById('save-response-text');
+        errorMsg.style.visibility = "visible";
         if (roomName.length < 1) {
             document.getElementById('save-response-text').innerHTML = "The name is too short";
             return;
@@ -58,6 +57,7 @@ var Admin;
         var roomPlan = rv.GetRoomPlan();
         if (!roomPlan)
             throw Error("rv has no roomplan");
+        errorMsg.style.visibility = "visible";
         roomPlanPOST("/update", roomPlan)
             .then(function (res) { return res.json(); })
             .then(function (res) { return errorMsg.innerHTML = res["message"]; })

@@ -212,7 +212,7 @@ class InteractiveSVGRect extends InteractiveSVGElement {
         this.height = h;
         this.registerEventListeners();
     }
-
+ 
     set Position(pos: IPoint) {
         SVGHelper.SetPosition(this.SvgElement, pos);
         this.pos = pos;

@@ -20,11 +20,13 @@ var RoomVisualizer = /** @class */ (function () {
         this.visualizer.Height = this.roomPlan.height;
         this.drawRoom();
     };
-    RoomVisualizer.prototype.AddTable = function (w, h) {
+    RoomVisualizer.prototype.AddTable = function (w, h, capacity) {
         var pos = { x: this.visualizer.Width / 2, y: this.visualizer.Height / 2 };
+        console.log(pos);
         var id = this.drawTable(w, h, pos, undefined, true);
         if (this.roomPlan) {
-            this.roomPlan.tables.push({ width: w, height: h, position: pos, id: id });
+            this.roomPlan.tables.push({ width: w, height: h, position: pos, id: id, capacity: capacity });
+            console.log(this.roomPlan);
         }
     };
     RoomVisualizer.prototype.GetSelected = function () {
@@ -86,7 +88,7 @@ var RoomVisualizer = /** @class */ (function () {
         var rect = this.visualizer.AddRect(w, h, pos, movable, "table");
         rect.OnClick = function () { _this.onTableClick(tableId); };
         rect.OnMove = function () { _this.updateRoomPlan(tableId, rect.Position); };
-        rect.ToggleClass("table");
+        rect.ToggleClass("tables");
         this.tables[tableId] = rect;
         return tableId;
     };

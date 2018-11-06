@@ -51,8 +51,8 @@
                         <a class="nav-link nav-delete" href="#">Delete</a>
                     </li>
                 </ul>
-                <form class="form-inline my-2 my-lg-0">
-                    <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                <form class="form-inline my-2 my-lg-0" action="{{ url_for('admin.search') }}" method="post">
+                    <input class="form-control mr-sm-2" name="search" type="search" placeholder="Search" aria-label="Search">
                     <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
                 </form>
             </div>
@@ -60,9 +60,9 @@
 
         <div class="card-header text-center">
             {% if session %}
-            {{session}}
+            <h2 display-4>{{session}}</h1>
             {% else %}
-            Default
+            <h2 display-4>Default</h1>
             {% endif %}
         </div>
 
@@ -70,7 +70,7 @@
         <div class="card card-load text-center card-body">
             <h5 class="card-title">Load a setup</h5>
             <form action="{{ url_for('admin.load') }}" method="post">
-                <select name="restaurants" class="custom-select mb-3" id="mydropdown">
+                <select name="restaurants" class="custom-select col-6" id="mydropdown">
                     <option value="Default">Select a restaurant</option>
                     {% for restaurant in restaurants %}
                     <option value={{restaurant}}>{{restaurant}}</option>
@@ -106,8 +106,8 @@
                 <div class="row">
                     <div class="col-sm">
                         <h6 class="card-subtitle mb-2 text-muted">Customize size</h6>
-                        <h6 class="card-subtitle mb-2">Width: <span><input type="text" id="table-width" value="220" size="5">
-                        </span> Height: <span><input id="table-height" type="text" value="17" size="5"></span></h6>
+                        <h6 class="card-subtitle mb-2">Width: <span><input type="text" id="table-width" value="200" size="5">
+                        </span> Height: <span><input id="table-height" type="text" value="20" size="5"></span></h6>
                         <div id="resizable" class="ui-widget-content">
                         </div>
                     </div>
@@ -135,6 +135,45 @@
             <hr>
         </div>
 
+
+        <div class="card text-center card-add-walls"></div>
+
+        <div class="card-body card text-center card-add-walls">
+            <h5 class="card-title">Add Walls</h5>
+            <hr>
+            <div class="container-fluid add-fluid">
+                <div class="row">
+                    <div class="col-sm">
+                        <h6 class="card-subtitle mb-2 text-muted">Customize size</h6>
+                        <h6 class="card-subtitle mb-2">Width: <span><input type="text" id="table-width" value="200" size="5">
+                        </span> Height: <span><input id="table-height" type="text" value="20" size="5"></span></h6>
+                        <div id="resizable" class="ui-widget-content">
+                        </div>
+                    </div>
+                    <div class="col-sm">
+                        <h6 class="card-subtitle mb-2 text-muted">Number of people on this table</h6>
+                        <select id="capacityList">
+                            <option value="2">2</option>
+                            <option value="4">4</option>
+                            <option value="6">6</option>
+                            <option value="8">8</option>
+                            <option value="10">10</option>
+                            <option value="12">12</option>
+                            <option value="14">14</option>
+                            <option value="16">16</option>
+                            <option value="18">18</option>
+                            <option value="20">20</option>
+                        </select>
+                    </div>
+                    <div class="col-sm">
+                        <h6 class="card-subtitle mb-2 text-muted">Add this table to the roomplan</h6>
+                        <button type="submit" class="btn btn-primary" id="addBtn">Submit</button>
+                    </div>
+                </div>
+            </div>
+            <hr>
+        </div>        
+
         <div class="card card-update text-center ">
             <div class="card-body">
                 {% if session %}
@@ -153,7 +192,7 @@
 
     <div class="card card-save text-center ">
         <div class="card-body">
-            <div class="form-group">
+            <div class="form-group col-6">
                 <label for="tableNameForm">Give this roomplan a name and click on the save button</label>
                 <input type="text" class="form-control" id="tableNameForm" placeholder="Table name..">
             </div>
@@ -168,7 +207,7 @@
 
     <div class="card card-delete text-center ">
         <div class="card-body">
-            <div class="form-group">
+            <div class="form-group col-6">
                 <form action="{{ url_for('admin.delete') }}" method="post">
                 <label for="tableNameForm">Enter the name of roomplan you want to delete</label>
                 <input type="text" class="form-control" name="deletedname" placeholder="Name of roomplan..">

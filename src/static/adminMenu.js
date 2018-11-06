@@ -10,7 +10,6 @@ $(window).resize(function() {
   app.displayWidthHeight()
 });
 
-
 $('.navbar-toggler').click(function() {
   setTimeout(function() {
       app.roomplanPosition()
@@ -24,7 +23,6 @@ $('.navbar').click(function() {
 $('#table-width, #table-height').change(function() {
   app.resizeTableOnInput()
  });
-
 
 var app = { // app is the class
 
@@ -62,7 +60,6 @@ var app = { // app is the class
           $(this.cards[i]).css({
               'display': 'none'
           })
-
       }
   },
   roomplanPosition: function() {
@@ -82,11 +79,17 @@ var app = { // app is the class
   resizeTableOnInput: function(){
     var width = $('#table-width').val();
     var height = $('#table-height').val();
-    if(width > 220){
-      var width = $('#table-width').val(220);
+    if(width > 200){
+      var width = $('#table-width').val(200);
     }
-    if(height > 220){
-      var width = $('#table-height').val(220);
+    if(height > 200){
+      var width = $('#table-height').val(200);
+    }
+    if(width < 20){
+        var width = $('#table-width').val(20);
+      }
+    if(height < 20){
+    var width = $('#table-height').val(20);
     }
     $("#resizable").css({
       'width': width,

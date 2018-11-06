@@ -84,6 +84,15 @@ def load():
         return redirect("/admin")
 
 
+@admin_blueprint.route('/search', methods=['POST'])
+def search():
+    if request.method == 'POST':
+        session.clear()
+        search = request.form.get("search").lower()
+        restaurants = get_restaurants()
+        if search in restaurants:
+            session['admin-roomplan'] = search
+    return redirect("/admin")    
 
 # Bare en route for å vise json fil til hvert bord
 @admin_blueprint.route('/api/<tablename>')

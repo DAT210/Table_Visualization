@@ -23,7 +23,7 @@ var User;
         button.type = "button";
         button.value = "Print selected tables";
         button.style.zIndex = "10";
-        button.onclick = function () { console.log(rv.GetSelected()); };
+        button.onclick = function () { alert("Selected tables: " + rv.GetSelected()); };
         document.body.appendChild(button);
     }
     function getBookings() {

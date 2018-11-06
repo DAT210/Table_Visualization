@@ -17,10 +17,12 @@ var Admin;
         rv = new RoomVisualizer(visualizer, true);
         rv.SetRoomPlan(roomPlan);
         var addBtn = document.getElementById('addBtn');
+        var addwall = document.getElementById('addWall');
         var savebtn = document.getElementById('saveBtn');
         var updatebtn = document.getElementById('updateBtn');
         addBtn.onclick = function () { addTable(); };
         savebtn.onclick = function () { saveTableLayout(); };
+        addwall.onclick = function () { addWall(); };
         updatebtn.onclick = function () { updateTableLayout(); };
     }
     function addTable() {
@@ -33,6 +35,25 @@ var Admin;
         var cap = e.options[e.selectedIndex].value;
         // Legger til et nytt element i sentrum, med størrelse lik innparameterene
         rv.AddTable(width, height, parseInt(cap));
+    }
+    function addWall() {
+        console.log("admin add wall");
+        var x_from = 150;
+        var x_to = 150;
+        var y_from = 90;
+        var y_to = 200;
+        // Legger til et nytt element i sentrum, med størrelse lik innparameterene
+        //rv.AddWall(x_from,x_to,y_from,y_to);
+        rv.AddWall(200, 600, 100, 100);
+        rv.AddWall(600, 600, 100, 400);
+        rv.AddWall(600, 300, 400, 400);
+        rv.AddWall(300, 300, 400, 300);
+        rv.AddWall(300, 200, 300, 300);
+        rv.AddWall(200, 200, 300, 100);
+        var roomPlan = rv.GetRoomPlan();
+        if (!roomPlan)
+            throw Error("rv has no roomplan");
+        rv.SetRoomPlan(roomPlan);
     }
     function saveTableLayout() {
         var roomName = document.getElementById('tableNameForm').value;

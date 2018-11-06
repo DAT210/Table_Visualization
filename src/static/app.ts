@@ -56,6 +56,13 @@ class RoomVisualizer {
             console.log(this.roomPlan);
         }
     }
+    public AddWall(x_from: number, x_to: number, y_from: number, y_to: number) {
+        console.log("Addwall");
+        if (this.roomPlan) {
+            this.roomPlan.walls.push({from: {x: x_from, y:y_from}, to: {x:x_to, y:y_to}});
+            console.log(this.roomPlan);
+        }
+    }
     public GetSelected(): number[] {
         const selected: number[] = [];
         for (let id in this.tables) {

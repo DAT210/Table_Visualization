@@ -24,6 +24,17 @@ $('#table-width, #table-height').change(function() {
   app.resizeTableOnInput()
  });
 
+ $.get("/api/restaurants", function(data){
+    data = $.parseJSON(data);
+    $("#myInput").autocomplete({
+        source:data
+  });
+ });
+
+
+
+
+
 var app = { // app is the class
 
   cards: ['.card-load', '.card-add-tables', '.card-add-walls', '.card-update', '.card-save', '.card-delete'],

@@ -99,6 +99,11 @@ def search():
 def api(tablename):
     return get_json_setup(tablename)
 
+@admin_blueprint.route('/api/restaurants')
+def restaurants():
+    restaurants = get_restaurants()
+    return json.dumps(restaurants)
+
 
 @admin_blueprint.route('/load/json')
 def loadjson():

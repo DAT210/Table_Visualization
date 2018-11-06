@@ -52,7 +52,7 @@
                     </li>
                 </ul>
                 <form class="form-inline my-2 my-lg-0" action="{{ url_for('admin.search') }}" method="post">
-                    <input class="form-control mr-sm-2" name="search" type="search" placeholder="Search" aria-label="Search">
+                    <input id="myInput" class="form-control mr-sm-2" name="search" type="search" placeholder="Search" aria-label="Search">
                     <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
                 </form>
             </div>
@@ -131,8 +131,8 @@
                         <button type="submit" class="btn btn-primary" id="addBtn">Submit</button>
                     </div>
                 </div>
+                <hr>
             </div>
-            <hr>
         </div>
 
 
@@ -145,33 +145,14 @@
                 <div class="row">
                     <div class="col-sm">
                         <h6 class="card-subtitle mb-2 text-muted">Customize size</h6>
-                        <h6 class="card-subtitle mb-2">Width: <span><input type="text" id="table-width" value="200" size="5">
-                        </span> Height: <span><input id="table-height" type="text" value="20" size="5"></span></h6>
-                        <div id="resizable" class="ui-widget-content">
-                        </div>
                     </div>
                     <div class="col-sm">
-                        <h6 class="card-subtitle mb-2 text-muted">Number of people on this table</h6>
-                        <select id="capacityList">
-                            <option value="2">2</option>
-                            <option value="4">4</option>
-                            <option value="6">6</option>
-                            <option value="8">8</option>
-                            <option value="10">10</option>
-                            <option value="12">12</option>
-                            <option value="14">14</option>
-                            <option value="16">16</option>
-                            <option value="18">18</option>
-                            <option value="20">20</option>
-                        </select>
-                    </div>
-                    <div class="col-sm">
-                        <h6 class="card-subtitle mb-2 text-muted">Add this table to the roomplan</h6>
-                        <button type="submit" class="btn btn-primary" id="addBtn">Submit</button>
+                        <h6 class="card-subtitle mb-2 text-muted">Add Walls to the roomplan</h6>
+                        <button type="submit" class="btn btn-primary" id="addWall">Submit</button>
                     </div>
                 </div>
+                <hr>
             </div>
-            <hr>
         </div>        
 
         <div class="card card-update text-center ">

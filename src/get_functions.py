@@ -51,6 +51,7 @@ def get_restaurants():
                 continue
             else:
                 restaurant_list.append(restaurant.name)
+        restaurant_list.sort()        
         return restaurant_list
 
 

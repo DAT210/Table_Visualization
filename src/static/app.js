@@ -29,6 +29,13 @@ var RoomVisualizer = /** @class */ (function () {
             console.log(this.roomPlan);
         }
     };
+    RoomVisualizer.prototype.AddWall = function (x_from, x_to, y_from, y_to) {
+        console.log("Addwall");
+        if (this.roomPlan) {
+            this.roomPlan.walls.push({ from: { x: x_from, y: y_from }, to: { x: x_to, y: y_to } });
+            console.log(this.roomPlan);
+        }
+    };
     RoomVisualizer.prototype.GetSelected = function () {
         var selected = [];
         for (var id in this.tables) {

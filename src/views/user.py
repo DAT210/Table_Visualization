@@ -50,6 +50,6 @@ def getTables():
 
 
 @user_blueprint.route('/api/booking/<restname>')
-def apiTest():
-    data = {"tables": [1, 3], "nrOfPeople": 2}
+def apiTest(restname):
+    data = {"tables": [1, 3], "nrOfPeople": 2, "name": restname}
     return json.dumps(data)

@@ -35,6 +35,15 @@ $("#myCanvas").click(function(event) {
     xCoord = event.pageX - $('#myCanvas').offset().left;
     yCoord = event.pageY - $('#myCanvas').offset().top;
     status = app.validateClick(xCoord,yCoord)
+    if(status == "done"){
+        walls = this.lines;
+        $('#addWall').css({
+            'display': 'initial'
+        })
+        $('#wall-add-status').html(""); 
+        $('#wall-add-status').html("Success! add the walls to the roomplan");
+        app.roomplanPosition()
+    } 
     if(status == "false"){
         return 
     } else{
@@ -62,6 +71,7 @@ var app = { // app is the class
     firstClick: 1,
     circles: [],
     lines: [],
+    path: [],
 
     init: function() {
         app.roomplanPosition()
@@ -220,12 +230,19 @@ var app = { // app is the class
         for (var key in this.circles) {
             x = this.circles[key]['x'];
             y = this.circles[key]['y'];
-            console.log(x + " " + y);
             if (xCurrent > x - 6 && xCurrent < x + 6) {
+                status = app.detectCrossFromY(yCoord,x,y)
+                if(status == "false"){
+                    return ["done"]
+                }
                 this.addLine(x,y,x,yCurrent)
                 return [x,yCurrent]
             } 
             else if (yCurrent > y - 6 && yCurrent < y + 6) {
+                status = app.detectCrossFromX(xCoord,x,y)
+                if(status == "false"){
+                    return ["done"]
+                }
                 this.addLine(x,y,xCurrent,y)
                 return [xCurrent,y]
             } 
@@ -233,6 +250,58 @@ var app = { // app is the class
             return ["false"]
     },
 
+    detectCrossFromY: function(yCurrent, xLined, yLined) {
+        for (var key in this.circles) {
+            xCross = this.circles[key]['x'];
+            yCross = this.circles[key]['y'];
+            if (yCurrent > yCross - 6 && yCurrent < yCross + 6) {
+                console.log("Krysspunkt her fra y");
+                this.addLine(xLined,yLined,xLined,yCross)
+                this.addLine(xLined,yCross,xCross,yCross)
+                this.addCircle(xLined,yCross)
+                return ["false"]
+            } 
+         }
+    },
 
+    detectCrossFromX: function(xCurrent, xLined, yLined) {
+        for (var key in this.circles) {
+            xCross = this.circles[key]['x'];
+            yCross = this.circles[key]['y'];
+            if (xCurrent > xCross - 6 && xCurrent < xCross + 6) {
+                console.log("Krysspunkt her fra x");
+                this.addLine(xLined,yLined,xCross,yLined)
+                this.addLine(xCross,yCross,xCross,yLined)
+                this.addCircle(xCross,yLined)
+                return ["false"]
+            } 
+         }
+    },
 
+    detectPath: function() {
+        if(this.circles.length < 4){
+            return ["false"]
+        }
+        for(i = 0; i<this.circles.length; i++){
+            var x = 0;
+            var y = 0;
+            for(j = 0; j<this.circles.length; j++){
+                if(i != j){
+                    if(this.circles[i]['x'] == this.circles[j]['x']){ // de ligger under hverandre
+                        y += 1;
+                    }
+                    if(this.circles[i]['y'] == this.circles[j]['y']){ // de ligger ved siden av hverandr
+                        x += 1;
+                    }
+                }
+                }
+            if(x>0 && y>0){
+                return ["path"]
+            }else{
+                return ["false"]
+            }    
+        }
+
+    },
 }
+

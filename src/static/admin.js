@@ -37,19 +37,15 @@ var Admin;
         rv.AddTable(width, height, parseInt(cap));
     }
     function addWall() {
-        console.log("admin add wall");
-        var x_from = 150;
-        var x_to = 150;
-        var y_from = 90;
-        var y_to = 200;
-        // Legger til et nytt element i sentrum, med størrelse lik innparameterene
-        //rv.AddWall(x_from,x_to,y_from,y_to);
-        rv.AddWall(200, 600, 100, 100);
-        rv.AddWall(600, 600, 100, 400);
-        rv.AddWall(600, 300, 400, 400);
-        rv.AddWall(300, 300, 400, 300);
-        rv.AddWall(300, 200, 300, 300);
-        rv.AddWall(200, 200, 300, 100);
+        var walls = app.lines;
+        for (var wall in walls) {
+            //rv.AddWall(x_from,x_to,y_from,y_to);
+            var x_from = parseInt(walls[wall]['lastx']);
+            var x_to = parseInt(walls[wall]['newx']);
+            var y_from = parseInt(walls[wall]['lasty']);
+            var y_to = parseInt(walls[wall]['newy']);
+            rv.AddWall(x_from, x_to, y_from, y_to);
+        }
         var roomPlan = rv.GetRoomPlan();
         if (!roomPlan)
             throw Error("rv has no roomplan");

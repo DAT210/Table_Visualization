@@ -72,8 +72,8 @@ h2{
 }
 
 
-#myCanvas{
-
+#addWall{
+  display: none;
 }
 #myDivCanvas{
   height: 400px;

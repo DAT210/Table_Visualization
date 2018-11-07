@@ -57,7 +57,7 @@ class RoomVisualizer {
         }
     }
     public AddWall(x_from: number, x_to: number, y_from: number, y_to: number) {
-        console.log("Addwall");
+        console.log("xfrom: " + x_from + " x_to " + x_to + " y_from " + y_from + "y_to: " + y_to);
         if (this.roomPlan) {
             this.roomPlan.walls.push({from: {x: x_from, y:y_from}, to: {x:x_to, y:y_to}});
             console.log(this.roomPlan);

@@ -10,7 +10,8 @@ namespace Admin {
     });
 
     let rv: RoomVisualizer;
-
+    declare var app: any;
+    
     function init(roomPlan: IRoom) {
         console.log("RoomPlan:");
         console.log(roomPlan);
@@ -40,20 +41,15 @@ namespace Admin {
     }
 
     function addWall() {
-        console.log("admin add wall");
-        let x_from = 150;
-        let x_to = 150;
-        let y_from = 90;
-        let y_to = 200;
-        
-        // Legger til et nytt element i sentrum, med størrelse lik innparameterene
-        //rv.AddWall(x_from,x_to,y_from,y_to);
-        rv.AddWall(200, 600, 100, 100);
-        rv.AddWall(600, 600, 100, 400);
-        rv.AddWall(600, 300, 400, 400);
-        rv.AddWall(300, 300, 400, 300);
-        rv.AddWall(300, 200, 300, 300);
-        rv.AddWall(200, 200, 300, 100);
+        let walls = app.lines;
+        for (let wall in walls) {
+            //rv.AddWall(x_from,x_to,y_from,y_to);
+            let x_from = parseInt(walls[wall]['lastx']);
+            let x_to = parseInt(walls[wall]['newx']);
+            let y_from = parseInt(walls[wall]['lasty']);
+            let y_to = parseInt(walls[wall]['newy']);
+            rv.AddWall(x_from,x_to,y_from,y_to);
+        }
         let roomPlan = rv.GetRoomPlan();
         if (!roomPlan) throw Error("rv has no roomplan");
         rv.SetRoomPlan(roomPlan);

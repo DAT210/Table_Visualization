@@ -42,6 +42,7 @@ namespace Admin {
 
     function addWall() {
         let walls = app.lines;
+        if (!walls) throw Error("No walls");
         for (let wall in walls) {
             //rv.AddWall(x_from,x_to,y_from,y_to);
             let x_from = parseInt(walls[wall]['lastx']);

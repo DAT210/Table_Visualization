@@ -76,8 +76,15 @@ h2{
   display: none;
 }
 #myDivCanvas{
-  height: 400px;
+  height: 500px;
   max-width: 700px;
   margin: auto;
   border: 1px solid black;
+}
+
+@media only screen and (max-width: 768px) {
+  #myDivCanvas{
+    display: none;
+
+  }
 }

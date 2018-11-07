@@ -38,6 +38,8 @@ var Admin;
     }
     function addWall() {
         var walls = app.lines;
+        if (!walls)
+            throw Error("No walls");
         for (var wall in walls) {
             //rv.AddWall(x_from,x_to,y_from,y_to);
             var x_from = parseInt(walls[wall]['lastx']);

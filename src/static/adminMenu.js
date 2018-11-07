@@ -49,11 +49,7 @@ $("#myCanvas").click(function(event) {
     } else{
         x = status.split(",")[0];
         y = status.split(",")[1];
-        console.log(status);
-        console.log("x: " + x + " y: " + y + " xcoord: " + xCoord + " ycoord: " + yCoord);
         app.addCircle(x, y)
-        console.log(app.circles);
-        console.log(app.lines);
     }
 });
 
@@ -226,7 +222,6 @@ var app = { // app is the class
             app.firstClick = 0;
             return ["false"]
         }
-        console.log(this.circles);
         for (var key in this.circles) {
             x = this.circles[key]['x'];
             y = this.circles[key]['y'];
@@ -255,7 +250,6 @@ var app = { // app is the class
             xCross = this.circles[key]['x'];
             yCross = this.circles[key]['y'];
             if (yCurrent > yCross - 6 && yCurrent < yCross + 6) {
-                console.log("Krysspunkt her fra y");
                 this.addLine(xLined,yLined,xLined,yCross)
                 this.addLine(xLined,yCross,xCross,yCross)
                 this.addCircle(xLined,yCross)
@@ -276,32 +270,6 @@ var app = { // app is the class
                 return ["false"]
             } 
          }
-    },
-
-    detectPath: function() {
-        if(this.circles.length < 4){
-            return ["false"]
-        }
-        for(i = 0; i<this.circles.length; i++){
-            var x = 0;
-            var y = 0;
-            for(j = 0; j<this.circles.length; j++){
-                if(i != j){
-                    if(this.circles[i]['x'] == this.circles[j]['x']){ // de ligger under hverandre
-                        y += 1;
-                    }
-                    if(this.circles[i]['y'] == this.circles[j]['y']){ // de ligger ved siden av hverandr
-                        x += 1;
-                    }
-                }
-                }
-            if(x>0 && y>0){
-                return ["path"]
-            }else{
-                return ["false"]
-            }    
-        }
-
     },
 }
 

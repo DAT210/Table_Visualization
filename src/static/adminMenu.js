@@ -250,8 +250,8 @@ var app = { // app is the class
             xCross = this.circles[key]['x'];
             yCross = this.circles[key]['y'];
             if (yCurrent > yCross - 6 && yCurrent < yCross + 6) {
-                this.addLine(xLined,yLined,xLined,yCross)
-                this.addLine(xLined,yCross,xCross,yCross)
+                this.addLine(xCross,yCross, xLined,yCross)
+                this.addLine(xLined,yCross,xLined,yLined)
                 this.addCircle(xLined,yCross)
                 return ["false"]
             } 
@@ -264,8 +264,8 @@ var app = { // app is the class
             yCross = this.circles[key]['y'];
             if (xCurrent > xCross - 6 && xCurrent < xCross + 6) {
                 console.log("Krysspunkt her fra x");
-                this.addLine(xLined,yLined,xCross,yLined)
                 this.addLine(xCross,yCross,xCross,yLined)
+                this.addLine(xCross,yLined,xLined,yLined)
                 this.addCircle(xCross,yLined)
                 return ["false"]
             } 

@@ -40,8 +40,11 @@ $("#myCanvas").click(function(event) {
         $('#addWall').css({
             'display': 'initial'
         })
-        $('#wall-add-status').html(""); 
-        $('#wall-add-status').html("Success! add the walls to the roomplan");
+        $('#wall-add-success').remove()
+        $('#wall-add-warning').remove()
+        $('#wall-add-status').css({
+            'display': 'block'
+        })
         app.roomplanPosition()
     } 
     if(status == "false"){
@@ -58,7 +61,12 @@ $("#myCanvas").mousemove(function(e) {
     app.drawCanvas()
 });
 
+$("#addWall").click(function() {
+    console.log("klikk");
+    $(".card-add-walls").remove()
 
+    app.roomplanPosition()
+});
 
 var app = { // app is the class
 
@@ -167,6 +175,30 @@ var app = { // app is the class
                 this.addTempLine(x, y, xCoord, y)
             }
         }
+        last = this.circles.length -1;
+        if(last >= 0){
+            lastx = this.circles[last]['x'];
+            lasty = this.circles[last]['y'];
+            if ((xCoord > lastx - 6 && xCoord < lastx + 6) || (yCoord > lasty - 6 && yCoord < lasty + 6) ) {
+                $('#wall-add-success').css({
+                    'display': 'block'
+                })
+                $('#wall-add-warning').css({
+                    'display': 'none'
+                })
+                app.roomplanPosition()
+    
+            } else{
+                $('#wall-add-success').css({
+                    'display': 'none'
+                })
+                $('#wall-add-warning').css({
+                    'display': 'block'
+                })
+                app.roomplanPosition()
+            }
+
+        }
     },
 
     addTempLine: function(lastx, lasty, newx, newy) {
@@ -222,26 +254,26 @@ var app = { // app is the class
             app.firstClick = 0;
             return ["false"]
         }
-        for (var key in this.circles) {
-            x = this.circles[key]['x'];
-            y = this.circles[key]['y'];
-            if (xCurrent > x - 6 && xCurrent < x + 6) {
-                status = app.detectCrossFromY(yCoord,x,y)
-                if(status == "false"){
-                    return ["done"]
-                }
-                this.addLine(x,y,x,yCurrent)
-                return [x,yCurrent]
-            } 
-            else if (yCurrent > y - 6 && yCurrent < y + 6) {
-                status = app.detectCrossFromX(xCoord,x,y)
-                if(status == "false"){
-                    return ["done"]
-                }
-                this.addLine(x,y,xCurrent,y)
-                return [xCurrent,y]
-            } 
-         }
+        last = this.circles.length -1;
+        x = this.circles[last]['x'];
+        y = this.circles[last]['y'];
+        if (xCurrent > x - 6 && xCurrent < x + 6) {
+            status = app.detectCrossFromY(yCoord,x,y)
+            if(status == "false"){
+                return ["done"]
+            }
+            this.addLine(x,y,x,yCurrent)
+            return [x,yCurrent]
+        } 
+        else if (yCurrent > y - 6 && yCurrent < y + 6) {
+            status = app.detectCrossFromX(xCoord,x,y)
+            if(status == "false"){
+                return ["done"]
+            }
+            this.addLine(x,y,xCurrent,y)
+            return [xCurrent,y]
+        } 
+
             return ["false"]
     },
 
@@ -250,8 +282,8 @@ var app = { // app is the class
             xCross = this.circles[key]['x'];
             yCross = this.circles[key]['y'];
             if (yCurrent > yCross - 6 && yCurrent < yCross + 6) {
-                this.addLine(xCross,yCross, xLined,yCross)
-                this.addLine(xLined,yCross,xLined,yLined)
+                this.addLine(xLined,yLined,xLined,yCross)
+                this.addLine(xLined,yCross,xCross,yCross)
                 this.addCircle(xLined,yCross)
                 return ["false"]
             } 
@@ -264,8 +296,8 @@ var app = { // app is the class
             yCross = this.circles[key]['y'];
             if (xCurrent > xCross - 6 && xCurrent < xCross + 6) {
                 console.log("Krysspunkt her fra x");
-                this.addLine(xCross,yCross,xCross,yLined)
-                this.addLine(xCross,yLined,xLined,yLined)
+                this.addLine(xLined,yLined,xCross,yLined)
+                this.addLine(xCross,yLined,xCross,yCross)
                 this.addCircle(xCross,yLined)
                 return ["false"]
             } 

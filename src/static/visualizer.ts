@@ -88,7 +88,7 @@ class InteractiveSVG implements IInteractiveVisualizer {
         }
         const diffX = Math.abs((this.width - right) - left);
         const diffY = Math.abs((this.height - bottom) - top);
-        SVGHelper.SetViewBox(this.svg, diffX/2, diffY/2, this.width, this.height)
+        SVGHelper.SetViewBox(this.svg, diffX / 2, diffY / 2, this.width, this.height)
     }
     public Reset(): void {
         this.elements = [];
@@ -212,7 +212,7 @@ class InteractiveSVGRect extends InteractiveSVGElement {
         this.height = h;
         this.registerEventListeners();
     }
- 
+
     set Position(pos: IPoint) {
         SVGHelper.SetPosition(this.SvgElement, pos);
         this.pos = pos;

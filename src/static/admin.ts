@@ -4,14 +4,14 @@ namespace Admin {
         fetch("/load/json")
             .then(r => { return r.json() })
             .then(r => {
-                let room: IRoom = <IRoom>r;
+                let room: IRoom = r as IRoom;
                 init(room);
             });
     });
 
     let rv: RoomVisualizer;
     declare var app: any;
-    
+
     function init(roomPlan: IRoom) {
         console.log("RoomPlan:");
         console.log(roomPlan);
@@ -25,7 +25,7 @@ namespace Admin {
         addBtn.onclick = () => { addTable() };
         savebtn.onclick = () => { saveTableLayout() };
         addwall.onclick = () => { addWall() };
-        updatebtn.onclick = () => { updateTableLayout() };   
+        updatebtn.onclick = () => { updateTableLayout() };
     }
 
     function addTable() {
@@ -34,29 +34,50 @@ namespace Admin {
         let height = box.clientHeight;
         let width = box.clientWidth;
         let e = document.getElementById('capacityList') as HTMLSelectElement;
-        let cap = e.options[e.selectedIndex].value;
-        
-        // Legger til et nytt element i sentrum, med størrelse lik innparameterene
-        rv.AddTable(width, height,parseInt(cap));
+        let cap = parseInt(e.options[e.selectedIndex].value);
+        let tablePos: IPoint = { x: rv.GetCenter().x - (width / 2), y: rv.GetCenter().y - (height / 2) };
+
+        let roomPlan = rv.GetRoomPlan();
+        if (roomPlan) {
+            roomPlan.tables.push({
+                width: width,
+                height: height,
+                position: tablePos,
+                capacity: cap
+            });
+            rv.SetRoomPlan(roomPlan);
+            console.log("Roomplan updated:");
+            console.log(rv.GetRoomPlan());
+        }
+        else {
+            console.error("Cannot add table: No roomplan stored in visualizer")
+        }
     }
 
     function addWall() {
         let walls = app.lines;
         if (!walls) throw Error("No walls");
+        let newWalls: IWall[] = [];
         for (let wall in walls) {
-            //rv.AddWall(x_from,x_to,y_from,y_to);
             let x_from = parseInt(walls[wall]['lastx']);
             let x_to = parseInt(walls[wall]['newx']);
             let y_from = parseInt(walls[wall]['lasty']);
             let y_to = parseInt(walls[wall]['newy']);
-            rv.AddWall(x_from,x_to,y_from,y_to);
+            let from: IPoint = { x: x_from, y: y_from };
+            let to: IPoint = { x: x_to, y: y_to };
+            newWalls.push({ from: from, to: to });
         }
         let roomPlan = rv.GetRoomPlan();
-        if (!roomPlan) throw Error("rv has no roomplan");
-        rv.SetRoomPlan(roomPlan);
+        if (roomPlan) {
+            roomPlan.walls = newWalls;
+            rv.SetRoomPlan(roomPlan);
+            console.log("Roomplan updated:");
+            console.log(rv.GetRoomPlan());
+        }
+        else {
+            console.error("Cannot add walls: No roomplan stored in visualizer");
+        }
     }
-
-
 
     function saveTableLayout() {
         const roomName = (<HTMLInputElement>document.getElementById('tableNameForm')).value;
@@ -89,7 +110,7 @@ namespace Admin {
             .then(res => res.json())
             .then(res => errorMsg.innerHTML = res["message"])
             .catch(err => console.log("Error:" + JSON.stringify(err)))
-            
+
         // add code to update GUI on success/not success
     }
 

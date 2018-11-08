@@ -32,26 +32,48 @@ var Admin;
         var height = box.clientHeight;
         var width = box.clientWidth;
         var e = document.getElementById('capacityList');
-        var cap = e.options[e.selectedIndex].value;
-        // Legger til et nytt element i sentrum, med størrelse lik innparameterene
-        rv.AddTable(width, height, parseInt(cap));
+        var cap = parseInt(e.options[e.selectedIndex].value);
+        var tablePos = { x: rv.GetCenter().x - (width / 2), y: rv.GetCenter().y - (height / 2) };
+        var roomPlan = rv.GetRoomPlan();
+        if (roomPlan) {
+            roomPlan.tables.push({
+                width: width,
+                height: height,
+                position: tablePos,
+                capacity: cap
+            });
+            rv.SetRoomPlan(roomPlan);
+            console.log("Roomplan updated:");
+            console.log(rv.GetRoomPlan());
+        }
+        else {
+            console.error("Cannot add table: No roomplan stored in visualizer");
+        }
     }
     function addWall() {
         var walls = app.lines;
         if (!walls)
             throw Error("No walls");
+        var newWalls = [];
         for (var wall in walls) {
-            //rv.AddWall(x_from,x_to,y_from,y_to);
             var x_from = parseInt(walls[wall]['lastx']);
             var x_to = parseInt(walls[wall]['newx']);
             var y_from = parseInt(walls[wall]['lasty']);
             var y_to = parseInt(walls[wall]['newy']);
-            rv.AddWall(x_from, x_to, y_from, y_to);
+            var from = { x: x_from, y: y_from };
+            var to = { x: x_to, y: y_to };
+            newWalls.push({ from: from, to: to });
         }
         var roomPlan = rv.GetRoomPlan();
-        if (!roomPlan)
-            throw Error("rv has no roomplan");
-        rv.SetRoomPlan(roomPlan);
+        if (roomPlan) {
+            roomPlan.walls = newWalls;
+            rv.SetRoomPlan(roomPlan);
+            console.log("Roomplan updated:");
+            console.log(rv.GetRoomPlan());
+        }
+        else {
+            console.error("Cannot add walls: No roomplan stored in visualizer");
+        }
     }
     function saveTableLayout() {
         var roomName = document.getElementById('tableNameForm').value;

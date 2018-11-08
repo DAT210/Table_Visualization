@@ -16,7 +16,8 @@ var User;
         var visualizer = new InteractiveSVG();
         rv = new RoomVisualizer(visualizer);
         rv.SetRoomPlan(roomPlan);
-        getBookings2(roomPlan.name).then(function (r) {
+        rv.CenterContent();
+        getBookings(roomPlan.name).then(function (r) {
             console.log(r);
             rv.MarkTablesAsBooked(r.tables);
         });
@@ -28,12 +29,8 @@ var User;
         button.onclick = function () { alert("Selected tables: " + rv.GetSelected()); };
         document.body.appendChild(button);
     }
-    function getBookings() {
-        // fetch (GET): get bookings from server
-        return { tables: [0, 2, 3], people: 3 };
-    }
-    function getBookings2(rName) {
-        var url = "/api/booking/" + rName;
+    function getBookings(restaurantName) {
+        var url = "/api/booking/" + restaurantName;
         return fetch(url)
             .then(function (r) { return r.json(); })
             .then(function (r) { return r; });

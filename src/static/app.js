@@ -74,16 +74,17 @@ var RoomVisualizer = /** @class */ (function () {
             return;
         for (var _i = 0, _a = this.roomPlan.tables; _i < _a.length; _i++) {
             var table = _a[_i];
-            var id = this.drawTable(table.width, table.height, table.position, table.id, this.movableTables);
+            var dispText = table.capacity ? table.capacity + "" : "";
+            var id = this.drawTable(table.width, table.height, table.position, dispText, table.id, this.movableTables);
             if (!table.id)
                 table.id = id;
         }
     };
-    RoomVisualizer.prototype.drawTable = function (w, h, pos, id, movable) {
+    RoomVisualizer.prototype.drawTable = function (w, h, pos, text, id, movable) {
         var _this = this;
         if (movable === void 0) { movable = false; }
         var tableId = id ? id : this.generateId();
-        var rect = this.visualizer.AddRect(w, h, pos, movable, "table");
+        var rect = this.visualizer.AddRect(w, h, pos, movable, "table", text);
         rect.OnClick = function () { _this.onTableClick(tableId); };
         rect.OnMove = function () { _this.updateRoomPlan(tableId, rect.Position); };
         rect.ToggleClass("tables");

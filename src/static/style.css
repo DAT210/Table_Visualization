@@ -1,9 +1,17 @@
 svg {
     background-color: white;
+    user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -webkit-user-select: none;
 }
 body {
     display: flex;
     justify-content: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+text {
+    fill: black;
 }
 
 #InteractiveSVGWrapper {

@@ -94,14 +94,15 @@ class RoomVisualizer {
     private drawTables(): void {
         if (!this.roomPlan) return;
         for (let table of this.roomPlan.tables) {
-            let id = this.drawTable(table.width, table.height, table.position, table.id, this.movableTables);
+            const dispText: string = table.capacity ? table.capacity+"" : "";
+            let id = this.drawTable(table.width, table.height, table.position, dispText, table.id, this.movableTables);
             if (!table.id) table.id = id;
         }
     }
-    private drawTable(w: number, h: number, pos: IPoint, id?: number, movable: boolean = false): number {
+    private drawTable(w: number, h: number, pos: IPoint, text: string, id?: number, movable: boolean = false): number {
         const tableId = id ? id : this.generateId();
 
-        const rect = this.visualizer.AddRect(w, h, pos, movable, "table");
+        const rect = this.visualizer.AddRect(w, h, pos, movable, "table", text);
         rect.OnClick = () => { this.onTableClick(tableId) };
         rect.OnMove = () => { this.updateRoomPlan(tableId, rect.Position) };
         rect.ToggleClass("tables");

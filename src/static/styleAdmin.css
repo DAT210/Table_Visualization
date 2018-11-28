@@ -1,3 +1,6 @@
+body{
+  background-color: #f8f8fa;
+}
 #InteractiveSVGWrapper {
   visibility: hidden;
   width: 100%;

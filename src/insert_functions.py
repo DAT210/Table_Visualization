@@ -1,5 +1,5 @@
-from __init__ import db
-from models import Roomplan, Tables, Walls
+from src import db
+from src.models import Roomplan, Tables, Walls
 from sqlalchemy import update, func
 
 
@@ -27,5 +27,5 @@ def insert_roomplan(name,data):
             i += 1
         db.session.commit()
     except:
-        return
+        return "error"
 

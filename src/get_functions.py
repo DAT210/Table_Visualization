@@ -1,6 +1,6 @@
 from flask import Flask,request, session, jsonify
-from __init__ import app, db
-from models import Roomplan, Walls, Tables
+from src import app, db
+from src.models import Roomplan, Walls, Tables
 import json
 from sqlalchemy import update, func
 

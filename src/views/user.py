@@ -1,11 +1,11 @@
 from flask import Flask, render_template, Blueprint, request, redirect, url_for, session, jsonify
-from __init__ import app, db
-from models import Roomplan
+from src import app, db
+from src.models import Roomplan
 import json
 import requests
-from get_functions import *
-from insert_functions import *
-from update_functions import *
+from src.get_functions import *
+from src.insert_functions import *
+from src.update_functions import *
 
 user_blueprint = Blueprint('user', __name__)
 

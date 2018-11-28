@@ -1,5 +1,5 @@
 from sqlalchemy_utils import database_exists, create_database, drop_database
-from __init__ import DB_URL, db
+from src import DB_URL, db
 from create_tables import start_tables
 
 if database_exists(DB_URL):

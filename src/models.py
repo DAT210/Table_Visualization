@@ -1,4 +1,4 @@
-from __init__ import db
+from src import db
 from sqlalchemy.orm import backref
 
 class Roomplan(db.Model):

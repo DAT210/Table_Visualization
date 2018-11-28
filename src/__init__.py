@@ -30,8 +30,8 @@ db = SQLAlchemy(app)
 #### blueprints ####
 ####################
 
-from views.admin import admin_blueprint
-from views.user import user_blueprint
+from src.views.admin import admin_blueprint
+from src.views.user import user_blueprint
 
 # register the blueprints
 app.register_blueprint(admin_blueprint)

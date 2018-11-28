@@ -1,6 +1,7 @@
 from flask import session
-from __init__ import app, db
-from models import Roomplan, Walls, Tables
+from src import app, db
+from src.models import Roomplan, Walls, Tables
+from sqlalchemy import update, func
 
 
 def delete_roomplan(name):

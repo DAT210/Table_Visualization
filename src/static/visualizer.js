@@ -49,9 +49,9 @@ var InteractiveSVG = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
-    InteractiveSVG.prototype.AddRect = function (w, h, pos, movable, tag) {
+    InteractiveSVG.prototype.AddRect = function (w, h, pos, movable, tag, displayText) {
         if (movable === void 0) { movable = false; }
-        var elm = new InteractiveSVGRect(w, h, pos, movable, tag);
+        var elm = new InteractiveSVGRect(w, h, pos, movable, tag, displayText);
         this.addElement(elm);
         return elm;
     };
@@ -193,12 +193,18 @@ var InteractiveSVGElement = /** @class */ (function () {
 }());
 var InteractiveSVGRect = /** @class */ (function (_super) {
     __extends(InteractiveSVGRect, _super);
-    function InteractiveSVGRect(w, h, position, movable, tag) {
+    function InteractiveSVGRect(w, h, position, movable, tag, displayText) {
         var _this = _super.call(this, movable, tag) || this;
         _this.pos = { x: 0, y: 0 };
         _this.width = 0;
         _this.height = 0;
-        _this.SvgElement = SVGHelper.NewRect(w, h);
+        _this.SvgElement = SVGHelper.NewSVGElement(w, h);
+        _this.SvgElement.appendChild(SVGHelper.NewRect(w, h));
+        if (displayText) {
+            var txtElement = SVGHelper.NewText(displayText, TextAnchor.Middle, TextAnchor.Middle);
+            _this.SvgElement.appendChild(txtElement);
+            SVGHelper.SetPosition(txtElement, { x: w / 2, y: h / 2 });
+        }
         if (position)
             _this.Position = position;
         else
@@ -237,6 +243,9 @@ var InteractiveSVGRect = /** @class */ (function (_super) {
         enumerable: true,
         configurable: true
     });
+    InteractiveSVGRect.prototype.setDisplayText = function (txt) {
+        this.SvgElement.appendChild(document.createTextNode(txt));
+    };
     return InteractiveSVGRect;
 }(InteractiveSVGElement));
 var InteractiveSVGLine = /** @class */ (function (_super) {
@@ -349,6 +358,39 @@ var SVGHelper = /** @class */ (function () {
         this.SetSize(svg, width, height);
         return svg;
     };
+    SVGHelper.NewGroup = function () {
+        var group = document.createElementNS(this.svgNS, "g");
+        return group;
+    };
+    SVGHelper.NewText = function (txt, anchorHor, anchorVer) {
+        if (anchorHor === void 0) { anchorHor = TextAnchor.Start; }
+        if (anchorVer === void 0) { anchorVer = TextAnchor.End; }
+        var text = document.createElementNS(this.svgNS, "text");
+        if (txt)
+            text.innerHTML = txt;
+        text.style.stroke = "none";
+        switch (anchorHor) {
+            case TextAnchor.End:
+                text.style.textAnchor = "end";
+                break;
+            case TextAnchor.Middle:
+                text.style.textAnchor = "middle";
+                break;
+            default:
+                text.style.textAnchor = "unset";
+        }
+        switch (anchorVer) {
+            case TextAnchor.Start:
+                text.style.dominantBaseline = "hanging";
+                break;
+            case TextAnchor.Middle:
+                text.style.dominantBaseline = "central";
+                break;
+            default:
+                text.style.dominantBaseline = "unset";
+        }
+        return text;
+    };
     SVGHelper.NewRect = function (width, height) {
         var rect = document.createElementNS(this.svgNS, "rect");
         this.SetSize(rect, width, height);
@@ -388,4 +430,10 @@ var SVGHelper = /** @class */ (function () {
     SVGHelper.svgNS = "http://www.w3.org/2000/svg";
     return SVGHelper;
 }());
+var TextAnchor;
+(function (TextAnchor) {
+    TextAnchor[TextAnchor["End"] = 0] = "End";
+    TextAnchor[TextAnchor["Start"] = 1] = "Start";
+    TextAnchor[TextAnchor["Middle"] = 2] = "Middle";
+})(TextAnchor || (TextAnchor = {}));
 //# sourceMappingURL=visualizer.js.map

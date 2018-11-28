@@ -31,7 +31,6 @@ def add():
             return json.dumps(response)
         
         insert_roomplan(table_name.lower(),data)
-
         session["admin-roomplan"] = table_name
         message = {
             "status": "success",
@@ -94,7 +93,8 @@ def search():
             session['admin-roomplan'] = search
     return redirect("/admin")    
 
-# Bare en route for å vise json fil til hvert bord
+
+# Bare en route for å vise json fil til hvert bordopsett
 @admin_blueprint.route('/api/<tablename>')
 def api(tablename):
     return get_json_setup(tablename)

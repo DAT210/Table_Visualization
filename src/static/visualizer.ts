@@ -2,7 +2,7 @@ interface IInteractiveVisualizer {
     Wrapper: HTMLElement,
     Width: number,
     Height: number,
-    AddRect(w: number, h: number, pos: IPoint, movable?: boolean, tag?: string): IInteractiveVisualizerElement,
+    AddRect(w: number, h: number, pos: IPoint, movable?: boolean, tag?: string, displayText?: string): IInteractiveVisualizerElement,
     AddLine(pos1: IPoint, pos2: IPoint): IInteractiveVisualizerElement,
     AddPoly(points: IPoint[], pos?: IPoint, movable?: boolean): IInteractiveVisualizerElement,
     GetElements(tag: string): IInteractiveVisualizerElement[],
@@ -49,8 +49,8 @@ class InteractiveSVG implements IInteractiveVisualizer {
         SVGHelper.SetViewBox(this.svg, 0, 0, this.width, this.height);
     }
 
-    public AddRect(w: number, h: number, pos: IPoint, movable: boolean = false, tag?: string): InteractiveSVGRect {
-        const elm = new InteractiveSVGRect(w, h, pos, movable, tag);
+    public AddRect(w: number, h: number, pos: IPoint, movable: boolean = false, tag?: string, displayText?: string): InteractiveSVGRect {
+        const elm = new InteractiveSVGRect(w, h, pos, movable, tag, displayText);
         this.addElement(elm);
         return elm;
     }
@@ -155,10 +155,10 @@ interface IInteractiveVisualizerElement {
     PrevPosition: IPoint | undefined,
     Movable: boolean,
     Tag: string | undefined,
-    Selected: boolean;
+    Selected: boolean,
     ToggleClass(className: string): void,
     OnClick: () => void,
-    OnMove: () => void,
+    OnMove: () => void
 }
 
 abstract class InteractiveSVGElement implements IInteractiveVisualizerElement {
@@ -197,15 +197,21 @@ abstract class InteractiveSVGElement implements IInteractiveVisualizerElement {
 }
 
 class InteractiveSVGRect extends InteractiveSVGElement {
-    public SvgElement: SVGRectElement;
+    public SvgElement: SVGElement;
 
     private pos: IPoint = { x: 0, y: 0 };
     private width: number = 0;
     private height: number = 0;
 
-    constructor(w: number, h: number, position?: IPoint, movable?: boolean, tag?: string) {
+    constructor(w: number, h: number, position?: IPoint, movable?: boolean, tag?: string, displayText?: string) {
         super(movable, tag);
-        this.SvgElement = SVGHelper.NewRect(w, h);
+        this.SvgElement = SVGHelper.NewSVGElement(w, h);
+        this.SvgElement.appendChild(SVGHelper.NewRect(w, h));
+        if (displayText) {
+            const txtElement = SVGHelper.NewText(displayText, TextAnchor.Middle, TextAnchor.Middle);
+            this.SvgElement.appendChild(txtElement);
+            SVGHelper.SetPosition(txtElement, { x: w/2, y: h/2 });
+        }
         if (position) this.Position = position;
         else this.Position = { x: 0, y: 0 };
         this.width = w;
@@ -230,6 +236,10 @@ class InteractiveSVGRect extends InteractiveSVGElement {
         SVGHelper.SetSize(this.SvgElement, this.width, this.height);
     }
     get Height() { return this.height; }
+
+    private setDisplayText(txt: string) {
+        this.SvgElement.appendChild(document.createTextNode(txt));
+    }
 }
 
 class InteractiveSVGLine extends InteractiveSVGElement {
@@ -320,6 +330,36 @@ class SVGHelper {
         this.SetSize(svg, width, height);
         return svg;
     }
+    public static NewGroup(): SVGGElement {
+        const group = document.createElementNS(this.svgNS, "g") as SVGGElement;
+        return group;
+    }
+    public static NewText(txt?: string, anchorHor: TextAnchor = TextAnchor.Start, anchorVer: TextAnchor = TextAnchor.End): SVGTextElement {
+        const text = document.createElementNS(this.svgNS, "text") as SVGTextElement;
+        if (txt) text.innerHTML = txt;
+        text.style.stroke = "none";
+        switch (anchorHor) {
+            case TextAnchor.End:
+                text.style.textAnchor = "end";
+                break;
+            case TextAnchor.Middle:
+                text.style.textAnchor = "middle";
+                break;
+            default:
+                text.style.textAnchor = "unset";
+        }
+        switch (anchorVer) {
+            case TextAnchor.Start:
+                text.style.dominantBaseline = "hanging";
+                break;
+            case TextAnchor.Middle:
+                text.style.dominantBaseline = "central";
+                break;
+            default:
+                text.style.dominantBaseline = "unset";
+        }
+        return text;
+    }
     public static NewRect(width: number, height: number): SVGRectElement {
         const rect = document.createElementNS(this.svgNS, "rect") as SVGRectElement;
         this.SetSize(rect, width, height);
@@ -356,4 +396,10 @@ class SVGHelper {
     public static SetViewBox(element: SVGSVGElement, x: number, y: number, w: number, h: number) {
         element.setAttribute("viewBox", `${x} ${y} ${w} ${h}`);
     }
+}
+
+enum TextAnchor {
+    End,
+    Start,
+    Middle
 }

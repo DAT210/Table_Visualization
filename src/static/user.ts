@@ -14,21 +14,30 @@ namespace User {
     function init(roomPlan: IRoom) {
         console.log("RoomPlan:");
         console.log(roomPlan);
+        
+        getBookings(roomPlan.name).then(r => {
+            console.log(r);
+            displayRoom(r, roomPlan);
+        })
+    }
+
+    function displayRoom(bookings: IBookings, roomPlan: IRoom) {
+        if (!bookings.tables && !bookings.nrOfPeople) {
+            console.error("Malformed response: ", JSON.stringify(bookings));
+            return
+        }
         const visualizer = new InteractiveSVG();
         rv = new RoomVisualizer(visualizer);
         rv.SetRoomPlan(roomPlan);
         rv.CenterContent();
+
         let nrOfPeople = 0;
-        getBookings(roomPlan.name).then(r => {
-            console.log(r);
-            nrOfPeople = r.nrOfPeople;
-            console.log(nrOfPeople);
-            rv.MarkTablesAsBooked(r.tables);
-        })
+        nrOfPeople = bookings.nrOfPeople;
+        console.log(nrOfPeople);
+        rv.MarkTablesAsBooked(bookings.tables);
 
         let roomtables = rv.GetRoomPlan();
 
-        // temp button for testing
         const button = document.createElement("input");
         button.type = "button";
         button.value = "Print selected tables";
@@ -55,6 +64,12 @@ namespace User {
             }
         };
         document.body.appendChild(button);
+
+        let testBut = document.createElement("button");
+        testBut.onclick = () => {console.log("clisk"); postTables([1,2,3])};
+        testBut.innerHTML = "Test";
+        testBut.style.zIndex = "1000";
+        document.body.appendChild(testBut);
     }
 
     interface IBookings {
@@ -78,12 +93,14 @@ namespace User {
 
     function postTables(tableIDs: number[]): void {
         //fetch (POST): send tableIDs to server
-        let url ="/api/tablevis/tables";
+        console.log("sent post")
+        let url ="/api/booking/posttables";
         let tables = {"tables": tableIDs}
         fetch(url, {
             method: "post",
             headers: { "Content-type": "application/json" },
             body: JSON.stringify(tables)
-        });
+        })
+        .then(res => {console.log(res)})
     }
 }

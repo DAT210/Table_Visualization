@@ -116,8 +116,4 @@ dmypy.json
 /.vscode
 
 *.js.map
-<<<<<<< HEAD
 node_modules/
-=======
-node_modules/
->>>>>>> 3bbeb151609aee742ec5e4abcb869c9fc5448e10

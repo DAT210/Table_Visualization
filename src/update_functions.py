@@ -1,9 +1,9 @@
 from flask import Flask,request, session, jsonify
-from __init__ import app, db
-from models import Roomplan, Walls, Tables
+from src import app, db
+from src.models import Roomplan, Walls, Tables
 import json
 from sqlalchemy import update, func
-from insert_functions import insert_roomplan
+from src.insert_functions import insert_roomplan
 
 
 def update_roomplan(name, data):
@@ -18,7 +18,8 @@ def update_roomplan(name, data):
             ypos = key["position"]['y']
             width = key["width"]
             height = key["height"]
-            table = Tables(id,xpos,ypos,width,height,name,1)
+            capacity = key["capacity"]
+            table = Tables(id,xpos,ypos,width,height,name,capacity)
             db.session.add(table)
         i = 1
         for wall in data['walls']:

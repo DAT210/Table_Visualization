@@ -1,6 +1,6 @@
 from flask import Flask,request, session, jsonify
-from __init__ import app, db
-from models import Roomplan, Walls, Tables
+from src import app, db
+from src.models import Roomplan, Walls, Tables
 import json
 from sqlalchemy import update, func
 
@@ -51,17 +51,18 @@ def get_restaurants():
                 continue
             else:
                 restaurant_list.append(restaurant.name)
+        restaurant_list.sort()        
         return restaurant_list
 
 
 
 
-def get_db_status(name):
+def get_db_status(name, data):
         roomplan = Roomplan.query.filter_by(name=name).first()
-        if len(name) < 1:
+        if len(data["tables"]) < 1:
             message = {
                 "status": "error",
-                "message": "The name is too short"
+                "message": "You have to add tables"
             }
             return message
         if (' ' in name) == True:

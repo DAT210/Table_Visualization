@@ -1,23 +1,22 @@
 from flask import Flask, render_template, Blueprint, request, redirect, url_for, session, jsonify
-from __init__ import app, db
-from models import Roomplan
+from src import app, db
+from src.models import Roomplan
 import json
 import requests
-from get_functions import *
-from insert_functions import *
-from update_functions import *
-
+from src.get_functions import *
+from src.insert_functions import *
+from src.update_functions import *
+from flask import Response
+from flask import request
 user_blueprint = Blueprint('user', __name__)
-
 
 @user_blueprint.route('/')
 def index():
-    return redirect("/table/oslo")
+    return redirect("/table/bergen")
 
 @user_blueprint.route('/test')
 def testing():
-    return render_template("index.html")
-
+    return render_template("test.html")
 
 @user_blueprint.route('/table/<tablename>')
 def table(tablename):
@@ -25,31 +24,13 @@ def table(tablename):
     session['user-roomplan'] = tablename
     return render_template("index.html")
 
-
-@user_blueprint.route('/bookedTables')
-def getTables():
-    tableIDs = []
-    rawData = apiTest()
-    bookingData = json.loads(rawData)
-    restaurant = bookingData["restaurant"]
-    bookedTables = bookingData["tables"]
-    rawDbData = get_json_setup(restaurant)
-    dbData = json.loads(rawDbData)
-    allTables = dbData["tables"]
-
-    for i in range(len(bookedTables)):
-        tableIDs.append(bookedTables[i])
-
-    for j in range(len(allTables)):
-        if allTables[j]["id"] in tableIDs:
-            allTables[j].update({"booked": 1})
-        else:
-            allTables[j].update({"booked": 0})
-
-    return json.dumps(dbData)
-
+@user_blueprint.route('/api/booking/posttables', methods=['POST'])
+def ourAPItest():
+    d = request.get_json()
+    t = requests.post('https://jsonplaceholder.typicode.com/posts', json=d)
+    return Response(t, status=200)
 
 @user_blueprint.route('/api/booking/<restname>')
-def apiTest():
-    data = {"tables": [1, 3], "nrOfPeople": 2}
+def apiTest(restname):
+    data = {"tables": [1, 4], "nrOfPeople": 3, "name": restname}
     return json.dumps(data)

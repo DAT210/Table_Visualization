@@ -4,12 +4,13 @@ namespace Admin {
         fetch("/load/json")
             .then(r => { return r.json() })
             .then(r => {
-                let room: IRoom = <IRoom>r;
+                let room: IRoom = r as IRoom;
                 init(room);
             });
     });
 
     let rv: RoomVisualizer;
+    declare var app: any;
 
     function init(roomPlan: IRoom) {
         console.log("RoomPlan:");
@@ -17,32 +18,71 @@ namespace Admin {
         const visualizer = new InteractiveSVG();
         rv = new RoomVisualizer(visualizer, true);
         rv.SetRoomPlan(roomPlan);
-
-        let box = (<HTMLInputElement>document.getElementById('box1'));
-        let savebtn = (<HTMLInputElement>document.getElementsByClassName('saveBtn')[0]);
-        let updatebtn = (<HTMLInputElement>document.getElementsByClassName('updateBtn')[0]);
-        box.style.width = 60 + "px";
-        box.style.height = 40 + "px";
-        box.onclick = () => { addTable() };
+        let addBtn = (<HTMLInputElement>document.getElementById('addBtn'));
+        let addwall = (<HTMLInputElement>document.getElementById('addWall'));
+        let savebtn = (<HTMLInputElement>document.getElementById('saveBtn'));
+        let updatebtn = (<HTMLInputElement>document.getElementById('updateBtn'));
+        addBtn.onclick = () => { addTable() };
         savebtn.onclick = () => { saveTableLayout() };
+        addwall.onclick = () => { addWall() };
         updatebtn.onclick = () => { updateTableLayout() };
     }
 
     function addTable() {
-        let box = <HTMLInputElement>document.getElementById('box1');
+        let box = <HTMLInputElement>document.getElementById('resizable');
         if (!box) return;
         let height = box.clientHeight;
         let width = box.clientWidth;
         let e = document.getElementById('capacityList') as HTMLSelectElement;
-        let strUser = e.options[e.selectedIndex].value;
+        let cap = parseInt(e.options[e.selectedIndex].value);
+        let tablePos: IPoint = { x: rv.GetCenter().x - (width / 2), y: rv.GetCenter().y - (height / 2) };
 
-        // Legger til et nytt element i sentrum, med størrelse lik innparameterene
-        rv.AddTable(width, height);
+        let roomPlan = rv.GetRoomPlan();
+        if (roomPlan) {
+            roomPlan.tables.push({
+                width: width,
+                height: height,
+                position: tablePos,
+                capacity: cap
+            });
+            rv.SetRoomPlan(roomPlan);
+            console.log("Roomplan updated:");
+            console.log(rv.GetRoomPlan());
+        }
+        else {
+            console.error("Cannot add table: No roomplan stored in visualizer")
+        }
+    }
+
+    function addWall() {
+        let walls = app.lines;
+        if (!walls) throw Error("No walls");
+        let newWalls: IWall[] = [];
+        for (let wall in walls) {
+            let x_from = parseInt(walls[wall]['lastx']);
+            let x_to = parseInt(walls[wall]['newx']);
+            let y_from = parseInt(walls[wall]['lasty']);
+            let y_to = parseInt(walls[wall]['newy']);
+            let from: IPoint = { x: x_from, y: y_from };
+            let to: IPoint = { x: x_to, y: y_to };
+            newWalls.push({ from: from, to: to });
+        }
+        let roomPlan = rv.GetRoomPlan();
+        if (roomPlan) {
+            roomPlan.walls = newWalls;
+            rv.SetRoomPlan(roomPlan);
+            console.log("Roomplan updated:");
+            console.log(rv.GetRoomPlan());
+        }
+        else {
+            console.error("Cannot add walls: No roomplan stored in visualizer");
+        }
     }
 
     function saveTableLayout() {
-        const roomName = (<HTMLInputElement>document.getElementById('table-name')).value;
+        const roomName = (<HTMLInputElement>document.getElementById('tableNameForm')).value;
         const errorMsg = (<HTMLInputElement>document.getElementById('save-response-text'));
+        errorMsg.style.visibility = "visible";
         if (roomName.length < 1) {
             (<HTMLInputElement>document.getElementById('save-response-text')).innerHTML = "The name is too short";
             return;
@@ -64,6 +104,7 @@ namespace Admin {
         const errorMsg = (<HTMLInputElement>document.getElementById('update-response-text'));
         let roomPlan = rv.GetRoomPlan();
         if (!roomPlan) throw Error("rv has no roomplan");
+        errorMsg.style.visibility = "visible";
 
         roomPlanPOST("/update", roomPlan)
             .then(res => res.json())

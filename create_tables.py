@@ -1,5 +1,5 @@
-from __init__ import db
-from models import Roomplan, Walls, Tables
+from src import db
+from src.models import Roomplan, Walls, Tables
 
 
 def start_tables():
@@ -15,7 +15,6 @@ def start_tables():
     wall4 =  Walls(4,"oslo", 300, 300, 400, 300)
     wall5 =  Walls(5,"oslo", 300, 200, 300, 300)
     wall6 =  Walls(6,"oslo", 200, 200, 300, 100)
-    
 
     db.session.add(wall1)
     db.session.add(wall2)
@@ -28,7 +27,6 @@ def start_tables():
     db.session.add(table3)
     db.session.add(table4)
     db.session.add(roomplan)
-
     # commit the changes
     db.session.commit()
 

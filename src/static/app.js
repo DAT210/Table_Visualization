@@ -20,13 +20,6 @@ var RoomVisualizer = /** @class */ (function () {
         this.visualizer.Height = this.roomPlan.height;
         this.drawRoom();
     };
-    RoomVisualizer.prototype.AddTable = function (w, h) {
-        var pos = { x: this.visualizer.Width / 2, y: this.visualizer.Height / 2 };
-        var id = this.drawTable(w, h, pos, undefined, true);
-        if (this.roomPlan) {
-            this.roomPlan.tables.push({ width: w, height: h, position: pos, id: id });
-        }
-    };
     RoomVisualizer.prototype.GetSelected = function () {
         var selected = [];
         for (var id in this.tables) {
@@ -46,11 +39,20 @@ var RoomVisualizer = /** @class */ (function () {
                 console.warn("Trying to mark non-existent table as booked. ID = " + id);
         }
     };
+    RoomVisualizer.prototype.GetCenter = function () {
+        return { x: this.visualizer.Width / 2, y: this.visualizer.Height / 2 };
+    };
+    RoomVisualizer.prototype.CenterContent = function () {
+        this.visualizer.CenterContent();
+    };
     RoomVisualizer.prototype.drawRoom = function () {
+        if (!this.roomPlan) {
+            console.error("No roomplan to draw");
+            return;
+        }
         this.visualizer.Reset();
         this.drawWallsAsPoly();
         this.drawTables();
-        this.visualizer.CenterContent();
     };
     RoomVisualizer.prototype.drawWallsAsLines = function () {
         if (!this.roomPlan)
@@ -72,17 +74,20 @@ var RoomVisualizer = /** @class */ (function () {
             return;
         for (var _i = 0, _a = this.roomPlan.tables; _i < _a.length; _i++) {
             var table = _a[_i];
-            this.drawTable(table.width, table.height, table.position, table.id, this.movableTables);
+            var dispText = table.capacity ? table.capacity + "" : "";
+            var id = this.drawTable(table.width, table.height, table.position, dispText, table.id, this.movableTables);
+            if (!table.id)
+                table.id = id;
         }
     };
-    RoomVisualizer.prototype.drawTable = function (w, h, pos, id, movable) {
+    RoomVisualizer.prototype.drawTable = function (w, h, pos, text, id, movable) {
         var _this = this;
         if (movable === void 0) { movable = false; }
         var tableId = id ? id : this.generateId();
-        var rect = this.visualizer.AddRect(w, h, pos, movable, "table");
+        var rect = this.visualizer.AddRect(w, h, pos, movable, "table", text);
         rect.OnClick = function () { _this.onTableClick(tableId); };
         rect.OnMove = function () { _this.updateRoomPlan(tableId, rect.Position); };
-        rect.ToggleClass("table");
+        rect.ToggleClass("tables");
         this.tables[tableId] = rect;
         return tableId;
     };
@@ -107,13 +112,6 @@ var RoomVisualizer = /** @class */ (function () {
         }
     };
     RoomVisualizer.prototype.generateId = function () {
-        /*let id: number;
-        do {
-            id = Math.floor((Math.random() * 1000))
-        }
-        while (id in this.tables)
-        console.log("Generated table ID: " + id);
-        return id;*/
         var id = 0;
         while (id in this.tables) {
             id++;

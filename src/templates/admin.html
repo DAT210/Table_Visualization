@@ -5,162 +5,221 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TableVisTest</title>
-    <link rel="stylesheet" href="/static/style.css">
-    <link rel="stylesheet" href="/static/styleAdmin.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <script src="/static/app.js"></script>
     <script src="/static/visualizer.js"></script>
     <script src="/static/admin.js"></script>
-
+    <link rel="stylesheet" href="/static/styleAdmin.css">
 </head>
 
 <body>
-    <div id="wrapper"></div>
 
+    <div class="container-fluid admin-panel">
+        <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #e3f2fd;">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <a class="navbar-brand" href="/admin">ADMIN</a>
 
-    <div class="menu-bar">
-        <div class="wrap">
-            <span class="decor"></span>
-            <nav>
-                <ul class="primary">
-                    <li>
-                        <a href="#load" id="load-setup">Load a setup</a>
+            <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
+                <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+                    <li class="nav-item active">
+                        <a class="nav-link nav-load" href="#">Load <span class="sr-only">(current)</span></a>
                     </li>
-                    <li id="create-new">
-                        <a href={{ url_for('admin.clear') }}>Create new</a>
+                    <li class="nav-item">
+                        <a class="nav-link nav-new" href={{ url_for('admin.clear') }}>New</a>
                     </li>
-                    <li>
-                        <a href="#edittools">Edit tools</a>
-                        <ul class="sub">
-                            <li><a href="#addwalls" id="add-walls">Add walls</a></li>
-                            <li><a href="#addtables" id="add-tables">Add tables</a></li>
-                            <li><a href="#removetables" id="remove-tables">Remove tables</a></li>
-                        </ul>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Edit
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item nav-add-tables" href="#">Add tables</a>
+                            <a class="dropdown-item nav-add-walls" href="#">Add walls</a>
+                        </div>
                     </li>
-                    <li>
-                        <a href="#savesetup">Save</a>
-                        <ul class="sub">
-                            <li><a href="#savenew" id="save-new">Save as new</a></li>
-                            <li><a href="#updatecurrent" id="update-current">Update current</a></li>
-                        </ul>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Save
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item nav-update" href="#">Update current</a>
+                            <a class="dropdown-item nav-save" href="#">Save as new </a>
+                        </div>
                     </li>
-                    <li>
-                        <a href="#deletesetup" id="delete">Delete</a>
+                    <li class="nav-item">
+                        <a class="nav-link nav-delete" href="#">Delete</a>
                     </li>
                 </ul>
-            </nav>
-        </div>
-    </div>
-
-    <div class="admin-box load-box">
-        <div class="load-position-box">
-            <div class="custom-select" style="width:220px;">
-                <form action="{{ url_for('admin.load') }}" method="post">
-                    <select name="restaurants">
-                        <option value="default">Select a restaurant</option>
-                        {% for restaurant in restaurants %}
-                        <option value={{restaurant}}>{{restaurant}}</option>
-                        {% endfor %}
-                    </select>
+                <form class="form-inline my-2 my-lg-0" action="{{ url_for('admin.search') }}" method="post">
+                    <input id="myInput" class="form-control mr-sm-2" name="search" type="search" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                </form>
             </div>
-            <input type="submit" class="submitbutton" id="load-btn" value="Confirm" />
-            </form>
-            {% if tablesetup %}
-            {{tablesetup}}
+        </nav>
+
+        <div class="card-header text-center">
+            {% if session %}
+            <h2 display-4>{{session}}</h1>
+            {% else %}
+            <h2 display-4>Default</h1>
             {% endif %}
         </div>
-    </div>
 
 
-    <div id="current-roomplan">
-        {% if session %}
-        <h3 class="area-header"><span data-shadow-text={{session}}>{{session}}</span></h3>
-        {% else %}
-        <h3 class="area-header"><span data-shadow-text="Admin page">Admin page</span></h3>
-        {% endif %}
-    </div>
-
-
-    <div class="admin-box addtable-box">
-
-        <div class="slidecontainer">
-            <p>Width of table</p>
-            <input type="range" min="40" max="500" value="40" class="slider" id="tableWidth">
-        </div>
-
-        <div class="slidecontainer">
-            <p>Height of table</p>
-            <input type="range" min="40" max="500" value="40" class="slider" id="tableHeight">
-        </div>
-        <p>Capasity of this table</p>
-        <select id="capacityList">
-            <option value="2">2</option>
-            <option value="4">4</option>
-            <option value="6">6</option>
-            <option value="8">8</option>
-            <option value="10">10</option>
-            <option value="12">12</option>
-            <option value="14">14</option>
-            <option value="16">16</option>
-            <option value="18">18</option>
-            <option value="20">20</option>
-        </select>
-
-        <div class="table-box" id="box1"></div>
-    </div>
-    </div>
-
-
-
-    <div class="admin-box save-new-box">
-        <p>Give this table layout a name and click on the save button</p>
-        <div class="center-forms">
-            <label>Name: <input class="text-input" type="text" id="table-name" name="name" /> </label> <br>
-            <label><input name="submit_button" class="submitbutton saveBtn" type="submit" value="Save table layout" /></label>
-        </div>
-        <p id="save-response-text"></p>
-    </div>
-
-
-    <div class="admin-box update-box">
-        {% if session %}
-        <p>Are you sure you want to update the {{session}} layout?</p>
-        <div class="center-forms">
-            <label><input name="submit_button" class="submitbutton updateBtn" type="submit" value="Yes" /></label>
-        </div>
-        {% else %}
-        <p>This table setup is not stored</p>
-        <label><input style="visibility:hidden" name="submit_button" class="submitbutton updateBtn" type="submit" value="Yes" /></label>
-        {% endif %}
-        <p id="update-response-text"></p>
-    </div>
-
-
-    <div class="admin-box delete-box">
-        <p>Enter the name of a table layout and click the delete button</p>
-        <div class="center-forms">
-            <form action="{{ url_for('admin.delete') }}" method="post">
-                <label>Name: <input class="text-input" type="text" name="deletedname" /> </label> <br>
-                <label><input name="submit_button" class="submitbutton" type="submit" value="Delete table layout" /></label>
+        <div class="card card-load text-center card-body">
+            <h5 class="card-title">Load a setup</h5>
+            <form action="{{ url_for('admin.load') }}" method="post">
+                <select name="restaurants" class="custom-select col-6" id="mydropdown">
+                    <option value="Default">Select a restaurant</option>
+                    {% for restaurant in restaurants %}
+                    <option value={{restaurant}}>{{restaurant}}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-primary">Submit</button>
             </form>
+            <hr>
+        </div>
+
+
+
+
+        {% if newroomplan %}
+        <div class="card text-center card-new">
+
+            <h5 class="card-title">Use the edit tools to add items on this restaurant</h5>
+
+        </div>
+        {% endif %}
+
+
+
+
+
+
+        <div class="card text-center card-add-tables"></div>
+
+        <div class="card-body card text-center card-add-tables">
+            <h5 class="card-title">Add tables</h5>
+            <hr>
+            <div class="container-fluid add-fluid">
+                <div class="row">
+                    <div class="col-sm">
+                        <h6 class="card-subtitle mb-2 text-muted">Customize size</h6>
+                        <h6 class="card-subtitle mb-2">Width: <span><input type="text" id="table-width" value="200" size="5">
+                        </span> Height: <span><input id="table-height" type="text" value="20" size="5"></span></h6>
+                        <div id="resizable" class="ui-widget-content">
+                        </div>
+                    </div>
+                    <div class="col-sm">
+                        <h6 class="card-subtitle mb-2 text-muted">Number of people on this table</h6>
+                        <select id="capacityList">
+                            <option value="2">2</option>
+                            <option value="4">4</option>
+                            <option value="6">6</option>
+                            <option value="8">8</option>
+                            <option value="10">10</option>
+                            <option value="12">12</option>
+                            <option value="14">14</option>
+                            <option value="16">16</option>
+                            <option value="18">18</option>
+                            <option value="20">20</option>
+                        </select>
+                    </div>
+                    <div class="col-sm">
+                        <h6 class="card-subtitle mb-2 text-muted">Add this table to the roomplan</h6>
+                        <button type="submit" class="btn btn-primary" id="addBtn">Submit</button>
+                    </div>
+                </div>
+                <hr>
+            </div>
+        </div>
+
+
+        <div class="card text-center card-add-walls"></div>
+        <div class="card-body card text-center card-add-walls">
+            <h5 class="card-title wall-header">Draw your walls on this canvas </h5>
+            <div class="col-md" id="myDivCanvas"><canvas id="myCanvas" width="700" height="500" > </canvas> </div>
+            <hr>
+            <div class="container-fluid add-fluid">
+                <div class="row">
+                    <div class="col-sm">
+                        <h6 class="card-subtitle mb-2 text-muted">Add Walls to the roomplan</h6>
+                        <div class="alert alert-warning" id="wall-add-warning">Not a valid position to click on</div>
+                        <div class="alert alert-success" id="wall-add-success">Valid position! click to add</div>
+                        <div class="alert alert-success" id="wall-add-status">Success! add the walls to the roomplan below</div>
+                        <button type="submit" class="btn btn-primary" id="addWall">Submit</button>
+                    </div>
+                </div>
+                <hr>
+            </div>
+        </div>        
+
+        <div class="card card-update text-center ">
+            <div class="card-body">
+                {% if session %}
+                <h5 class="card-title">Do you want to update the {{session}} roomplan?</h5>
+                <a href="#" class="btn btn-primary" id="updateBtn">Yes</a>
+                <div class="alert alert-info" id="update-response-text">
+                </div>
+                <hr>
+            {% else %}
+            <h5 class="card-title">This roomplan is not stored</h5>
+            <hr>
+            {% endif %}
+        </div>
+      </div>
+
+
+    <div class="card card-save text-center ">
+        <div class="card-body">
+            <div class="form-group col-6">
+                <label for="tableNameForm">Give this roomplan a name and click on the save button</label>
+                <input type="text" class="form-control" id="tableNameForm" placeholder="Table name..">
+            </div>
+            <a href="#" class="btn btn-primary" id="saveBtn">Submit</a>
+            <div class="alert alert-info" id="save-response-text">
+            </div>
+            <hr>
         </div>
     </div>
-
-    <div class="admin-box create-box">
-        <p>Create new</p>
-    </div>
+    
 
 
-    <div class="admin-box addwalls-box">
-        <p>Add walls</p>
-    </div>
+    <div class="card card-delete text-center ">
+        <div class="card-body">
+            <div class="form-group col-6">
+                <form action="{{ url_for('admin.delete') }}" method="post">
+                <label for="tableNameForm">Enter the name of roomplan you want to delete</label>
+                <input type="text" class="form-control" name="deletedname" placeholder="Name of roomplan..">
+            </div>
+            <button  name="submit_button" type="submit" class="btn btn-primary">Delete roomplan</button>
+          </form>
+            <hr>
+        </div>
+      </div>
+    
+  </div>
 
 
 
-    <div class="admin-box removetable-box">
-        <p>Remove tables</p>
-    </div>
-    <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+
+
+
+
+
+
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <link href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="/static/adminMenu.js"></script>
+
 </body>
 
 </html>

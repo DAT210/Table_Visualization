@@ -128,8 +128,16 @@ The admin page contains a bunch of useful functionality and editing tools
 #### User page
 The table visualization of a restaurant is accessible at 
 ```sh
-http://127.0.0.1:4000/table/<tablename>
+http://127.0.0.1:4000/table/<restname>
 ```
+
+{
+  "tables": [1, 3], 
+  "nrOfPeople": 8
+  "rest": "oslo"
+}
+
+
 Color identifiers on the tables tells the user if a table is booked or not. A small number on the table implicates how many people this table can fit. The user can choose which of the available tables to book. The user then confirms the booking, and our software checks weather or not the chosen tables fits enough people compared to the booking data they sent in. 
 
 #### Other feautures

@@ -1,144 +1,146 @@
 
-# Table Visulization &middot; [![Build Status](https://img.shields.io/travis/npm/npm/latest.svg?style=flat-square)](https://travis-ci.org/npm/npm) [![npm](https://img.shields.io/npm/v/npm.svg?style=flat-square)](https://www.npmjs.com/package/npm) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com) [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://github.com/your/your-project/blob/master/LICENSE)
-> Additional information or tag line
+[![N|Solid](https://i.imgur.com/VWF4BmY.png)]()
 
-Table Visualization is made by Group 3
+## Table of Contents:
 
-## Installing / Getting started
+1. [Overview](#Overview)
+2. [Setup ](#setup-and-run)
+	* [Run in docker](#docker)
+	* [Setting up dev](#dev)
+3. [Usage](#usage)
+    * [Admin](#api-get)
+    * [User](#api-post)
+    * [Tests](#api-patch)
 
+
+This project provides a visualization of the restaurants roomplans. 
+
+# Setup
+#### Run in docker
 Make sure you have docker installed before testing this project:
-```shell
+```sh
 docker -v
 ```
 If not, download on: https://www.docker.com/
 
-### Set up git repository
-```shell
+##### Set up git repository
+#
+```sh
 git clone https://github.com/DAT210/Table_Visualization.git
 cd into the repository location
 ```
-
-### Build the images and run containers
-```shell
+##### Build the images and run containers
+#
+```sh
 docker-compose up -d --build
 ```
-This will build and start running two containers.  The app should be visible at:  <br />
-http://127.0.0.1:4000/    (Docker) <br />
-http://192.168.99.100:4000/    (Docker toolbox)
+This will build and start running two containers. The app should be visible at: 
+http://127.0.0.1:4000/ (Docker) 
+http://192.168.99.100:4000/ (Docker toolbox)
 
 PostgreSQL port:5432
+##### Automatically populate database from python file
 
-### Connect to the database container
+Run this to automatically create a database named "mydb" inside the postgres server. The database.py file will set up a database and create tables with inserts statements found in create_tables.py file.
+```sh
+docker-compose exec app python database.py 
+```
+You can now bash into the postgres server and \c mydb. The \d will then list the tables on mydb, and 
+select * from [table name] will show all of the entries.
+
+##### Connect to the database container
 You can bash into the postgres server currently running by entering:
-```shell
+```sh
 docker exec -it postgresql psql -U postgres
 ```
 Useful commands inside the postgres server:
-```shell
+```sh
 \l    (list of databases)
 \c    (connect to a database)
 \d    (List of tables inside the database)
 \q    (To exit the postgres server)
 ```
-### Automatically populate database from python file
-Run this to automatically create a database named "mydb" inside the postgres server. The database.py file will set up
-a database and create tables with inserts statements found in create_tables.py file.
-```shell
-docker-compose exec app python src/database.py 
+#### Setting up dev
+You need to install Python3 and Postgres on your machine to run this code locally. After the git repo is cloned, enter the repo and set up a virtual environment to run on
+```sh
+python -m pip install virtualenv
+virtualenv venv
 ```
-You can now bash into the postgres server and \c mydb. The \d will then list the tables on mydb, and <br /> select * from [table name] will show all of the entries.
-
-## Developing
-
-### Built With
-List main libraries, frameworks used including versions (React, Angular etc...)
-
-### Prerequisites
-What is needed to set up the dev environment. For instance, global dependencies or any other tools. include download links.
-
-
-### Setting up Dev
-
-Here's a brief intro about what a developer must do in order to start developing
-the project further:
-
-```shell
-git clone https://github.com/your/your-project.git
-cd your-project/
-packagemanager install
+Activate the venv
+```sh
+source venv/bin/activate
+```
+Then, install the required dependencies 
+```sh
+python -m pip install Flask
+python -m pip install SqlAlchemy
+python -m pip install Flask-SQLAlchemy
+python -m pip install pytest
+python -m pip install psycopg2
+python -m pip install requests
 ```
 
-And state what happens step-by-step. If there is any virtual environment, local server or database feeder needed, explain here.
-
-### Building
-
-If your project needs some additional steps for the developer to build the
-project after some code changes, state them here. for example:
-
-```shell
-./configure
-make
-make install
+You need to install TypeScript aswell if you want to develop the room visualizer further.
+```sh
+npm install -g typescript
+```
+Compile the TypeScript into JavaScript by entering
+```sh
+tsc
+```
+into cmd or terminal
+##### Add config
+Run these commands in cmd or terminal to export environment variables needed
+```sh
+export POSTGRES_URL="localhost:5432"
+export POSTGRES_USER="postgres"
+export POSTGRES_PW="dbpw"
+export POSTGRES_DB="test"
+export APP_KEY='SomeRandomKey'
+export APP_SETTINGS="config.DevelopmentConfig"
+```
+##### Run the code locally
+The project should be able to run smoothly at this point. Now you have to simply run the database file to populate the database with initial data. Then start the app, which should be available on local host
+```sh
+python database.py
+python app.py
 ```
 
-Here again you should state what actually happens when the code above gets
-executed.
-
-### Deploying / Publishing
-give instructions on how to build and release a new version
-In case there's some step you have to take that publishes this project to a
-server, this is the right time to state it.
-
-```shell
-packagemanager deploy your-project -s server.com -u username -p password
+# Usage
+#### Admin page
+Edit or create your own roomplans at
+```sh
+http://127.0.0.1:4000/admin
 ```
+The admin page contains a bunch of useful functionality and editing tools
 
-And again you'd need to tell what the previous code actually does.
+| Options | Functionality |
+| ------ | ------ |
+| Load| Load an existing restaurants roomplan|
+| New | Creates a blank canvas you can draw on|
+| Add tables | Add table to the roomplan |
+| Add walls | Add a path of walls to the roomplan|
+| Update | Update the current roomplan |
+| Save | Save the roomplan as a new setup |
+| Delete| Delete a roomplan from the database|
 
-## Versioning
-
-We can maybe use [SemVer](http://semver.org/) for versioning. For the versions available, see the [link to tags on this repository](/tags).
-
-
-## Configuration
-
-Here you should write what are all of the configurations a user can enter when
-using the project.
-
-## Tests
-
-Describe and show how to run the tests with code examples.
-Explain what these tests test and why.
-
-<b>Typescript</b><br>
-
-Install mocha/chai and types:
-
-```shell
-npm i -D chai mocha nyc ts-node typescript
-npm i -D @types/chai @types/mocha
+[![N|Solid](https://i.imgur.com/g7vclav.png)]()
+#### User page
+The table visualization of a restaurant is accessible at 
+```sh
+http://127.0.0.1:4000/table/<tablename>
 ```
+Color identifiers on the tables tells the user if a table is booked or not. A small number on the table implicates how many people this table can fit. The user can choose which of the available tables to book. The user then confirms the booking, and our software checks weather or not the chosen tables fits enough people compared to the booking data they sent in. 
 
-Run Tests:
+#### Other feautures
+| Function | URL |
+| ------ | ------ |
+| List of stored restaurants in JSON | [http://`<host>`/api/restaurants][editevents] |
+| All data of the roomplan in JSON | [http://`<host>`/api/<tablename>][editevents] |
 
-```shell
-npm test
+#### Tests
+The unit tests is written inside the tests folder. Simply run
+```sh
+py.test
 ```
-
-## Style guide
-
-Explain your code style and show how to check it.
-
-## Api Reference
-
-If the api is external, link to api documentation. If not describe your api including authentication methods as well as explaining all the endpoints with their required parameters.
-
-
-## Database
-
-Explaining what database (and version) has been used. Provide download links.
-Documents your database design and schemas, relations etc... 
-
-## Licensing
-
-State what the license is and how to find the text version of the license.
+into the cmd or terminal to automatically run all of the tests. 

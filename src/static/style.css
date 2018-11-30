@@ -19,14 +19,14 @@ text {
     width: 100%;
 }
 .tables {
-    fill: green;
+    fill: #116802;
 }
 .table-selected {
     stroke: blue;
     stroke-width: 2px;
 }
 .table-booked {
-    fill: red;
+    fill: #4d5b4b;
 }
 .room {
     fill: darkgray;

@@ -12,7 +12,7 @@ user_blueprint = Blueprint('user', __name__)
 
 @user_blueprint.route('/')
 def index():
-    return redirect("/table/bergen")
+    return redirect("/table/oslo")
 
 @user_blueprint.route('/test')
 def testing():

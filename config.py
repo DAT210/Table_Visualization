@@ -8,7 +8,6 @@ class Config(object):
     SECRET_KEY = os.environ['APP_KEY']
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-
 class ProductionConfig(Config):
     DEBUG = False
 
